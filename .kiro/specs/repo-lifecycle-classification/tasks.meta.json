@@ -1,0 +1,36 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Define domain types and the `LIFECYCLE_CONFIG` object": [
+      {
+        "executionId": "832ef42b-fbc1-4fc0-9a88-4ab58b3173b4",
+        "chatSessionId": "sess_84e64d83-8680-41c3-aee4-0b07c4ad3c77",
+        "timestamp": 1793815482842
+      },
+      {
+        "executionId": "832ef42b-fbc1-4fc0-9a88-4ab58b3173b4",
+        "chatSessionId": "sess_84e64d83-8680-41c3-aee4-0b07c4ad3c77",
+        "timestamp": 1793815658696
+      }
+    ],
+    "1.2 Configure the Vitest runner": [
+      {
+        "executionId": "832ef42b-fbc1-4fc0-9a88-4ab58b3173b4",
+        "chatSessionId": "sess_84e64d83-8680-41c3-aee4-0b07c4ad3c77",
+        "timestamp": 1793815483687
+      },
+      {
+        "executionId": "832ef42b-fbc1-4fc0-9a88-4ab58b3173b4",
+        "chatSessionId": "sess_84e64d83-8680-41c3-aee4-0b07c4ad3c77",
+        "timestamp": 1793815659264
+      }
+    ],
+    "1. Set up shared types and the test runner": [
+      {
+        "executionId": "832ef42b-fbc1-4fc0-9a88-4ab58b3173b4",
+        "chatSessionId": "sess_84e64d83-8680-41c3-aee4-0b07c4ad3c77",
+        "timestamp": 1793815659331
+      }
+    ]
+  }
+}
