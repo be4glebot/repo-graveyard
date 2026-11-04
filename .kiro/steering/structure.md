@@ -16,12 +16,17 @@ app/
     repo/route.ts                # lazy per-repo facts (heartbeat, deps)
     seance/route.ts              # séance opening + follow-ups (rate-limited)
     diagnosis/route.ts           # diagnosis, plan, eulogy, epitaph (rate-limited)
-  badge/[user]/[repo]/route.ts   # stretch: SVG repo badge
-  card/[user]/route.ts           # stretch: SVG profile card
+    export/route.ts              # Revive in Kiro file map as JSON (used by graveyard-mcp)
+    turning/route.ts             # turning-soon list as JSON (used by graveyard-mcp)
+    auth/[...nextauth]/route.ts  # Auth.js GitHub sign-in (read:user only)
+    overrides/route.ts           # owner-only override writes (POST) and reads
+  badge/[user]/[repo]/route.ts   # SVG repo badge
+  card/[user]/route.ts           # SVG profile card
+  g/[username]/opengraph-image.tsx  # share card
 components/
-  scene/        # Scene, Sky, Moon, Hills, Cemetery, Crypt, Fence, Fog, GatesIntro, TurningSoon, SummaryLine, LightsOnTable
+  scene/        # Scene, Sky, Moon, Hills, Cemetery, Crypt, Fence, Fog, LightsOutIntro, Atmosphere (tree, bats, grain, vignette, lightning), TurningSoon, SummaryLine, LightsOnTable
   creatures/    # Ghost (decay 0–3), Risen, Zombie (decay 0–4), Tombstone, Coffin
-  detail/       # DetailPanel, Heartbeat, FactsPanel, DependencyTable, Diagnosis, RevivalPlan, Eulogy, Epitaph, SummonLater
+  detail/       # DetailPanel, Heartbeat, FactsPanel, DependencyTable, Diagnosis, RevivalPlan, Eulogy, Epitaph, SummonLater, ReviveInKiro, HauntYourReadme
   seance/       # SeanceRoom, GhostVoice, EvidenceChip, FollowUpQuestion
   ledger/       # CoronersLedger
   ui/           # shared buttons, menus, toggles, sound toggle
@@ -38,6 +43,12 @@ lib/
   seance.ts        # gather séance facts (server) + pure evidence validator
   ledger.ts        # pure: graveyard-wide pattern stats
   ics.ts           # pure: build .ics reminder
+  kiroExport.ts    # pure: facts + revival plan + now → Kiro spec/steering file map
+  badge.ts         # pure: creature state → SVG badge / profile card markup
+  stats.ts         # graveyards-opened counter (server only)
+  auth.ts          # Auth.js config (server only)
+  ownerOverrides.ts  # pure: owner check + merge of server/local overrides
+  audio.ts         # client-only audio manager (Web Audio, synth + CC0 samples, mute, de-dupe)
   llm.ts           # provider-agnostic LLM wrapper (server only)
   ai.ts            # prompts + zod schemas (server only)
   cache.ts         # Redis cache helpers (server only)
@@ -47,8 +58,14 @@ tests/
   property/        # fast-check property tests
 public/
   sounds/          # royalty-free / CC0 audio only, with a CREDITS.md
+mcp/               # graveyard-mcp: package.json, src/index.ts, README.md (stdio MCP server)
 docs/
   design-review/   # dated screenshots from /design-review runs (for the write-up)
+  KIRO_JOURNEY.md  # build journal: strategy, experiments, receipts (write as you go)
+  ART_PROMPTS.md   # image prompts for creature and backdrop art
+.kiro/
+  settings/mcp.json  # workspace MCP servers, including graveyard-mcp
+  agents/            # design-critic, voice-editor, graveyard-keeper
 ```
 
 ## Conventions

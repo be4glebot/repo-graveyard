@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Revive in Kiro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=UnifrakturMaguntia&amp;family=IM+Fell+English:ital@0;1&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#05060a}
+@keyframes flame{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.78)}}
+.flame{animation:flame 1.1s ease-in-out infinite;transform-origin:50% 100%;transform-box:fill-box}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+.wm{font-family:UnifrakturMaguntia,serif;font-weight:400;text-shadow:0 0 22px rgba(194,42,62,.45)}
+.cz{font-family:Cinzel,Georgia,serif;font-weight:700;letter-spacing:2.5px;text-transform:uppercase}
+.fell{font-family:"IM Fell English",Georgia,serif}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+.lbl{font-family:Cinzel,Georgia,serif;font-weight:700;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#8d897b}
+.panel{border:1px solid #24222c;border-radius:6px;background:radial-gradient(ellipse at 50% 20%,#12131d,#09090e 80%)}
+.btn-red{height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 20px;border-radius:4px;border:1px solid #c22a3e;background:linear-gradient(#9b1c31,#6e0f1f);color:#fff1f2;font:700 13px Cinzel,Georgia,serif;letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 0 22px rgba(194,42,62,.35);cursor:pointer}
+.btn{height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:4px;border:1px solid #2c2a35;background:#0d0c12;color:#ecead9;font:500 14px Inter,system-ui,sans-serif;cursor:pointer}
+.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;border:1px solid #2c3550;background:#0d1220;color:#9fe7ff;font:12px "JetBrains Mono",monospace}
+
+</style>
+</helmet>
+<div style="position: relative; width: 100%; height: 900px; overflow: hidden; background: radial-gradient(ellipse at 20% 60%, #121a24, #05060a 60%); color: #ecead9; font-family: Inter, system-ui, sans-serif">
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs>
+      <linearGradient id="ghostfade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#eef9ff" stop-opacity=".96"></stop>
+        <stop offset=".5" stop-color="#cfe9f5" stop-opacity=".78"></stop>
+        <stop offset="1" stop-color="#9fd8ee" stop-opacity="0"></stop>
+      </linearGradient>
+      <radialGradient id="ghosthood" cx=".5" cy=".32" r=".42">
+        <stop offset="0" stop-color="#0a1220" stop-opacity=".55"></stop>
+        <stop offset="1" stop-color="#0a1220" stop-opacity="0"></stop>
+      </radialGradient>
+      <filter id="tatter-a" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="6"></feDisplacementMap>
+      </filter>
+      <filter id="tatter-b" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="7"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="12"></feDisplacementMap>
+      </filter>
+      <filter id="wisp" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4"></feGaussianBlur></filter></defs></svg>
+  <div style="position: absolute; left: 90px; top: 300px; filter: drop-shadow(0 0 30px rgba(159, 231, 255, .55)); opacity: .9"><svg viewBox="0 0 130 190" width="180" height="264" aria-hidden="true" style="overflow: visible">
+              <path d="M10 182 C24 162 106 162 120 182 Z" fill="#1a1612"></path>
+              <path d="M22 176 C40 168 90 168 108 176" stroke="#2a221b" stroke-width="3" fill="none"></path>
+              <path d="M56 124 L54 172 M72 124 L74 172" stroke="#14161d" stroke-width="12" stroke-linecap="round"></path>
+              <path d="M50 76 L36 104 L32 128 M80 76 L94 104 L98 128" stroke="#9aa597" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+              <path d="M32 128 L28 136 M32 128 L33 138 M98 128 L102 136 M98 128 L97 138" stroke="#9aa597" stroke-width="2.4" stroke-linecap="round"></path>
+              <path d="M50 70 C44 92 46 112 52 128 L58 122 L64 130 L70 122 L76 128 C82 112 84 92 78 70 C70 62 58 62 50 70 Z" fill="#23262f"></path>
+              <path d="M64 66 V56" stroke="#9aa597" stroke-width="8" stroke-linecap="round"></path>
+              <ellipse cx="64" cy="40" rx="15" ry="18" fill="#9aa597"></ellipse>
+              <ellipse cx="58" cy="38" rx="4.6" ry="5.4" fill="#050507"></ellipse>
+              <ellipse cx="70" cy="38" rx="4.6" ry="5.4" fill="#050507"></ellipse>
+              <circle cx="58" cy="39" r="2.2" fill="#9fe7ff"></circle>
+              <circle cx="70" cy="39" r="2.2" fill="#9fe7ff"></circle>
+              <path d="M58 52 C60 56 68 56 70 52" stroke="#050507" stroke-width="2.4" fill="none"></path>
+            </svg></div>
+  <p class="fell" style="position: absolute; left: 40px; top: 600px; width: 320px; text-align: center; font-style: italic; font-size: 18px; color: #9fe7ff">habit-tracker has risen.</p>
+  <div style="position: absolute; inset: 0; background: rgba(2, 2, 5, .55)"></div>
+
+  <div role="dialog" aria-labelledby="rik-title" style="position: absolute; left: 380px; top: 56px; width: 1000px; height: 790px; box-sizing: border-box; border: 1px solid #3a2a33; border-radius: 6px; background: #0b0a10; box-shadow: 0 30px 80px rgba(0, 0, 0, .8), 0 0 60px rgba(155, 28, 49, .18); display: flex; flex-direction: column">
+    <div style="padding: 28px 32px 20px; border-bottom: 1px solid #1f1d26; display: flex; justify-content: space-between; gap: 20px; align-items: flex-start">
+      <div>
+        <span class="lbl">Resurrection rite</span>
+        <h2 id="rik-title" class="cz" style="margin: 8px 0 6px; font-size: 26px; letter-spacing: 3px; color: #ecead9">Revive in Kiro</h2>
+        <p class="fell" style="margin: 0; font-style: italic; font-size: 18px; color: #c9c4ae">Take its unfinished business with you. Kiro will know exactly where you left off.</p>
+      </div>
+      <button type="button" class="btn" aria-label="Close" style="width: 44px; padding: 0; justify-content: center">✕</button>
+    </div>
+    <div style="flex: 1; display: grid; grid-template-columns: 300px 1fr; min-height: 0">
+      <div style="border-right: 1px solid #1f1d26; padding: 18px 0; display: flex; flex-direction: column; gap: 2px">
+        <span class="lbl" style="padding: 0 16px 10px">4 files</span>
+        <div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 12px; border-left: 2px solid transparent; font: 13px 'JetBrains Mono', monospace; color: #b9b6a3"><span>.kiro/</span><span style="color: #6f6b60; font-size: 11px"></span></div><div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 28px; border-left: 2px solid transparent; font: 13px 'JetBrains Mono', monospace; color: #b9b6a3"><span>specs/</span><span style="color: #6f6b60; font-size: 11px"></span></div><div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 44px; border-left: 2px solid transparent; font: 13px 'JetBrains Mono', monospace; color: #b9b6a3"><span>revive-habit-tracker/</span><span style="color: #6f6b60; font-size: 11px"></span></div><div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 60px; border-left: 2px solid transparent; font: 13px 'JetBrains Mono', monospace; color: #b9b6a3"><span>requirements.md</span><span style="color: #6f6b60; font-size: 11px">4 reqs</span></div><div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 60px; border-left: 2px solid transparent; font: 13px 'JetBrains Mono', monospace; color: #b9b6a3"><span>design.md</span><span style="color: #6f6b60; font-size: 11px"></span></div><div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 60px; background: rgba(155, 28, 49, .25); border-left: 2px solid #c22a3e; font: 13px 'JetBrains Mono', monospace; color: #ecead9"><span>tasks.md</span><span style="color: #6f6b60; font-size: 11px">5 tasks</span></div><div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 28px; border-left: 2px solid transparent; font: 13px 'JetBrains Mono', monospace; color: #b9b6a3"><span>steering/</span><span style="color: #6f6b60; font-size: 11px"></span></div><div style="display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px 7px 44px; border-left: 2px solid transparent; font: 13px 'JetBrains Mono', monospace; color: #b9b6a3"><span>revival.md</span><span style="color: #6f6b60; font-size: 11px">always</span></div>
+        <div style="margin: auto 16px 0; padding: 14px; border: 1px dashed #2c2a35; border-radius: 4px; font-size: 12px; line-height: 1.6; color: #a7a392">Built from the séance: <span class="chip">a3f9c21</span> <span class="chip">streak.ts:42</span> <span class="chip">feature/reminders</span> <span class="chip">#7</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; min-width: 0">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; border-bottom: 1px solid #1f1d26">
+          <span class="mono" style="font-size: 13px; color: #a7a392">.kiro/specs/revive-habit-tracker/<span style="color: #ecead9">tasks.md</span></span>
+          <button type="button" class="btn" style="height: 36px">Copy file</button>
+        </div>
+        <pre class="mono" style="flex: 1; margin: 0; padding: 20px 24px; overflow: hidden; font-size: 13px; line-height: 1.65; color: #d9d6c3; white-space: pre-wrap; background: #08080c"><span style="color:#e6cf9a"># Implementation Plan</span>
+
+<span style="color:#9fe7ff">- [ ] 1.</span> Fix the off-by-one in the streak calculation
+  - Count today only after a check-in exists
+  - <span style="color:#8d897b">_Requirements: 1.1 · Evidence: a3f9c21, streak.ts:42_</span>
+
+<span style="color:#9fe7ff">- [ ] 2.</span> Merge feature/reminders into main
+  - Resolve the 2 conflicting files first
+  - <span style="color:#8d897b">_Requirements: 2.1 · Evidence: branch feature/reminders (+2)_</span>
+
+<span style="color:#9fe7ff">- [ ] 3.</span> Make reminders fire at the scheduled time
+  - <span style="color:#8d897b">_Requirements: 3.1 · Evidence: issue #7_</span>
+
+<span style="color:#9fe7ff">- [ ] 4.</span> Upgrade next 13.4.2 → 16.4.5
+  - <span style="color:#8d897b">_Requirements: 4.1 · Evidence: package.json_</span>
+
+<span style="color:#9fe7ff">- [ ] 5.</span> Upgrade date-fns 2.30.0 → 4.1.0
+  - <span style="color:#8d897b">_Requirements: 4.2 · Evidence: package.json_</span></pre>
+      </div>
+    </div>
+    <div style="padding: 22px 32px; border-top: 1px solid #1f1d26; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 24px; align-items: center">
+      <div style="display: flex; gap: 12px; align-items: flex-start"><span class="cz" style="flex: none; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #c22a3e; display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: 0; color: #ff8a98">1</span><div><div style="font-size: 14px; font-weight: 600">Unzip into habit-tracker/</div><div style="font-size: 13px; color: #a7a392; margin-top: 2px">The .kiro folder goes in the repo root.</div></div></div>
+      <div style="display: flex; gap: 12px; align-items: flex-start"><span class="cz" style="flex: none; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #c22a3e; display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: 0; color: #ff8a98">2</span><div><div style="font-size: 14px; font-weight: 600">Open the folder in Kiro</div><div style="font-size: 13px; color: #a7a392; margin-top: 2px">Steering loads the project's story.</div></div></div>
+      <div style="display: flex; gap: 12px; align-items: flex-start"><span class="cz" style="flex: none; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #c22a3e; display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: 0; color: #ff8a98">3</span><div><div style="font-size: 14px; font-weight: 600">Open the spec, start task 1</div><div style="font-size: 13px; color: #a7a392; margin-top: 2px">Click “Start task” on task 1.</div></div></div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px">
+        <button type="button" class="btn-red">↓ Download .zip</button>
+        <span style="font-size: 12px; color: #8d897b">Nothing is pushed to GitHub.</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic { renderVals() { return {}; } }
+</script>
+</body>
+</html>

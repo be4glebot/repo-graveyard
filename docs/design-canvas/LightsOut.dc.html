@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The lights-out opening</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=UnifrakturMaguntia&amp;family=IM+Fell+English:ital@0;1&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#030408}
+a{color:#f4b860}a:hover{color:#ffd28f}
+@keyframes flick{0%{opacity:0}6%{opacity:.94}9%{opacity:0}24%{opacity:.97}27%{opacity:.1}44%{opacity:1}46%{opacity:.25}58%{opacity:.9}61%{opacity:.4}72%{opacity:1}100%{opacity:1}}
+@keyframes jitter{0%,100%{transform:translate(0,0)}20%{transform:translate(1px,-1px)}40%{transform:translate(-2px,1px)}60%{transform:translate(1px,1px)}80%{transform:translate(-1px,0)}}
+@keyframes bleed{0%{background:#fffdf7;color:#1f2330}100%{background:#3a0a14;color:#ffd6dc}}
+@keyframes eyes{0%,30%{opacity:0}34%{opacity:1}52%{opacity:1}53%{opacity:0}56%{opacity:1}80%{opacity:1}100%{opacity:0}}
+@keyframes eyes2{0%,58%{opacity:0}64%{opacity:.8}84%{opacity:.8}86%{opacity:0}100%{opacity:0}}
+@keyframes bolt{0%{opacity:0}5%{opacity:1}12%{opacity:.1}20%{opacity:.9}34%{opacity:0}100%{opacity:0}}
+@keyframes reveal{0%{opacity:0}5%{opacity:1}34%{opacity:1}100%{opacity:.85}}
+@keyframes shake{0%,100%{transform:translate(0,0)}10%{transform:translate(-4px,2px)}20%{transform:translate(4px,-2px)}30%{transform:translate(-3px,1px)}40%{transform:translate(2px,-1px)}50%{transform:translate(0,0)}}
+@keyframes light{0%{opacity:0;transform:scale(.4)}55%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+@keyframes rise{0%{transform:translateY(300px);opacity:.15}100%{transform:translateY(0);opacity:1}}
+@keyframes fadein{0%{opacity:0}100%{opacity:1}}
+@keyframes slowin{0%{opacity:0;letter-spacing:12px;filter:blur(6px)}100%{opacity:1;letter-spacing:3px;filter:blur(0)}}
+@keyframes flame{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.78)}}
+@keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(-40px)}}
+.flick{animation:flick 1.2s steps(1,end) forwards}
+.jitter{animation:jitter .1s linear infinite}
+.bleed{animation:bleed .9s ease-in forwards}
+.eyes{opacity:0;animation:eyes 1.6s linear forwards}
+.eyes2{opacity:0;animation:eyes2 1.6s linear forwards}
+.bolt{opacity:0;animation:bolt .9s linear forwards}
+.reveal{opacity:0;animation:reveal .9s linear forwards}
+.shake{animation:shake .5s ease-out .05s}
+.lit{opacity:0;animation:light .55s ease-out forwards}
+.rise{animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards}
+.fadein{opacity:0;animation:fadein 1s ease-out forwards}
+.slowin{opacity:0;animation:slowin 1.4s ease-out forwards}
+.flame{animation:flame 1.1s ease-in-out infinite;transform-origin:50% 100%;transform-box:fill-box}
+.drift{animation:drift 30s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.flick,.jitter,.bleed,.eyes,.eyes2,.bolt,.shake,.lit,.rise,.fadein,.slowin,.flame,.drift,.reveal{animation:none;opacity:1;transform:none;filter:none}.bolt,.eyes,.eyes2{opacity:0}}
+.pill{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #2c3550;background:#0d1220;color:#b9b6a3;font:500 13px Inter,system-ui,sans-serif;cursor:pointer}
+.pill.on{border-color:#c22a3e;color:#fff;background:#9b1c31}
+</style>
+</helmet>
+<div style="min-height: 1180px; display: flex; flex-direction: column; background: #030408; color: #ecead9; font-family: Inter, system-ui, sans-serif">
+
+  <div style="min-height: 80px; box-sizing: border-box; padding: 16px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border-bottom: 1px solid #1a1218; background: #0a0b12">
+    <button type="button" onClick="{{play}}" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 18px; border-radius: 10px; border: 1px solid #c22a3e; background: #6e0f1f; color: #fff; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; box-shadow: 0 0 20px rgba(194, 42, 62, .35)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4l13 8-13 8z"></path></svg>
+      Play the opening
+    </button>
+    <sc-for list="{{steps}}" as="st" hint-placeholder-count="6">
+      <button type="button" class="{{st.cls}}" onClick="{{st.pick}}">{{st.label}}</button>
+    </sc-for>
+    <span style="margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #b9b6a3">{{caption}}</span>
+  </div>
+
+  <div class="{{stageClass}}" style="position: relative; height: 1100px; overflow: hidden; background: #030408">
+
+    <sc-if value="{{showList}}" hint-placeholder-val="{{ true }}">
+      <div class="{{listClass}}" style="position: absolute; inset: 0; background: #f6f3ea; color: #1f2330; padding: 56px 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <span style="font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: {{eyebrowColor}}">{{eyebrow}}</span>
+            <h1 style="margin: 0; font-family: 'IM Fell English', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1.05">{{headA}} <em style="color: {{headBColor}}">{{headB}}</em></h1>
+            <p style="margin: 0; font-size: 15px; color: #4a4f5e">{{subline}}</p>
+          </div>
+          <button type="button" style="height: 44px; padding: 0 20px; border-radius: 999px; border: 0; background: #1f2330; color: #f6f3ea; font: 500 14px Inter, system-ui, sans-serif; cursor: pointer">Lights off</button>
+        </div>
+        <div style="border: 1px solid #e2dccb; border-radius: 16px; overflow: hidden; background: #fffdf7; box-shadow: 0 10px 30px rgba(60, 50, 30, .06)">
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 14px 24px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #6b6556; border-bottom: 1px solid #e2dccb">
+            <span>Repository</span><span>{{colState}}</span><span>{{colWhen}}</span>
+          </div>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+            <div class="{{r.cls}}" style="display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; padding: 9px 24px; font-size: 14px; border-bottom: 1px solid #efeadc">
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace">{{r.name}}</span>
+              <span><span style="padding: 2px 10px; border-radius: 999px; background: #efe9d9; color: #4a3f2a; font-size: 12px; font-weight: 500">{{r.state}}</span></span>
+              <span>{{r.when}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{showFlicker}}" hint-placeholder-val="{{ false }}">
+        <div class="flick" aria-hidden="true" style="position: absolute; inset: 0; background: #030408"></div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{showDark}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; background: #030408">
+        <sc-if value="{{showEyes}}" hint-placeholder-val="{{ false }}">
+          <svg class="eyes" aria-hidden="true" viewBox="0 0 80 20" style="position: absolute; left: calc(50% - 60px); top: 330px; width: 120px; height: 30px; filter: drop-shadow(0 0 10px rgba(194, 42, 62, .9))">
+            <ellipse cx="18" cy="10" rx="9" ry="4" fill="#c22a3e"></ellipse><ellipse cx="62" cy="10" rx="9" ry="4" fill="#c22a3e"></ellipse>
+            <ellipse cx="18" cy="10" rx="2" ry="3.6" fill="#140206"></ellipse><ellipse cx="62" cy="10" rx="2" ry="3.6" fill="#140206"></ellipse>
+          </svg>
+          <svg class="eyes2" aria-hidden="true" viewBox="0 0 40 10" style="position: absolute; left: 14%; top: 560px; width: 44px; height: 11px; filter: drop-shadow(0 0 6px rgba(194, 42, 62, .8))"><ellipse cx="9" cy="5" rx="4" ry="2" fill="#9b1c31"></ellipse><ellipse cx="31" cy="5" rx="4" ry="2" fill="#9b1c31"></ellipse></svg>
+          <svg class="eyes2" aria-hidden="true" viewBox="0 0 40 10" style="position: absolute; right: 18%; top: 610px; width: 36px; height: 9px; animation-delay: .25s; filter: drop-shadow(0 0 6px rgba(194, 42, 62, .8))"><ellipse cx="9" cy="5" rx="4" ry="2" fill="#9b1c31"></ellipse><ellipse cx="31" cy="5" rx="4" ry="2" fill="#9b1c31"></ellipse></svg>
+          <p class="slowin" style="position: absolute; left: 0; right: 0; top: 440px; margin: 0; text-align: center; font-family: 'Cinzel', Georgia, serif; font-weight: 500; font-size: 22px; text-transform: uppercase; color: #c22a3e; animation-delay: .5s; text-shadow: 0 0 16px rgba(194, 42, 62, .6)">You left them here…</p>
+        </sc-if>
+
+        <sc-if value="{{showCastle}}" hint-placeholder-val="{{ false }}">
+          <div class="{{castleWrap}}" style="position: absolute; inset: 0">
+            <div style="position: absolute; left: 0; right: 0; top: 0; height: 600px; background: linear-gradient(#0a0d18, #120c16)"></div>
+            <svg class="drift" aria-hidden="true" viewBox="0 0 1440 220" preserveAspectRatio="none" style="position: absolute; left: -40px; top: 40px; width: calc(100% + 80px); height: 220px">
+              <path d="M0 120 C120 60 240 90 320 110 C420 40 560 60 620 110 C720 70 860 60 940 120 C1040 80 1160 70 1240 120 C1320 90 1400 100 1480 120 V0 H0 Z" fill="#06080f" opacity=".95"></path>
+            </svg>
+            <div class="{{moonClass}}" aria-hidden="true" style="position: absolute; right: 12%; top: 150px; width: 124px; height: 124px; border-radius: 50%; background: #e8b8a8; box-shadow: 0 0 90px 26px rgba(194, 70, 60, .35); opacity: {{moonOpacity}}"></div>
+            <svg aria-hidden="true" viewBox="0 0 1440 360" preserveAspectRatio="none" style="position: absolute; left: 0; top: 240px; width: 100%; height: 360px">
+              <path d="M0 360 V250 C140 230 260 190 380 196 L520 150 C560 140 600 150 640 170 L760 200 C900 210 1060 190 1200 230 C1300 250 1380 240 1440 250 V360 Z" fill="#060810"></path>
+              <path d="M520 150 V96 H532 V86 H542 V96 H556 V40 L572 6 L588 40 V96 H612 V52 L654 18 L696 52 V96 H708 V26 L724 -6 L740 26 V96 H760 V86 H770 V96 H784 V170 L640 170 Z" fill="#040509"></path>
+              <rect x="636" y="66" width="7" height="12" rx="3.5" fill="#f4b860" opacity="{{winOn}}"></rect>
+              <rect x="652" y="66" width="7" height="12" rx="3.5" fill="#f4b860" opacity="{{winOn}}"></rect>
+              <rect x="720" y="40" width="8" height="15" rx="4" fill="#c22a3e"></rect>
+              <rect x="568" y="56" width="6" height="11" rx="3" fill="#f4b860" opacity="{{winOn}}"></rect>
+            </svg>
+            <div style="position: absolute; left: 0; right: 0; top: 590px; bottom: 0; background: #07080e"></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showBolt}}" hint-placeholder-val="{{ false }}">
+          <div class="bolt" aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 40% 10%, rgba(230, 236, 255, .95), rgba(160, 170, 210, .5) 50%, rgba(40, 40, 70, .2))"></div>
+          <svg class="bolt" aria-hidden="true" viewBox="0 0 80 300" style="position: absolute; left: 34%; top: 0; width: 80px; height: 300px; filter: drop-shadow(0 0 14px #dfe7ff)"><path d="M48 0 L30 110 L46 112 L22 220 L40 222 L14 300 L58 190 L40 188 L64 96 L46 94 L62 0 Z" fill="#f4f6ff"></path></svg>
+        </sc-if>
+
+        <sc-for list="{{candles}}" as="c" hint-placeholder-count="7">
+          <svg class="lit" aria-hidden="true" viewBox="0 0 20 44" width="22" height="48" style="position: absolute; left: {{c.left}}; top: {{c.top}}; animation-delay: {{c.delay}}; filter: drop-shadow(0 0 14px rgba(244, 184, 96, .75))">
+            <rect x="5" y="18" width="10" height="26" rx="2" fill="#ecead9"></rect>
+            <path class="flame" d="M10 2 C15 8 15 13 10 16 C5 13 5 8 10 2 Z" fill="#f4b860"></path>
+          </svg>
+        </sc-for>
+        <sc-if value="{{showTitle}}" hint-placeholder-val="{{ false }}">
+          <h2 class="fadein" style="position: absolute; left: 0; right: 0; top: 650px; margin: 0; text-align: center; font-family: 'UnifrakturMaguntia', serif; font-weight: 400; font-size: 64px; color: #ecead9; text-shadow: 0 0 26px rgba(194, 42, 62, .55); animation-delay: .6s">Repo Graveyard</h2>
+        </sc-if>
+        <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 280px 120px rgba(1, 1, 3, .95)"></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showScene}}" hint-placeholder-val="{{ false }}">
+      <div class="fadein" style="position: absolute; inset: 0">
+        <dc-import name="Main" hint-size="100%,1100px"></dc-import>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+var STEPS = [
+  { label: "1 · Lights on", caption: "0.0s · the plain register (also the real Lights-on mode) · sound: fluorescent hum" },
+  { label: "2 · Flicker", caption: "1.0s · lights fail, copy turns sinister, the oldest rows bleed red · sound: buzz, three pops" },
+  { label: "3 · Darkness", caption: "2.2s · total black, red eyes open and blink, 'You left them here…' · sound: silence, a held breath" },
+  { label: "4 · Lightning", caption: "3.8s · a flash reveals the castle on the cliff, screen shakes · sound: thunder crack, rain begins" },
+  { label: "5 · Candles", caption: "4.7s · blood moon rises, candles light one by one, title burns in · sound: match strikes, distant bell" },
+  { label: "6 · The graveyard", caption: "6.2s · the estate appears · sound: ambient bed (rain, wind, ravens, low organ drone)" }
+];
+var DELAYS = [1000, 2200, 3800, 4700, 6200];
+var ROWS = [
+  ["lantern-cli", "Ghost", "3 days ago"], ["moodboard-app", "Ghost", "21 days ago"], ["trail-journal", "Ghost", "44 days ago"],
+  ["api-server", "Ghost", "81 days ago"], ["pixel-pet", "Risen", "5 months ago"], ["habit-tracker", "Zombie", "4 months ago"],
+  ["discord-dice", "Zombie", "7 months ago"], ["weather-widget", "Tombstone", "8 months ago"], ["recipe-scraper", "Zombie", "9 months ago"],
+  ["chess-bot", "Zombie", "1 year ago"], ["crypto-tracker", "Coffin", "1 year ago"], ["senior-capstone", "Tombstone", "2 years ago"],
+  ["budget-buddy", "Zombie", "2 years ago"], ["todo-app-v3", "Coffin", "3 years ago"], ["markdown-notes", "Tombstone", "3 years ago"],
+  ["portfolio-v2", "Zombie", "4 years ago"]
+];
+var SINISTER = { Ghost: "Restless", Risen: "Risen", Zombie: "Undead", Tombstone: "At rest", Coffin: "Sealed" };
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 5 };
+    this.timers = [];
+  }
+  componentWillUnmount() { this.clearTimers(); }
+  clearTimers() { this.timers.forEach(function (t) { clearTimeout(t); }); this.timers = []; }
+  renderVals() {
+    var self = this;
+    var step = this.state.step;
+    var sin = step === 1;
+    var play = function () {
+      self.clearTimers();
+      self.setState({ step: 0 });
+      DELAYS.forEach(function (ms, i) {
+        self.timers.push(setTimeout(function () { self.setState({ step: i + 1 }); }, ms));
+      });
+    };
+    var steps = STEPS.map(function (s, i) {
+      return { label: s.label, cls: i === step ? "pill on" : "pill", pick: function () { self.clearTimers(); self.setState({ step: i }); } };
+    });
+    var candles = [
+      { left: "calc(50% - 300px)", top: "770px", delay: ".2s" },
+      { left: "calc(50% - 200px)", top: "792px", delay: ".45s" },
+      { left: "calc(50% - 100px)", top: "806px", delay: ".7s" },
+      { left: "calc(50% - 11px)", top: "812px", delay: ".95s" },
+      { left: "calc(50% + 80px)", top: "806px", delay: "1.2s" },
+      { left: "calc(50% + 180px)", top: "792px", delay: "1.45s" },
+      { left: "calc(50% + 280px)", top: "770px", delay: "1.7s" }
+    ];
+    return {
+      play: play,
+      steps: steps,
+      caption: STEPS[step].caption,
+      rows: ROWS.map(function (r, i) {
+        return { name: r[0], state: sin ? SINISTER[r[1]] : r[1], when: sin ? r[2].replace("ago", "since last breath") : r[2], cls: sin && i >= 9 ? "bleed" : "" };
+      }),
+      candles: step === 4 ? candles : [],
+      eyebrow: sin ? "The estate register · none may leave" : "The estate register",
+      eyebrowColor: sin ? "#9b1c31" : "#8a6a3a",
+      headA: sin ? "Every soul," : "Every project,",
+      headB: sin ? "bound here forever." : "accounted for.",
+      headBColor: sin ? "#9b1c31" : "#a8794a",
+      subline: sin ? "16 souls on this estate · ordered by when they were last seen alive" : "16 public repositories · sorted by last push",
+      colState: sin ? "Condition" : "State",
+      colWhen: sin ? "Last seen alive" : "Last push",
+      showList: step <= 1,
+      showFlicker: sin,
+      listClass: sin ? "jitter" : "",
+      showDark: step >= 2 && step <= 4,
+      showEyes: step === 2,
+      showCastle: step === 3 || step === 4,
+      showBolt: step === 3,
+      castleWrap: step === 3 ? "reveal" : "",
+      stageClass: step === 3 ? "shake" : "",
+      moonClass: step === 4 ? "rise" : "",
+      moonOpacity: step === 4 ? "1" : "0",
+      winOn: step === 4 ? ".85" : "0",
+      showTitle: step === 4,
+      showScene: step === 5
+    };
+  }
+}
+</script>
+</body>
+</html>

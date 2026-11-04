@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Repo Graveyard — The Haunted Estate</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=UnifrakturMaguntia&amp;family=IM+Fell+English:ital@0;1&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#05060a}
+a{color:#f4b860}a:hover{color:#ffd28f}
+.creature{background:none;border:0;padding:8px;margin:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;border-radius:14px;color:inherit;font:inherit}
+.creature:focus-visible,.creature.is-focused{outline:2px solid #c22a3e;outline-offset:6px;box-shadow:0 0 30px rgba(194,42,62,.25)}
+.creature:hover .lift{transform:translateY(-6px)}
+.lift{transition:transform .4s ease}
+.cname{margin-top:4px;font-family:"Cinzel",Georgia,serif;font-size:13px;font-weight:700;letter-spacing:.5px;color:#ecead9;white-space:nowrap;text-shadow:0 1px 6px #000}
+.csub{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;color:#a7a392;white-space:nowrap;text-shadow:0 1px 6px #000}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes flickerSlow{0%,100%{opacity:1}42%{opacity:1}45%{opacity:.5}48%{opacity:1}80%{opacity:.8}}
+@keyframes flickerFast{0%,100%{opacity:1}10%{opacity:.35}14%{opacity:.95}38%{opacity:.25}41%{opacity:1}70%{opacity:.55}73%{opacity:1}}
+@keyframes shamble{0%,100%{transform:rotate(-4deg) translateX(0)}35%{transform:rotate(1deg) translateX(5px)}50%{transform:rotate(3deg) translateX(7px)}}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.8}}
+@keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(50px)}}
+@keyframes flame{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.78)}}
+@keyframes batfly{0%{transform:translate(0,0) scale(1)}50%{transform:translate(-140px,-30px) scale(.9)}100%{transform:translate(-300px,10px) scale(.8);opacity:0}}
+@keyframes flap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.35)}}
+@keyframes lightning{0%,92%,100%{opacity:0}93%{opacity:.7}93.6%{opacity:.05}94.4%{opacity:.55}95.5%{opacity:0}}
+@keyframes whisper{0%,100%{opacity:0}12%,70%{opacity:1}82%{opacity:0}}
+@keyframes winflick{0%,100%{opacity:1}46%{opacity:1}48%{opacity:.15}52%{opacity:.9}74%{opacity:.3}76%{opacity:1}}
+@keyframes clouds{0%,100%{transform:translateX(0)}50%{transform:translateX(-70px)}}
+@keyframes grain{0%,100%{transform:translate(0,0)}25%{transform:translate(-2%,1%)}50%{transform:translate(1%,-2%)}75%{transform:translate(2%,2%)}}
+@keyframes risenpulse{0%,100%{filter:drop-shadow(0 0 10px rgba(159,231,255,.35))}50%{filter:drop-shadow(0 0 26px rgba(159,231,255,.7))}}
+.motion .bob{animation:bob 6s ease-in-out infinite}
+.motion .sway{animation:sway 7s ease-in-out infinite;transform-origin:50% 0}
+.motion .flicker-slow{animation:flickerSlow 4.2s steps(1,end) infinite}
+.motion .flicker-fast{animation:flickerFast 2.1s steps(1,end) infinite}
+.motion .shamble{animation:shamble 4s ease-in-out infinite;transform-origin:50% 100%}
+.motion .twinkle{animation:twinkle 3s ease-in-out infinite}
+.motion .drift{animation:drift 20s ease-in-out infinite}
+.motion .flame{animation:flame 1.1s ease-in-out infinite;transform-origin:50% 100%;transform-box:fill-box}
+.motion .bat{animation:batfly 10s linear infinite}
+.motion .wing{animation:flap .26s ease-in-out infinite;transform-origin:50% 50%;transform-box:fill-box}
+.motion .lightning{animation:lightning 13s linear infinite}
+.motion .grain{animation:grain .9s steps(4,end) infinite}
+.motion .winflick{animation:winflick 7s steps(1,end) infinite}
+.motion .clouds{animation:clouds 45s ease-in-out infinite}
+.motion .whisper{animation:whisper 9s ease-in-out infinite}
+.motion .risenpulse{animation:risenpulse 3s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.motion *{animation:none!important}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.btn{height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:6px;border:1px solid #2c2a35;background:rgba(10,9,14,.85);color:#ecead9;font:500 14px Inter,system-ui,sans-serif;cursor:pointer}
+</style>
+</helmet>
+<div class="{{rootClass}}" style="position: relative; width: 100%; height: 1100px; overflow: hidden; background: #05060a; font-family: Inter, system-ui, sans-serif; color: #ecead9">
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="ghostfade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#eef9ff" stop-opacity=".96"></stop>
+        <stop offset=".5" stop-color="#cfe9f5" stop-opacity=".78"></stop>
+        <stop offset="1" stop-color="#9fd8ee" stop-opacity="0"></stop>
+      </linearGradient>
+      <radialGradient id="ghosthood" cx=".5" cy=".32" r=".42">
+        <stop offset="0" stop-color="#0a1220" stop-opacity=".55"></stop>
+        <stop offset="1" stop-color="#0a1220" stop-opacity="0"></stop>
+      </radialGradient>
+      <filter id="tatter-a" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="6"></feDisplacementMap>
+      </filter>
+      <filter id="tatter-b" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="7"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="12"></feDisplacementMap>
+      </filter>
+      <filter id="wisp" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4"></feGaussianBlur></filter>
+      <filter id="grain-noise"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter>
+      <pattern id="pickets" width="22" height="90" patternUnits="userSpaceOnUse">
+        <rect x="9" y="14" width="4" height="76" fill="#101219"></rect>
+        <path d="M11 0 L17 15 L11 11 L5 15 Z" fill="#232634"></path>
+      </pattern>
+    </defs>
+  </svg>
+
+  <!-- sky -->
+  <div style="position: absolute; left: 0; right: 0; top: 0; height: 700px; background: linear-gradient(#06080f 0%, #0c0f1b 45%, #1a0e18 88%, #200d16 100%)"></div>
+  <sc-for list="{{stars}}" as="s" hint-placeholder-count="40">
+    <div class="twinkle" style="position: absolute; left: {{s.left}}; top: {{s.top}}; width: {{s.size}}; height: {{s.size}}; border-radius: 50%; background: #ecead9; opacity: .5; animation-delay: {{s.delay}}"></div>
+  </sc-for>
+
+  <div aria-hidden="true" style="position: absolute; right: 9%; top: 120px; width: 170px; height: 170px; border-radius: 50%; background: {{moonColor}}; opacity: {{moonOpacity}}; box-shadow: 0 0 120px 40px {{moonGlowColor}}">
+    <div style="position: absolute; left: 36px; top: 42px; width: 30px; height: 30px; border-radius: 50%; background: rgba(120, 60, 50, .22)"></div>
+    <div style="position: absolute; left: 98px; top: 86px; width: 20px; height: 20px; border-radius: 50%; background: rgba(120, 60, 50, .22)"></div>
+    <div style="position: absolute; left: 62px; top: 116px; width: 14px; height: 14px; border-radius: 50%; background: rgba(120, 60, 50, .22)"></div>
+  </div>
+
+  <svg class="clouds" aria-hidden="true" viewBox="0 0 700 200" style="position: absolute; right: -4%; top: 150px; width: 700px; height: 200px">
+    <path d="M300 130 C270 130 262 100 292 94 C298 66 342 60 360 82 C380 56 432 62 438 94 C472 90 488 124 460 134 Z" fill="#07080d" opacity=".96"></path>
+    <path d="M470 100 C446 100 440 78 462 74 C468 54 500 52 512 68 C530 50 568 56 570 78 C594 76 602 100 582 106 Z" fill="#090a10" opacity=".92"></path>
+    <path d="M80 70 C56 70 48 48 70 44 C76 24 108 22 120 38 C138 20 176 26 178 48 C202 46 210 70 190 74 Z" fill="#0a0b12" opacity=".8"></path>
+  </svg>
+
+  <!-- castle on the cliff, under the moon -->
+  <svg aria-hidden="true" viewBox="0 0 520 380" style="position: absolute; right: 2%; top: 250px; width: 520px; height: 380px">
+    <path d="M0 380 C40 340 110 300 170 290 L230 250 C260 238 300 238 330 250 L420 290 C470 300 500 330 520 380 Z" fill="#06070c"></path>
+    <path d="M196 262 V200 H210 V188 H222 V200 H238 V120 L256 80 L274 120 V200 H296 V116 L342 70 L388 116 V200 H402 V60 L422 14 L442 60 V200 H456 V188 H468 V200 H484 V290 L196 280 Z" fill="#030409"></path>
+    <path d="M250 120 L256 94 L262 120 Z" fill="#030409"></path>
+    <rect x="332" y="140" width="8" height="15" rx="4" fill="#f4b860" opacity=".8"></rect>
+    <rect x="348" y="140" width="8" height="15" rx="4" fill="#f4b860" opacity=".5"></rect>
+    <rect class="winflick" x="252" y="150" width="7" height="13" rx="3.5" fill="#f4b860"></rect>
+    <rect x="417" y="88" width="10" height="20" rx="5" fill="#c22a3e"></rect>
+    <rect x="411" y="82" width="22" height="32" rx="11" fill="#c22a3e" opacity=".35" style="filter: blur(7px)"></rect>
+    <rect x="216" y="222" width="6" height="11" rx="3" fill="#f4b860" opacity=".35"></rect>
+  </svg>
+
+  <sc-for list="{{bats}}" as="b" hint-placeholder-count="3">
+    <div class="bat" aria-hidden="true" style="position: absolute; right: {{b.right}}; top: {{b.top}}; animation-delay: {{b.delay}}">
+      <svg viewBox="0 0 24 10" width="{{b.w}}" height="{{b.h}}"><path class="wing" d="M0 6 Q4 0 8 4 Q10 2 12 4 Q14 2 16 4 Q20 0 24 6 Q20 5 18 8 Q15 6 12 9 Q9 6 6 8 Q4 5 0 6 Z" fill="#030409"></path></svg>
+    </div>
+  </sc-for>
+
+  <!-- hills + ground -->
+  <svg aria-hidden="true" viewBox="0 0 1440 200" preserveAspectRatio="none" style="position: absolute; left: 0; top: 540px; width: 100%; height: 200px">
+    <path d="M0 120 C200 70 380 96 560 104 C740 112 860 70 1040 84 C1200 96 1320 120 1440 110 L1440 200 L0 200 Z" fill="#0b0c14"></path>
+    <path d="M0 150 C180 124 320 140 500 138 C680 136 800 118 980 126 C1160 134 1300 148 1440 136 L1440 200 L0 200 Z" fill="#08090f"></path>
+  </svg>
+  <div style="position: absolute; left: 0; right: 0; top: 700px; bottom: 0; background: linear-gradient(#08090f, #050609)"></div>
+
+  <!-- dead tree -->
+  <svg aria-hidden="true" viewBox="0 0 260 640" style="position: absolute; left: -10px; top: 90px; width: 250px; height: 620px">
+    <path d="M80 640 C74 560 86 480 72 410 C64 360 46 330 20 300" fill="none" stroke="#04050a" stroke-width="22" stroke-linecap="round"></path>
+    <path d="M72 410 C92 340 124 300 160 254 M74 480 C52 452 32 440 0 434 M80 530 C118 500 158 486 200 474 M160 254 C176 214 198 194 226 172 M160 254 C146 222 132 204 118 178 M200 474 C224 456 240 432 258 414 M20 300 C8 280 4 262 2 240" fill="none" stroke="#04050a" stroke-width="8" stroke-linecap="round"></path>
+    <path d="M226 172 L246 150 M226 172 L238 192 M118 178 L102 156 M258 414 L268 398 M2 240 L-8 222 M200 474 L214 492" fill="none" stroke="#04050a" stroke-width="3.5" stroke-linecap="round"></path>
+    <path d="M150 262 L150 300" stroke="#0a0a10" stroke-width="1.2"></path>
+    <path d="M142 300 C142 292 158 292 158 300 L156 318 L144 318 Z" fill="#0b0b11"></path>
+  </svg>
+
+  <header style="position: absolute; left: 0; right: 0; top: 0; padding: 28px 56px; display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 20px; z-index: 11">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+        <h1 style="margin: 0; font-family: 'UnifrakturMaguntia', 'IM Fell English', serif; font-weight: 400; font-size: 46px; line-height: 1; color: #ecead9; text-shadow: 0 0 22px rgba(194, 42, 62, .5)">Repo Graveyard</h1>
+        <span style="font-family: 'Cinzel', Georgia, serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #e6cf9a; border: 1px solid #6e5530; border-radius: 3px; padding: 5px 10px">Haunted Estate · sample</span>
+      </div>
+      <p style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-size: 13px; letter-spacing: 2px; color: #a7a392">16 souls · 4 ghosts · 1 risen · 6 zombies · 3 at rest · 2 sealed</p>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+      <form style="display: flex; align-items: center; gap: 8px; margin: 0">
+        <label for="visit" class="sr-only">GitHub username</label>
+        <input id="visit" type="text" placeholder="Visit another graveyard…" style="width: 230px; height: 44px; box-sizing: border-box; padding: 0 14px; border-radius: 6px; border: 1px solid #2c2a35; background: rgba(10, 9, 14, .85); color: #ecead9; font: 14px Inter, system-ui, sans-serif">
+      </form>
+      <button type="button" class="btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f4b860" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"></path><path d="M12 3v2"></path><rect x="7" y="5" width="10" height="14" rx="3"></rect><path d="M12 9v4"></path><path d="M9 21h6"></path></svg>
+        Lights on
+      </button>
+      <button type="button" class="btn" aria-label="Turn sound on" style="width: 44px; padding: 0; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a7a392" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M17 9l4 6"></path><path d="M21 9l-4 6"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <div style="position: absolute; left: 0; right: 0; top: 128px; display: flex; justify-content: center; z-index: 11">
+    <a href="#api-server" style="display: flex; align-items: center; gap: 12px; min-height: 46px; box-sizing: border-box; padding: 0 20px; border-radius: 4px; border: 1px solid rgba(194, 42, 62, .75); background: rgba(70, 8, 20, .55); color: #ecead9; text-decoration: none; font-size: 14px; box-shadow: 0 0 34px rgba(194, 42, 62, .3)">
+      <svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><rect x="5" y="9" width="6" height="11" rx="1" fill="#ecead9"></rect><path class="flame" d="M8 1 C11 4 11 7 8 9 C5 7 5 4 8 1 Z" fill="#f4b860"></path></svg>
+      <span><strong style="font-weight: 600">api-server</strong> turns in <strong style="font-weight: 600; color: #ff8a98">9 days</strong>. It can still be saved.</span>
+      <span style="font-family: 'Cinzel', Georgia, serif; font-weight: 700; letter-spacing: 1px; color: #ff8a98">Go to it →</span>
+    </a>
+  </div>
+
+  <!-- ghosts drift in the sky -->
+  <sc-for list="{{ghosts}}" as="g" hint-placeholder-count="4">
+    <div id="{{g.id}}" style="position: absolute; left: {{g.left}}; top: {{g.top}}; z-index: 4">
+      <button type="button" class="{{g.btnClass}}" aria-label="{{g.aria}}">
+        <div class="lift">
+          <div class="bob" style="animation-delay: {{g.delay}}">
+            <div class="sway" style="animation-delay: {{g.delay}}">
+              <div class="{{g.flicker}}" style="opacity: {{g.opacity}}; filter: {{g.glow}}">
+              <svg viewBox="0 0 120 170" width="{{g.w}}" height="{{g.h}}" aria-hidden="true" style="overflow: visible">
+                <g filter="{{g.svgFilter}}">
+                  <path d="M34 80 C18 90 8 104 0 124 C10 116 18 114 26 116 C22 108 26 96 34 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
+                  <path d="M86 80 C102 90 112 104 120 124 C110 116 102 114 94 116 C98 108 94 96 86 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
+                  <path d="{{g.path}}" fill="url(#ghostfade)"></path>
+                  <ellipse cx="60" cy="56" rx="30" ry="38" fill="url(#ghosthood)"></ellipse>
+                </g>
+                <ellipse cx="48" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(-14 48 50)"></ellipse>
+                <ellipse cx="72" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(14 72 50)"></ellipse>
+                <circle cx="49" cy="54" r="1.6" fill="#9fe7ff" opacity="{{g.glint}}"></circle>
+                <circle cx="71" cy="54" r="1.6" fill="#9fe7ff" opacity="{{g.glint}}"></circle>
+                <path d="M54 72 C54 66 66 66 66 72 L65 92 C63 98 57 98 55 92 Z" fill="#04060b" opacity=".92"></path>
+                <path d="M46 62 L45 74 M74 62 L75 76" stroke="#04060b" stroke-width="1.4" opacity="{{g.drip}}" stroke-linecap="round"></path>
+              </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="cname">{{g.name}}</span>
+        <span class="csub">{{g.sub}}</span>
+      </button>
+    </div>
+  </sc-for>
+
+  <div class="whisper" role="status" style="position: absolute; left: 50%; top: 528px; transform: translateX(-50%); z-index: 11; padding: 12px 24px; border-radius: 4px; border: 1px solid rgba(194, 42, 62, .4); background: rgba(4, 4, 8, .82); font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-size: 19px; color: #d9d6c3; white-space: nowrap; box-shadow: 0 0 30px rgba(0, 0, 0, .8)">habit-tracker is still waiting for you…</div>
+
+  <!-- iron fence, pillars, gate (back edge of the graveyard) -->
+  <svg aria-hidden="true" style="position: absolute; left: 3%; width: 39%; top: 650px; height: 90px; z-index: 2"><rect x="0" y="30" width="100%" height="4" fill="#101219"></rect><rect x="0" y="70" width="100%" height="4" fill="#101219"></rect><rect x="0" y="0" width="100%" height="90" fill="url(#pickets)"></rect></svg>
+  <svg aria-hidden="true" style="position: absolute; left: 51%; width: 22%; top: 650px; height: 90px; z-index: 2"><rect x="0" y="30" width="100%" height="4" fill="#101219"></rect><rect x="0" y="70" width="100%" height="4" fill="#101219"></rect><rect x="0" y="0" width="100%" height="90" fill="url(#pickets)"></rect></svg>
+  <sc-for list="{{pillars}}" as="p" hint-placeholder-count="2">
+    <svg aria-hidden="true" viewBox="0 0 34 140" style="position: absolute; left: {{p.left}}; top: 600px; width: 34px; height: 140px; z-index: 2"><path d="M17 0 L28 16 H6 Z" fill="#24222c"></path><rect x="2" y="16" width="30" height="10" fill="#2c2a35"></rect><rect x="5" y="26" width="24" height="114" fill="#1d1b24" stroke="#2c2a35"></rect><path d="M8 50 H26 M8 80 H26 M8 110 H26" stroke="#141319" stroke-width="2"></path></svg>
+  </sc-for>
+  <svg aria-hidden="true" viewBox="0 0 120 180" preserveAspectRatio="none" style="position: absolute; left: 42.6%; width: 8.4%; top: 560px; height: 180px; z-index: 2">
+    <path d="M10 56 Q60 -6 110 56" fill="none" stroke="#232634" stroke-width="6"></path>
+    <path d="M22 56 Q60 16 98 56" fill="none" stroke="#171a24" stroke-width="3"></path>
+    <path d="M60 4 V-10 M52 -2 H68" stroke="#232634" stroke-width="4"></path>
+    <path d="M24 56 V180 M36 56 V180 M48 56 V180 M60 56 V180 M72 56 V180 M84 56 V180 M96 56 V180" stroke="#101219" stroke-width="4"></path>
+    <path d="M18 118 H102" stroke="#101219" stroke-width="5"></path>
+    <circle cx="46" cy="88" r="9" fill="none" stroke="#232634" stroke-width="2.5"></circle>
+    <circle cx="74" cy="88" r="9" fill="none" stroke="#232634" stroke-width="2.5"></circle>
+  </svg>
+  <sc-for list="{{ravens}}" as="rv" hint-placeholder-count="2">
+    <svg aria-hidden="true" viewBox="0 0 44 34" style="position: absolute; left: {{rv.left}}; top: 572px; width: 42px; height: 32px; z-index: 3; transform: scaleX({{rv.flip}})"><path d="M6 26 Q10 14 22 14 Q28 9 35 11 L42 13 L35 15 Q33 22 26 25 L22 32 L20 25 L12 30 Z" fill="#020305"></path><circle cx="34" cy="12.6" r="1.4" fill="#e03a4f"></circle></svg>
+  </sc-for>
+
+  <!-- risen, climbing out of its grave -->
+  <div style="position: absolute; left: 3%; top: 720px; z-index: 5">
+    <button type="button" class="creature" aria-label="pixel-pet, risen, push within 9 days or it falls back">
+      <div class="lift risenpulse"><svg viewBox="0 0 130 190" width="92" height="134" aria-hidden="true" style="overflow: visible">
+              <path d="M10 182 C24 162 106 162 120 182 Z" fill="#1a1612"></path>
+              <path d="M22 176 C40 168 90 168 108 176" stroke="#2a221b" stroke-width="3" fill="none"></path>
+              <path d="M56 124 L54 172 M72 124 L74 172" stroke="#14161d" stroke-width="12" stroke-linecap="round"></path>
+              <path d="M50 76 L36 104 L32 128 M80 76 L94 104 L98 128" stroke="#9aa597" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+              <path d="M32 128 L28 136 M32 128 L33 138 M98 128 L102 136 M98 128 L97 138" stroke="#9aa597" stroke-width="2.4" stroke-linecap="round"></path>
+              <path d="M50 70 C44 92 46 112 52 128 L58 122 L64 130 L70 122 L76 128 C82 112 84 92 78 70 C70 62 58 62 50 70 Z" fill="#23262f"></path>
+              <path d="M64 66 V56" stroke="#9aa597" stroke-width="8" stroke-linecap="round"></path>
+              <ellipse cx="64" cy="40" rx="15" ry="18" fill="#9aa597"></ellipse>
+              <ellipse cx="58" cy="38" rx="4.6" ry="5.4" fill="#050507"></ellipse>
+              <ellipse cx="70" cy="38" rx="4.6" ry="5.4" fill="#050507"></ellipse>
+              <circle cx="58" cy="39" r="2.2" fill="#9fe7ff"></circle>
+              <circle cx="70" cy="39" r="2.2" fill="#9fe7ff"></circle>
+              <path d="M58 52 C60 56 68 56 70 52" stroke="#050507" stroke-width="2.4" fill="none"></path>
+            </svg></div>
+      <span class="cname">pixel-pet</span>
+      <span class="csub" style="color: #9fe7ff">risen · 9 days to push</span>
+    </button>
+  </div>
+
+  <!-- tombstones -->
+  <sc-for list="{{tombstones}}" as="t" hint-placeholder-count="3">
+    <div style="position: absolute; left: {{t.left}}; top: {{t.top}}; z-index: 4">
+      <button type="button" class="creature" aria-label="{{t.aria}}">
+        <div class="lift"><svg viewBox="0 0 100 130" width="{{t.w}}" height="{{t.h}}" aria-hidden="true" style="overflow: visible">
+              <ellipse cx="48" cy="126" rx="44" ry="5" fill="#000" opacity=".55"></ellipse>
+              <g transform="rotate({{t.tilt}} 48 124)">
+                <path d="{{t.shape}}" fill="#2b2c35" stroke="#3a3b46" stroke-width="2"></path>
+                <path d="M20 24 C26 16 36 14 40 14" stroke="#4a4b58" stroke-width="2" fill="none" opacity=".6"></path>
+                <path d="M30 70 H66 M34 78 H62 M36 86 H60" stroke="#191a21" stroke-width="2.4" stroke-linecap="round"></path>
+                <path d="M58 20 L52 36 L58 46 L52 60" fill="none" stroke="#111218" stroke-width="2" opacity="{{t.crack}}"></path>
+                <g opacity="{{t.moss}}"><path d="M14 124 C16 108 22 104 26 112 C28 100 34 104 34 124 Z M62 124 C64 112 72 110 76 124 Z M14 76 C10 84 12 96 16 100 Z" fill="#33452a"></path></g>
+                <rect x="6" y="120" width="84" height="7" rx="2" fill="#16171d"></rect>
+              </g>
+              <rect x="88" y="108" width="7" height="14" rx="1" fill="#d9d4c0"></rect>
+              <path class="flame" d="M91.5 95 C95 100 95 104 91.5 107 C88 104 88 100 91.5 95 Z" fill="#f4b860" style="filter: drop-shadow(0 0 6px #f4b860)"></path>
+            </svg></div>
+        <span class="cname">{{t.name}}</span>
+        <span class="csub">{{t.sub}}</span>
+      </button>
+    </div>
+  </sc-for>
+
+  <!-- the crypt: a mausoleum -->
+  <div style="position: absolute; left: 75%; top: 700px; width: 22%; height: 300px; z-index: 3">
+    <svg aria-hidden="true" viewBox="0 0 320 300" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%">
+      <path d="M10 300 V90 L160 20 L310 90 V300 Z" fill="#14131a" stroke="#24222c" stroke-width="3"></path>
+      <path d="M30 96 L160 36 L290 96" fill="none" stroke="#24222c" stroke-width="3"></path>
+      <path d="M150 54 H170 M160 44 V68" stroke="#2c2a35" stroke-width="4"></path>
+      <rect x="22" y="100" width="22" height="200" fill="#1b1a22"></rect><rect x="276" y="100" width="22" height="200" fill="#1b1a22"></rect>
+      <path d="M60 300 V150 Q160 90 260 150 V300 Z" fill="#07070b"></path>
+    </svg>
+    <span style="position: absolute; left: 0; right: 0; top: 104px; text-align: center; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: #8d897b">The crypt</span>
+    <sc-for list="{{coffins}}" as="c" hint-placeholder-count="2">
+      <div style="position: absolute; left: {{c.left}}; top: {{c.top}}">
+        <button type="button" class="creature" aria-label="{{c.aria}}">
+          <div class="lift"><svg viewBox="0 0 130 70" width="110" height="60" aria-hidden="true">
+              <path d="M8 35 L28 10 L104 14 L122 35 L104 56 L28 60 Z" fill="#241713" stroke="#3a2620" stroke-width="2"></path>
+              <path d="M22 35 L34 18 L98 21 L110 35 L98 49 L34 52 Z" fill="none" stroke="#2f1f1a" stroke-width="1.5"></path>
+              <path d="M54 30 H76 M65 22 V48" stroke="#1a100d" stroke-width="3"></path>
+              <path d="M24 14 L108 56" stroke="#7d8492" stroke-width="3.5" stroke-dasharray="6 3"></path>
+              <path d="M24 56 L108 14" stroke="#7d8492" stroke-width="3.5" stroke-dasharray="6 3"></path>
+              <path d="M61 30 V26 A4 4 0 0 1 69 26 V30" fill="none" stroke="#9aa1ad" stroke-width="2"></path>
+              <rect x="57" y="30" width="16" height="12" rx="2" fill="#5b6270"></rect>
+            </svg></div>
+          <span class="cname">{{c.name}}</span>
+          <span class="csub">{{c.sub}}</span>
+        </button>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- zombies shamble toward the gate -->
+  <sc-for list="{{zombies}}" as="z" hint-placeholder-count="6">
+    <div style="position: absolute; left: {{z.left}}; top: {{z.top}}; z-index: 6">
+      <button type="button" class="creature" aria-label="{{z.aria}}">
+        <div class="lift">
+          <div class="shamble" style="animation-duration: {{z.speed}}; animation-delay: {{z.delay}}">
+            <svg viewBox="0 0 130 180" width="{{z.w}}" height="{{z.h}}" aria-hidden="true" style="overflow: visible">
+                <ellipse cx="62" cy="176" rx="40" ry="5" fill="#000" opacity=".5"></ellipse>
+                <path d="M54 118 L46 146 L36 172" stroke="#14161d" stroke-width="12" stroke-linecap="round" fill="none"></path>
+                <path d="M30 172 L44 174" stroke="#0b0c10" stroke-width="7" stroke-linecap="round"></path>
+                <path d="M68 118 L76 146 L74 172" stroke="#1a1c24" stroke-width="12" stroke-linecap="round" fill="none"></path>
+                <path d="M72 172 L86 174" stroke="#0b0c10" stroke-width="7" stroke-linecap="round"></path>
+                <path d="M50 76 L40 100 L42 124" stroke="{{z.skin}}" stroke-width="7" stroke-linecap="round" fill="none" opacity="{{z.arm2}}"></path>
+                <path d="M42 124 L38 132 M42 124 L44 133 M42 124 L48 130" stroke="{{z.skin}}" stroke-width="2.4" stroke-linecap="round" opacity="{{z.arm2}}"></path>
+                <path d="M50 76 L44 90" stroke="{{z.skin}}" stroke-width="7" stroke-linecap="round" opacity="{{z.stump}}"></path>
+                <path d="M46 72 C40 92 42 110 48 122 L52 116 L56 124 L60 116 L64 125 L68 117 L74 123 C80 104 80 86 74 66 C66 58 52 60 46 72 Z" fill="{{z.shirt}}"></path>
+                <path d="M54 82 L60 96 M66 78 L62 90" stroke="#07080b" stroke-width="2" opacity="{{z.tears}}"></path>
+                <g opacity="{{z.ribs}}"><path d="M54 84 Q62 80 70 84 M53 92 Q62 88 71 92 M54 100 Q62 96 70 100" stroke="#cfc8ad" stroke-width="2" fill="none" stroke-linecap="round"></path></g>
+                <circle cx="66" cy="96" r="4" fill="#4a1418" opacity="{{z.wound}}"></circle>
+                <path d="M70 72 L94 86 L114 90" stroke="{{z.skin}}" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+                <path d="M114 90 L126 86 M114 90 L127 91 M114 90 L125 96 M113 92 L120 100" stroke="{{z.skin}}" stroke-width="2.4" stroke-linecap="round"></path>
+                <path d="M68 66 L76 58" stroke="{{z.skin}}" stroke-width="8" stroke-linecap="round"></path>
+                <g transform="rotate(22 82 48)">
+                  <ellipse cx="82" cy="46" rx="15" ry="18" fill="{{z.head}}"></ellipse>
+                  <path d="M70 34 C74 26 86 24 94 32 M72 30 L68 22 M80 28 L80 18 M88 29 L92 21" stroke="#0c0d10" stroke-width="2" fill="none" stroke-linecap="round" opacity="{{z.hair}}"></path>
+                  <ellipse cx="76" cy="44" rx="4.6" ry="5.6" fill="#050507"></ellipse>
+                  <ellipse cx="89" cy="44" rx="4.6" ry="5.6" fill="#050507"></ellipse>
+                  <circle cx="76.5" cy="45" r="1.3" fill="{{z.eye}}"></circle>
+                  <circle cx="88.5" cy="45" r="1.3" fill="{{z.eye}}"></circle>
+                  <path d="M82 50 L80 55 L84 55 Z" fill="#050507" opacity="{{z.skull}}"></path>
+                  <path d="M74 58 C76 68 88 68 90 58 Z" fill="#050507"></path>
+                  <path d="M77 59 V62 M80 59 V63 M83 59 V63 M86 59 V62" stroke="#cfc8ad" stroke-width="1.4"></path>
+                  <path d="M92 40 C96 44 96 50 92 54" stroke="#4a1418" stroke-width="2.5" fill="none" opacity="{{z.wound}}"></path>
+                </g>
+              </svg>
+          </div>
+        </div>
+        <span class="cname">{{z.name}}</span>
+        <span class="csub">{{z.sub}}</span>
+      </button>
+    </div>
+  </sc-for>
+
+  <sc-for list="{{fog}}" as="f" hint-placeholder-count="4">
+    <div class="drift" aria-hidden="true" style="position: absolute; left: {{f.left}}; top: {{f.top}}; width: {{f.w}}; height: {{f.h}}; border-radius: 50%; background: rgba(170, 180, 205, {{f.alpha}}); filter: blur(40px); animation-delay: {{f.delay}}; pointer-events: none; z-index: 7"></div>
+  </sc-for>
+
+  <div class="lightning" aria-hidden="true" style="position: absolute; inset: 0; background: #dfe8ff; opacity: 0; pointer-events: none; z-index: 9; animation-duration: {{lightningEvery}}"></div>
+  <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 9; box-shadow: inset 0 0 300px 120px rgba(0, 0, 2, .92), inset 0 0 600px 80px rgba(70, 6, 16, .2)"></div>
+  <svg aria-hidden="true" viewBox="0 0 170 170" style="position: absolute; left: 0; top: 0; width: 210px; height: 210px; pointer-events: none; z-index: 9"><g fill="none" stroke="rgba(236, 234, 217, .12)" stroke-width="1"><path d="M0 0 L170 40 M0 0 L120 120 M0 0 L40 170 M0 0 L170 100 M0 0 L90 170"></path><path d="M30 7 Q24 24 7 30 M60 14 Q48 48 14 60 M95 22 Q72 72 22 95 M130 31 Q98 98 31 130"></path></g></svg>
+  <svg aria-hidden="true" viewBox="0 0 170 170" style="position: absolute; right: 0; top: 0; width: 180px; height: 180px; pointer-events: none; z-index: 9; transform: scaleX(-1)"><g fill="none" stroke="rgba(236, 234, 217, .09)" stroke-width="1"><path d="M0 0 L170 40 M0 0 L120 120 M0 0 L40 170 M0 0 L170 100"></path><path d="M30 7 Q24 24 7 30 M60 14 Q48 48 14 60 M95 22 Q72 72 22 95"></path></g></svg>
+  <svg class="grain" aria-hidden="true" style="position: absolute; left: -5%; top: -5%; width: 110%; height: 110%; pointer-events: none; z-index: 9; opacity: .08"><rect width="100%" height="100%" filter="url(#grain-noise)"></rect></svg>
+
+  <!-- footer strip: nothing overlaps creatures -->
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 56px; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 56px; background: linear-gradient(transparent, rgba(0, 0, 0, .85) 40%); box-sizing: border-box">
+    <span style="font-family: 'Cinzel', Georgia, serif; font-weight: 700; letter-spacing: 1.5px; font-size: 12px; text-transform: uppercase; color: #e6cf9a">Sample estate · enter your own name at the gate</span>
+    <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: #8d897b">glow = recent push · flicker = days quiet · moon reddens when the undead outnumber the living · fog = undecided · lightning = ancient</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"motion":{"editor":"boolean","default":true,"section":"Scene"},"$preview":{"width":1440,"height":1100}}'>
+var GHOST_LOOK = [
+  { op: 1, glow: "drop-shadow(0 0 26px rgba(159,231,255,0.7))", path: "M60 8 C36 8 26 28 26 52 C26 68 22 80 16 94 C10 108 14 120 20 130 C20 144 22 156 28 168 C34 160 38 156 42 160 C46 166 50 168 54 160 C58 154 62 154 66 162 C70 168 74 166 78 158 C82 152 88 154 92 164 C98 156 100 144 100 130 C106 120 110 108 104 94 C98 80 94 68 94 52 C94 28 84 8 60 8 Z", filt: "url(#wisp)", flicker: "", glint: 1, drip: 0 },
+  { op: 0.78, glow: "drop-shadow(0 0 16px rgba(159,231,255,0.45))", path: "M60 8 C36 8 26 28 26 52 C26 68 22 80 16 94 C10 108 14 120 20 130 C20 144 22 156 28 168 C34 160 38 156 42 160 C46 166 50 168 54 160 C58 154 62 154 66 162 C70 168 74 166 78 158 C82 152 88 154 92 164 C98 156 100 144 100 130 C106 120 110 108 104 94 C98 80 94 68 94 52 C94 28 84 8 60 8 Z", filt: "url(#tatter-a)", flicker: "", glint: 0.7, drip: 0 },
+  { op: 0.6, glow: "drop-shadow(0 0 9px rgba(159,231,255,0.3))", path: "M60 8 C36 8 26 28 26 52 C26 68 22 80 16 94 C10 108 14 120 20 130 L24 168 L32 148 L38 164 L46 140 L52 168 L58 146 L64 166 L70 144 L78 168 L84 146 L90 162 L96 136 C104 120 110 108 104 94 C98 80 94 68 94 52 C94 28 84 8 60 8 Z", filt: "url(#tatter-a)", flicker: "flicker-slow", glint: 0.4, drip: 0.6 },
+  { op: 0.42, glow: "drop-shadow(0 0 5px rgba(194,42,62,0.35))", path: "M60 10 C38 10 28 30 28 54 C28 68 24 80 18 94 C12 106 16 116 22 124 L26 150 L30 132 L36 158 L42 128 L48 146 L54 122 L58 150 L64 124 L70 154 L76 128 L82 144 L88 120 L94 140 L98 122 C104 112 108 104 102 94 C96 80 92 68 92 54 C92 30 82 10 60 10 Z", filt: "url(#tatter-b)", flicker: "flicker-fast", glint: 0, drip: 1 }
+];
+var GHOST_WORD = ["healthy", "fading", "flickering", "about to turn"];
+var ZOMBIE_LOOK = [
+  { skin: "#7e8a6c", head: "#7e8a6c", shirt: "#2a2e38", eye: "#e2dc9c", hair: 1, arm2: 1, stump: 0, ribs: 0, skull: 0, wound: 0.6, tears: 0.5, speed: "3.8s" },
+  { skin: "#77806a", head: "#77806a", shirt: "#252831", eye: "#e2dc9c", hair: 0.8, arm2: 1, stump: 0, ribs: 0, skull: 0, wound: 1, tears: 1, speed: "4.4s" },
+  { skin: "#6f7466", head: "#6f7466", shirt: "#20222a", eye: "#c9c08a", hair: 0.5, arm2: 0, stump: 1, ribs: 0.5, skull: 0.3, wound: 1, tears: 1, speed: "5.2s" },
+  { skin: "#9c9784", head: "#a29d88", shirt: "#1b1d24", eye: "#b23a48", hair: 0.2, arm2: 0, stump: 1, ribs: 1, skull: 0.8, wound: 0.6, tears: 1, speed: "6s" },
+  { skin: "#cdc6ad", head: "#d6cfb6", shirt: "#16181e", eye: "#c22a3e", hair: 0, arm2: 0, stump: 1, ribs: 1, skull: 1, wound: 0, tears: 1, speed: "7s" }
+];
+var ZOMBIE_WORD = ["fresh", "rotting", "decayed", "skeletal", "ancient"];
+var TOMB_SHAPE = {"arch": "M14 124 V44 C14 18 30 6 48 6 C66 6 82 18 82 44 V124 Z", "cross": "M38 124 V58 H18 V40 H38 V8 H58 V40 H78 V58 H58 V124 Z", "gothic": "M14 124 V46 L48 4 L82 46 V124 Z"};
+
+class Component extends DCLogic {
+  renderVals() {
+    var motion = this.props.motion ?? true;
+
+    var ghostData = [
+      { id: "lantern-cli", decay: 0, quiet: "3 days quiet", left: "15%", top: "196px" },
+      { id: "moodboard-app", decay: 1, quiet: "21 days quiet", left: "30%", top: "300px" },
+      { id: "trail-journal", decay: 2, quiet: "44 days quiet", left: "45%", top: "210px" },
+      { id: "api-server", decay: 3, quiet: "81 days quiet", left: "59%", top: "330px" }
+    ];
+    var ghosts = ghostData.map(function (g, i) {
+      var look = GHOST_LOOK[g.decay];
+      return {
+        id: g.id, name: g.id, left: g.left, top: g.top,
+        sub: GHOST_WORD[g.decay] + " · " + g.quiet,
+        aria: g.id + ", ghost, " + GHOST_WORD[g.decay] + ", " + g.quiet,
+        opacity: look.op, glow: look.glow, path: look.path, svgFilter: look.filt,
+        flicker: look.flicker, glint: look.glint, drip: look.drip,
+        w: 96, h: 136, delay: (i * 1.3) + "s",
+        btnClass: g.id === "api-server" ? "creature is-focused" : "creature"
+      };
+    });
+
+    var zombieData = [
+      { name: "habit-tracker", decay: 0, quiet: "4 mo", left: "47%", top: "770px", scale: 1.12 },
+      { name: "discord-dice", decay: 1, quiet: "7 mo", left: "35%", top: "796px", scale: 1.0 },
+      { name: "recipe-scraper", decay: 1, quiet: "9 mo", left: "60%", top: "792px", scale: 1.0 },
+      { name: "chess-bot", decay: 2, quiet: "1 yr 6 mo", left: "23%", top: "812px", scale: 0.94 },
+      { name: "budget-buddy", decay: 3, quiet: "2 yr 5 mo", left: "13%", top: "832px", scale: 0.9 },
+      { name: "portfolio-v2", decay: 4, quiet: "4 yr", left: "67%", top: "830px", scale: 0.88 }
+    ];
+    var zombies = zombieData.map(function (z, i) {
+      var look = ZOMBIE_LOOK[z.decay];
+      return {
+        name: z.name, left: z.left, top: z.top,
+        sub: ZOMBIE_WORD[z.decay] + " · " + z.quiet,
+        aria: z.name + ", zombie, " + ZOMBIE_WORD[z.decay] + ", quiet " + z.quiet,
+        w: Math.round(96 * z.scale), h: Math.round(134 * z.scale),
+        skin: look.skin, head: look.head, shirt: look.shirt, eye: look.eye, hair: look.hair, arm2: look.arm2, stump: look.stump,
+        ribs: look.ribs, skull: look.skull, wound: look.wound, tears: look.tears, speed: look.speed, delay: (i * 0.6) + "s"
+      };
+    });
+
+    var tombstones = [
+      { name: "weather-widget", sub: "shipped · quiet 8 mo", left: "17%", top: "636px", moss: 0.15, crack: 0, tilt: -2, shape: TOMB_SHAPE.arch, w: 74, h: 96 },
+      { name: "senior-capstone", sub: "shipped · quiet 2 yr", left: "29%", top: "620px", moss: 0.6, crack: 0.6, tilt: 3, shape: TOMB_SHAPE.cross, w: 80, h: 104 },
+      { name: "markdown-notes", sub: "shipped · quiet 3 yr", left: "57%", top: "636px", moss: 1, crack: 1, tilt: -5, shape: TOMB_SHAPE.gothic, w: 74, h: 96 }
+    ].map(function (t) {
+      t.aria = t.name + ", tombstone, finished, " + t.sub;
+      return t;
+    });
+
+    var coffins = [
+      { name: "crypto-tracker", sub: "sealed", left: "4%", top: "200px" },
+      { name: "todo-app-v3", sub: "sealed", left: "48%", top: "200px" }
+    ].map(function (c) {
+      c.aria = c.name + ", sealed in a chained coffin, scrapped on purpose";
+      return c;
+    });
+
+    var stars = [];
+    var seed = 11;
+    function rand() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < 60; i++) {
+      var size = rand() < 0.15 ? 3 : 2;
+      stars.push({ left: (rand() * 100).toFixed(2) + "%", top: Math.round(90 + rand() * 420) + "px", size: size + "px", delay: (rand() * 3).toFixed(2) + "s" });
+    }
+
+    var ghostCount = 4, zombieCount = 6;
+    var health = ghostCount / (ghostCount + zombieCount);
+    var fogAlpha = Math.min(0.2, 0.05 + zombieCount * 0.022);
+    var fog = [
+      { left: "-8%", top: "930px", w: "50%", h: "170px", alpha: fogAlpha, delay: "0s" },
+      { left: "28%", top: "960px", w: "48%", h: "150px", alpha: fogAlpha, delay: "-7s" },
+      { left: "62%", top: "920px", w: "46%", h: "180px", alpha: fogAlpha, delay: "-12s" },
+      { left: "6%", top: "760px", w: "80%", h: "100px", alpha: fogAlpha * 0.55, delay: "-3s" }
+    ];
+
+    var ancient = zombieData.filter(function (z) { return z.decay === 4; }).length;
+    return {
+      rootClass: motion ? "motion" : "",
+      bats: [
+        { right: "11%", top: "170px", w: 32, h: 14, delay: "0s" },
+        { right: "6%", top: "210px", w: 24, h: 10, delay: "-3.5s" },
+        { right: "16%", top: "140px", w: 18, h: 8, delay: "-7s" }
+      ],
+      lightningEvery: ancient > 0 ? Math.max(7, 16 - ancient * 3) + "s" : "0s",
+      ghosts: ghosts, zombies: zombies, tombstones: tombstones, coffins: coffins,
+      stars: stars, fog: fog,
+      moonOpacity: (0.75 + health * 0.25).toFixed(2),
+      moonColor: health >= 0.5 ? "#ecead9" : "#e7b4a2",
+      moonGlowColor: health >= 0.5 ? "rgba(236,234,217,0.25)" : "rgba(178,48,52,0.38)",
+      pillars: [{ left: "calc(42% - 17px)" }, { left: "calc(51% - 17px)" }, { left: "calc(73% - 17px)" }],
+      ravens: [{ left: "calc(42% - 20px)", flip: 1 }, { left: "calc(51% - 18px)", flip: -1 }]
+    };
+  }
+}
+</script>
+</body>
+</html>

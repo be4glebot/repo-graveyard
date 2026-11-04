@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Repo Graveyard — landing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=UnifrakturMaguntia&amp;family=IM+Fell+English:ital@0;1&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#040509}
+a{color:#e6cf9a}a:hover{color:#ffd28f}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes flame{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.78)}}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.8}}
+@keyframes clouds{0%,100%{transform:translateX(0)}50%{transform:translateX(-70px)}}
+@keyframes fog{0%,100%{transform:translateX(0);opacity:.55}50%{transform:translateX(60px);opacity:.8}}
+@keyframes winflick{0%,100%{opacity:1}46%{opacity:1}48%{opacity:.15}52%{opacity:.9}74%{opacity:.3}76%{opacity:1}}
+@keyframes lightning{0%,94%,100%{opacity:0}95%{opacity:.5}95.6%{opacity:.05}96.4%{opacity:.4}97.4%{opacity:0}}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.1)}}
+.motion .bob{animation:bob 5s ease-in-out infinite}
+.motion .flame{animation:flame 1.1s ease-in-out infinite;transform-origin:50% 100%;transform-box:fill-box}
+.motion .twinkle{animation:twinkle 3s ease-in-out infinite}
+.motion .clouds{animation:clouds 50s ease-in-out infinite}
+.motion .fog{animation:fog 18s ease-in-out infinite}
+.motion .winflick{animation:winflick 7s steps(1,end) infinite}
+.motion .lightning{animation:lightning 11s linear infinite}
+.motion .blink{animation:blink 6s linear infinite;transform-origin:center;transform-box:fill-box}
+@media (prefers-reduced-motion: reduce){.motion .bob,.motion .flame,.motion .twinkle,.motion .clouds,.motion .fog,.motion .winflick,.motion .lightning,.motion .blink{animation:none}}
+.snd{min-height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;border:1px solid #2c2a35;background:rgba(10,8,14,.8);color:#b9b6a3;font:500 14px Inter,system-ui,sans-serif;cursor:pointer}
+.snd.on{border-color:#c22a3e;color:#ecead9;background:rgba(110,15,31,.4)}
+</style>
+</helmet>
+<div class="motion" style="position: relative; min-height: 900px; overflow: hidden; background: #040509; color: #ecead9; font-family: Inter, system-ui, sans-serif">
+  <div style="position: absolute; left: 0; right: 0; top: 0; height: 700px; background: linear-gradient(#070912, #140c16 70%, #1a0d14)"></div>
+  <sc-for list="{{stars}}" as="s" hint-placeholder-count="40">
+    <div class="twinkle" aria-hidden="true" style="position: absolute; left: {{s.left}}; top: {{s.top}}; width: {{s.size}}; height: {{s.size}}; border-radius: 50%; background: #ecead9; animation-delay: {{s.delay}}"></div>
+  </sc-for>
+
+  <div aria-hidden="true" style="position: absolute; left: 50%; top: 70px; width: 210px; height: 210px; margin-left: 140px; border-radius: 50%; background: #e7b4a2; box-shadow: 0 0 120px 40px rgba(178, 48, 52, .35)">
+    <div style="position: absolute; left: 46px; top: 56px; width: 34px; height: 34px; border-radius: 50%; background: #d89e8c"></div>
+    <div style="position: absolute; left: 120px; top: 110px; width: 22px; height: 22px; border-radius: 50%; background: #d89e8c"></div>
+  </div>
+
+  <svg class="clouds" aria-hidden="true" viewBox="0 0 1440 240" preserveAspectRatio="none" style="position: absolute; left: -60px; top: 120px; width: calc(100% + 120px); height: 240px">
+    <path d="M760 170 C730 170 720 140 750 134 C756 104 800 98 818 120 C838 94 890 100 896 132 C930 128 946 162 918 172 Z" fill="#08090f" opacity=".95"></path>
+    <path d="M940 210 C910 210 902 182 930 176 C936 150 978 146 994 166 C1014 142 1062 150 1066 178 C1098 176 1108 206 1082 214 Z" fill="#0a0b12" opacity=".9"></path>
+    <path d="M120 90 C96 90 88 66 112 62 C118 42 152 40 164 56 C182 38 220 44 222 66 C248 64 256 92 232 96 Z" fill="#0b0d16" opacity=".8"></path>
+  </svg>
+
+  <svg aria-hidden="true" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMax slice" style="position: absolute; left: 0; top: 180px; width: 100%; height: 520px">
+    <path d="M0 520 V420 C160 400 300 380 420 384 C520 386 580 340 640 300 L700 250 C740 236 780 240 820 262 L900 300 C980 330 1100 360 1240 380 C1340 392 1400 400 1440 404 V520 Z" fill="#07080e"></path>
+    <path d="M664 262 V196 H678 V184 H690 V196 H706 V120 L726 80 L746 120 V196 H770 V110 L830 62 L890 110 V196 H904 V70 L926 22 L948 70 V196 H970 V184 H982 V196 H998 V280 L820 262 Z" fill="#040509"></path>
+    <path d="M720 120 L726 92 L732 120 Z" fill="#040509"></path>
+    <rect x="812" y="138" width="8" height="15" rx="4" fill="#f4b860" opacity=".85"></rect>
+    <rect x="830" y="138" width="8" height="15" rx="4" fill="#f4b860" opacity=".55"></rect>
+    <rect class="winflick" x="722" y="150" width="7" height="13" rx="3.5" fill="#f4b860"></rect>
+    <rect x="921" y="96" width="10" height="20" rx="5" fill="#c22a3e"></rect>
+    <rect x="917" y="92" width="18" height="28" rx="9" fill="#c22a3e" opacity=".3" style="filter: blur(6px)"></rect>
+    <rect x="690" y="216" width="6" height="11" rx="3" fill="#f4b860" opacity=".4"></rect>
+    <path d="M998 280 C1040 292 1060 300 1100 318" stroke="#0c0d14" stroke-width="3" fill="none"></path>
+  </svg>
+
+  <div class="lightning" aria-hidden="true" style="position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 62% 10%, rgba(220, 228, 255, .7), transparent 60%)"></div>
+
+  <div style="position: absolute; left: 0; right: 0; top: 690px; bottom: 0; background: #06070c"></div>
+  <div class="fog" aria-hidden="true" style="position: absolute; left: -10%; right: -10%; top: 640px; height: 160px; z-index: 3; background: radial-gradient(ellipse at 30% 50%, rgba(160, 170, 190, .22), transparent 60%), radial-gradient(ellipse at 75% 60%, rgba(160, 170, 190, .18), transparent 55%); filter: blur(8px)"></div>
+
+  <svg aria-hidden="true" viewBox="0 0 1000 760" preserveAspectRatio="none" style="position: absolute; left: calc(50% - 470px); top: 150px; width: 940px; height: 700px; z-index: 2">
+    <path d="M90 760 V300 Q90 30 500 30 Q910 30 910 300 V760" fill="none" stroke="#1a1820" stroke-width="22"></path>
+    <path d="M90 760 V300 Q90 30 500 30 Q910 30 910 300 V760" fill="none" stroke="#2a2733" stroke-width="3"></path>
+    <path d="M130 760 V310 Q130 72 500 72 Q870 72 870 310 V760" fill="none" stroke="#14121a" stroke-width="6"></path>
+    <path d="M500 30 L500 4 M486 14 H514" stroke="#2a2733" stroke-width="6"></path>
+    <path d="M60 760 V250 H120 V760 Z M880 760 V250 H940 V760 Z" fill="#1d1b24" stroke="#2e2b38" stroke-width="2"></path>
+    <path d="M52 250 L90 200 L128 250 Z M872 250 L910 200 L948 250 Z" fill="#26232e"></path>
+    <path d="M60 330 H120 M60 430 H120 M60 530 H120 M60 630 H120 M880 330 H940 M880 430 H940 M880 530 H940 M880 630 H940" stroke="#15131a" stroke-width="3"></path>
+  </svg>
+  <svg aria-hidden="true" viewBox="0 0 44 34" style="position: absolute; left: calc(50% - 452px); top: 316px; width: 44px; height: 34px; z-index: 4"><path d="M6 26 Q10 14 22 14 Q28 9 35 11 L42 13 L35 15 Q33 22 26 25 L22 32 L20 25 L12 30 Z" fill="#020305"></path><circle class="blink" cx="34" cy="12.6" r="1.4" fill="#e03a4f"></circle></svg>
+  <svg aria-hidden="true" viewBox="0 0 44 34" style="position: absolute; left: calc(50% + 410px); top: 316px; width: 44px; height: 34px; z-index: 4; transform: scaleX(-1)"><path d="M6 26 Q10 14 22 14 Q28 9 35 11 L42 13 L35 15 Q33 22 26 25 L22 32 L20 25 L12 30 Z" fill="#020305"></path><circle class="blink" cx="34" cy="12.6" r="1.4" fill="#e03a4f" style="animation-delay: 2.4s"></circle></svg>
+
+  <main style="position: relative; z-index: 5; max-width: 760px; margin: 0 auto; padding: 300px 24px 0; display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center">
+    <span style="font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 13px; letter-spacing: 5px; text-transform: uppercase; color: #9b8a6a">Est. the day you ran git init</span>
+    <h1 style="margin: 0; font-family: 'UnifrakturMaguntia', 'IM Fell English', serif; font-weight: 400; font-size: 104px; line-height: .95; color: #ecead9; text-shadow: 0 0 30px rgba(194, 42, 62, .55), 0 4px 0 #1a0a10">Repo Graveyard</h1>
+    <p style="margin: 0; max-width: 540px; font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-size: 21px; line-height: 1.5; color: #c9c4ae">Every project you ever abandoned is still out there, waiting. Enter, and decide which of them may rise again.</p>
+    <form style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 10px 0 0">
+      <label for="gh-user" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0)">GitHub username</label>
+      <input id="gh-user" type="text" placeholder="Speak your GitHub name" style="width: 300px; height: 54px; box-sizing: border-box; padding: 0 18px; border-radius: 4px; border: 1px solid #3a3442; background: rgba(8, 7, 12, .9); color: #ecead9; font: 16px Inter, system-ui, sans-serif; box-shadow: inset 0 0 12px rgba(0, 0, 0, .8)">
+      <button type="submit" style="height: 54px; padding: 0 26px; border-radius: 4px; border: 1px solid #c22a3e; background: linear-gradient(#9b1c31, #6e0f1f); color: #fff1f2; font: 700 15px 'Cinzel', Georgia, serif; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 26px rgba(194, 42, 62, .45)">Open the gate</button>
+    </form>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center">
+      <button type="button" class="{{soundOnCls}}" onClick="{{soundOn}}" aria-pressed="{{soundOnPressed}}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16 9a4 4 0 0 1 0 6"></path><path d="M19 6a8 8 0 0 1 0 12"></path></svg>
+        Enter with sound
+      </button>
+      <button type="button" class="{{soundOffCls}}" onClick="{{soundOff}}" aria-pressed="{{soundOffPressed}}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M17 9l4 6"></path><path d="M21 9l-4 6"></path></svg>
+        In silence
+      </button>
+      <span style="color: #5a5466">·</span>
+      <a href="LightsOut.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; font-family: 'Cinzel', Georgia, serif; font-size: 14px; letter-spacing: 1px">Tour the Haunted Estate →</a>
+    </div>
+  </main>
+
+  <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 690px; z-index: 4; display: flex; justify-content: center; align-items: flex-end; gap: 64px">
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs>
+      <linearGradient id="ghostfade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#eef9ff" stop-opacity=".96"></stop>
+        <stop offset=".5" stop-color="#cfe9f5" stop-opacity=".78"></stop>
+        <stop offset="1" stop-color="#9fd8ee" stop-opacity="0"></stop>
+      </linearGradient>
+      <radialGradient id="ghosthood" cx=".5" cy=".32" r=".42">
+        <stop offset="0" stop-color="#0a1220" stop-opacity=".55"></stop>
+        <stop offset="1" stop-color="#0a1220" stop-opacity="0"></stop>
+      </radialGradient>
+      <filter id="tatter-a" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="6"></feDisplacementMap>
+      </filter>
+      <filter id="tatter-b" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="7"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="12"></feDisplacementMap>
+      </filter>
+      <filter id="wisp" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4"></feGaussianBlur></filter></defs></svg>
+    <svg viewBox="0 0 100 130" width="68" height="88" aria-hidden="true" style="overflow: visible">
+              <ellipse cx="48" cy="126" rx="44" ry="5" fill="#000" opacity=".55"></ellipse>
+              <g transform="rotate(-3 48 124)">
+                <path d="M14 124 V46 L48 4 L82 46 V124 Z" fill="#2b2c35" stroke="#3a3b46" stroke-width="2"></path>
+                <path d="M20 24 C26 16 36 14 40 14" stroke="#4a4b58" stroke-width="2" fill="none" opacity=".6"></path>
+                <path d="M30 70 H66 M34 78 H62 M36 86 H60" stroke="#191a21" stroke-width="2.4" stroke-linecap="round"></path>
+                <path d="M58 20 L52 36 L58 46 L52 60" fill="none" stroke="#111218" stroke-width="2" opacity="1"></path>
+                <g opacity="1"><path d="M14 124 C16 108 22 104 26 112 C28 100 34 104 34 124 Z M62 124 C64 112 72 110 76 124 Z M14 76 C10 84 12 96 16 100 Z" fill="#33452a"></path></g>
+                <rect x="6" y="120" width="84" height="7" rx="2" fill="#16171d"></rect>
+              </g>
+              <rect x="88" y="108" width="7" height="14" rx="1" fill="#d9d4c0"></rect>
+              <path class="flame" d="M91.5 95 C95 100 95 104 91.5 107 C88 104 88 100 91.5 95 Z" fill="#f4b860" style="filter: drop-shadow(0 0 6px #f4b860)"></path>
+            </svg>
+    <div class="bob" style="margin-bottom: 30px; filter: drop-shadow(0 0 20px rgba(159, 231, 255, .55))"><svg viewBox="0 0 120 170" width="80" height="114" aria-hidden="true" style="overflow: visible">
+                <g filter="url(#wisp)">
+                  <path d="M34 80 C18 90 8 104 0 124 C10 116 18 114 26 116 C22 108 26 96 34 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
+                  <path d="M86 80 C102 90 112 104 120 124 C110 116 102 114 94 116 C98 108 94 96 86 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
+                  <path d="M60 8 C36 8 26 28 26 52 C26 68 22 80 16 94 C10 108 14 120 20 130 C20 144 22 156 28 168 C34 160 38 156 42 160 C46 166 50 168 54 160 C58 154 62 154 66 162 C70 168 74 166 78 158 C82 152 88 154 92 164 C98 156 100 144 100 130 C106 120 110 108 104 94 C98 80 94 68 94 52 C94 28 84 8 60 8 Z" fill="url(#ghostfade)"></path>
+                  <ellipse cx="60" cy="56" rx="30" ry="38" fill="url(#ghosthood)"></ellipse>
+                </g>
+                <ellipse cx="48" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(-14 48 50)"></ellipse>
+                <ellipse cx="72" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(14 72 50)"></ellipse>
+                <circle cx="49" cy="54" r="1.6" fill="#9fe7ff" opacity="1"></circle>
+                <circle cx="71" cy="54" r="1.6" fill="#9fe7ff" opacity="1"></circle>
+                <path d="M54 72 C54 66 66 66 66 72 L65 92 C63 98 57 98 55 92 Z" fill="#04060b" opacity=".92"></path>
+                <path d="M46 62 L45 74 M74 62 L75 76" stroke="#04060b" stroke-width="1.4" opacity="0" stroke-linecap="round"></path>
+              </svg></div>
+    <svg viewBox="0 0 130 180" width="84" height="116" aria-hidden="true" style="overflow: visible">
+                <ellipse cx="62" cy="176" rx="40" ry="5" fill="#000" opacity=".5"></ellipse>
+                <path d="M54 118 L46 146 L36 172" stroke="#14161d" stroke-width="12" stroke-linecap="round" fill="none"></path>
+                <path d="M30 172 L44 174" stroke="#0b0c10" stroke-width="7" stroke-linecap="round"></path>
+                <path d="M68 118 L76 146 L74 172" stroke="#1a1c24" stroke-width="12" stroke-linecap="round" fill="none"></path>
+                <path d="M72 172 L86 174" stroke="#0b0c10" stroke-width="7" stroke-linecap="round"></path>
+                <path d="M50 76 L40 100 L42 124" stroke="#77806a" stroke-width="7" stroke-linecap="round" fill="none" opacity="1"></path>
+                <path d="M42 124 L38 132 M42 124 L44 133 M42 124 L48 130" stroke="#77806a" stroke-width="2.4" stroke-linecap="round" opacity="1"></path>
+                <path d="M50 76 L44 90" stroke="#77806a" stroke-width="7" stroke-linecap="round" opacity="0"></path>
+                <path d="M46 72 C40 92 42 110 48 122 L52 116 L56 124 L60 116 L64 125 L68 117 L74 123 C80 104 80 86 74 66 C66 58 52 60 46 72 Z" fill="#252831"></path>
+                <path d="M54 82 L60 96 M66 78 L62 90" stroke="#07080b" stroke-width="2" opacity="1"></path>
+                <g opacity="0"><path d="M54 84 Q62 80 70 84 M53 92 Q62 88 71 92 M54 100 Q62 96 70 100" stroke="#cfc8ad" stroke-width="2" fill="none" stroke-linecap="round"></path></g>
+                <circle cx="66" cy="96" r="4" fill="#4a1418" opacity="1"></circle>
+                <path d="M70 72 L94 86 L114 90" stroke="#77806a" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+                <path d="M114 90 L126 86 M114 90 L127 91 M114 90 L125 96 M113 92 L120 100" stroke="#77806a" stroke-width="2.4" stroke-linecap="round"></path>
+                <path d="M68 66 L76 58" stroke="#77806a" stroke-width="8" stroke-linecap="round"></path>
+                <g transform="rotate(22 82 48)">
+                  <ellipse cx="82" cy="46" rx="15" ry="18" fill="#77806a"></ellipse>
+                  <path d="M70 34 C74 26 86 24 94 32 M72 30 L68 22 M80 28 L80 18 M88 29 L92 21" stroke="#0c0d10" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"></path>
+                  <ellipse cx="76" cy="44" rx="4.6" ry="5.6" fill="#050507"></ellipse>
+                  <ellipse cx="89" cy="44" rx="4.6" ry="5.6" fill="#050507"></ellipse>
+                  <circle cx="76.5" cy="45" r="1.3" fill="#e2dc9c"></circle>
+                  <circle cx="88.5" cy="45" r="1.3" fill="#e2dc9c"></circle>
+                  <path d="M82 50 L80 55 L84 55 Z" fill="#050507" opacity="0"></path>
+                  <path d="M74 58 C76 68 88 68 90 58 Z" fill="#050507"></path>
+                  <path d="M77 59 V62 M80 59 V63 M83 59 V63 M86 59 V62" stroke="#cfc8ad" stroke-width="1.4"></path>
+                  <path d="M92 40 C96 44 96 50 92 54" stroke="#4a1418" stroke-width="2.5" fill="none" opacity="1"></path>
+                </g>
+              </svg>
+    <svg viewBox="0 0 130 70" width="100" height="54" aria-hidden="true">
+              <path d="M8 35 L28 10 L104 14 L122 35 L104 56 L28 60 Z" fill="#241713" stroke="#3a2620" stroke-width="2"></path>
+              <path d="M22 35 L34 18 L98 21 L110 35 L98 49 L34 52 Z" fill="none" stroke="#2f1f1a" stroke-width="1.5"></path>
+              <path d="M54 30 H76 M65 22 V48" stroke="#1a100d" stroke-width="3"></path>
+              <path d="M24 14 L108 56" stroke="#7d8492" stroke-width="3.5" stroke-dasharray="6 3"></path>
+              <path d="M24 56 L108 14" stroke="#7d8492" stroke-width="3.5" stroke-dasharray="6 3"></path>
+              <path d="M61 30 V26 A4 4 0 0 1 69 26 V30" fill="none" stroke="#9aa1ad" stroke-width="2"></path>
+              <rect x="57" y="30" width="16" height="12" rx="2" fill="#5b6270"></rect>
+            </svg>
+  </div>
+
+  <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 6; box-shadow: inset 0 0 260px 110px rgba(1, 1, 3, .92), inset 0 0 520px 60px rgba(70, 6, 16, .25)"></div>
+  <svg aria-hidden="true" viewBox="0 0 170 170" style="position: absolute; left: 0; top: 0; width: 200px; height: 200px; pointer-events: none; z-index: 6"><g fill="none" stroke="rgba(236, 234, 217, .14)" stroke-width="1"><path d="M0 0 L170 40 M0 0 L120 120 M0 0 L40 170 M0 0 L170 100 M0 0 L90 170"></path><path d="M30 7 Q24 24 7 30 M60 14 Q48 48 14 60 M95 22 Q72 72 22 95 M130 31 Q98 98 31 130"></path></g></svg>
+
+  <p style="position: absolute; left: 0; right: 0; bottom: 22px; z-index: 7; margin: 0; text-align: center; font-size: 13px; color: #9a95a3">Read-only. Repo Graveyard never changes anything on your GitHub.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sound: true }; }
+  renderVals() {
+    var self = this;
+    var on = this.state.sound;
+    var stars = [];
+    var seed = 5;
+    function rand() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < 46; i++) {
+      stars.push({ left: (rand() * 100).toFixed(2) + "%", top: Math.round(14 + rand() * 300) + "px", size: (rand() < 0.15 ? 3 : 2) + "px", delay: (rand() * 3).toFixed(2) + "s" });
+    }
+    return {
+      stars: stars,
+      soundOnCls: on ? "snd on" : "snd",
+      soundOffCls: on ? "snd" : "snd on",
+      soundOnPressed: on ? "true" : "false",
+      soundOffPressed: on ? "false" : "true",
+      soundOn: function () { self.setState({ sound: true }); },
+      soundOff: function () { self.setState({ sound: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

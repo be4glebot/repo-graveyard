@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Séance — habit-tracker</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#05070c}
+a{color:#f4b860}a:hover{color:#ffd28f}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes flame{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.8)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.motion .bob{animation:bob 6s ease-in-out infinite}
+.motion .flame{animation:flame 1.1s ease-in-out infinite;transform-origin:50% 100%;transform-box:fill-box}
+.motion .pulse{animation:pulse 2s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.motion .bob,.motion .flame,.motion .pulse{animation:none}}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;margin:0 2px;border-radius:6px;border:1px solid rgba(159,231,255,.45);background:rgba(159,231,255,.08);color:#9fe7ff;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13px;font-style:normal;text-decoration:none;white-space:nowrap;vertical-align:2px}
+.chip:hover{background:rgba(159,231,255,.16);color:#c9f3ff}
+.ask{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #2c3550;background:#0d1220;color:#ecead9;font:13px Inter,system-ui,sans-serif;cursor:pointer}
+.ask:hover{border-color:#9fe7ff}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+</style>
+</helmet>
+<div class="{{rootClass}}" style="min-height: 900px; display: flex; flex-wrap: wrap; background: #05070c; color: #ecead9; font-family: Inter, system-ui, sans-serif">
+
+  <section aria-label="Séance scene" style="flex: 999 1 560px; min-width: 0; min-height: 900px; position: relative; overflow: hidden">
+    <div style="position: absolute; left: 40px; top: 32px; display: flex; flex-direction: column; gap: 8px; z-index: 2">
+      <a href="Main.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; text-decoration: none">← Back to the estate</a>
+      <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #b9b6a3">Séance in progress</span>
+    </div>
+
+    <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 520px; height: 520px; margin: -280px 0 0 -260px; border-radius: 50%; background: rgba(159, 231, 255, .03); box-shadow: 0 0 120px 40px rgba(159, 231, 255, .05)"></div>
+    <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 340px; height: 340px; margin: -190px 0 0 -170px; border-radius: 50%; background: rgba(159, 231, 255, .04)"></div>
+
+    <div aria-hidden="true" class="bob" style="position: absolute; left: 50%; top: 50%; margin: -190px 0 0 -90px; filter: drop-shadow(0 0 34px rgba(159, 231, 255, .7))">
+      <svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs>
+      <linearGradient id="ghostfade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#eef9ff" stop-opacity=".96"></stop>
+        <stop offset=".5" stop-color="#cfe9f5" stop-opacity=".78"></stop>
+        <stop offset="1" stop-color="#9fd8ee" stop-opacity="0"></stop>
+      </linearGradient>
+      <radialGradient id="ghosthood" cx=".5" cy=".32" r=".42">
+        <stop offset="0" stop-color="#0a1220" stop-opacity=".55"></stop>
+        <stop offset="1" stop-color="#0a1220" stop-opacity="0"></stop>
+      </radialGradient>
+      <filter id="tatter-a" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="6"></feDisplacementMap>
+      </filter>
+      <filter id="tatter-b" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="7"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="12"></feDisplacementMap>
+      </filter>
+      <filter id="wisp" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4"></feGaussianBlur></filter></defs></svg><svg viewBox="0 0 120 170" width="190" height="270" aria-hidden="true" style="overflow: visible">
+                <g filter="url(#wisp)">
+                  <path d="M34 80 C18 90 8 104 0 124 C10 116 18 114 26 116 C22 108 26 96 34 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
+                  <path d="M86 80 C102 90 112 104 120 124 C110 116 102 114 94 116 C98 108 94 96 86 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
+                  <path d="M60 8 C36 8 26 28 26 52 C26 68 22 80 16 94 C10 108 14 120 20 130 C20 144 22 156 28 168 C34 160 38 156 42 160 C46 166 50 168 54 160 C58 154 62 154 66 162 C70 168 74 166 78 158 C82 152 88 154 92 164 C98 156 100 144 100 130 C106 120 110 108 104 94 C98 80 94 68 94 52 C94 28 84 8 60 8 Z" fill="url(#ghostfade)"></path>
+                  <ellipse cx="60" cy="56" rx="30" ry="38" fill="url(#ghosthood)"></ellipse>
+                </g>
+                <ellipse cx="48" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(-14 48 50)"></ellipse>
+                <ellipse cx="72" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(14 72 50)"></ellipse>
+                <circle cx="49" cy="54" r="1.6" fill="#9fe7ff" opacity="1"></circle>
+                <circle cx="71" cy="54" r="1.6" fill="#9fe7ff" opacity="1"></circle>
+                <path d="M54 72 C54 66 66 66 66 72 L65 92 C63 98 57 98 55 92 Z" fill="#04060b" opacity=".92"></path>
+                <path d="M46 62 L45 74 M74 62 L75 76" stroke="#04060b" stroke-width="1.4" opacity="0" stroke-linecap="round"></path>
+              </svg>
+    </div>
+
+    <sc-for list="{{candles}}" as="c" hint-placeholder-count="5">
+      <svg aria-hidden="true" viewBox="0 0 20 44" width="20" height="44" style="position: absolute; left: {{c.left}}; top: {{c.top}}; filter: drop-shadow(0 0 12px rgba(244, 184, 96, .7))">
+        <rect x="5" y="18" width="10" height="26" rx="2" fill="#ecead9"></rect>
+        <path class="flame" d="M10 2 C15 8 15 13 10 16 C5 13 5 8 10 2 Z" fill="#f4b860"></path>
+      </svg>
+    </sc-for>
+
+    <p style="position: absolute; left: 0; right: 0; bottom: 56px; margin: 0; text-align: center; font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-size: 20px; color: #b9b6a3">The ghost of <span style="color: #ecead9">habit-tracker</span> answers.</p>
+  </section>
+
+  <aside aria-label="Repository record" style="flex: 1 1 520px; max-width: 640px; min-width: 0; box-sizing: border-box; padding: 36px 40px 40px; background: #161d31; border-left: 1px solid #232b40; display: flex; flex-direction: column; gap: 26px">
+
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h1 style="margin: 0; font-family: 'IM Fell English', Georgia, serif; font-weight: 400; font-size: 40px; line-height: 1.1">habit-tracker</h1>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <span style="padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(143, 179, 89, .6); color: #b7d68a; font-size: 12px; font-weight: 500">Zombie · fresh</span>
+          <span style="padding: 4px 10px; border-radius: 999px; border: 1px solid #2c3550; color: #b9b6a3; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px">quiet 4 months</span>
+        </div>
+      </div>
+      <button type="button" aria-label="Close record" style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #2c3550; background: #0d1220; cursor: pointer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b9b6a3" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>
+      </button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #b9b6a3">
+        <span>Heartbeat · 52 weeks</span><span>flatlined 17 weeks</span>
+      </div>
+      <svg viewBox="0 0 520 64" preserveAspectRatio="none" role="img" aria-label="Weekly commits for the last 52 weeks: steady activity, then no commits for the last 17 weeks" style="width: 100%; height: 64px; border-bottom: 1px solid #232b40">
+        <polyline points="{{ekg}}" fill="none" stroke="#8fb359" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+      </svg>
+    </div>
+
+    <div id="facts" style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #b9b6a3">From GitHub</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px">
+        <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12px; color: #b9b6a3">Last push</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">4 months ago</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12px; color: #b9b6a3">Language</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">TypeScript</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12px; color: #b9b6a3">Last commit</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">wip: streak calc off by one</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12px; color: #b9b6a3">Open issues</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">3</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12px; color: #b9b6a3">Outdated dependencies</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">2 of 14</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12px; color: #b9b6a3">Unmerged branches</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">1</span></div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 22px; border-top: 1px solid #232b40">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <svg width="18" height="20" viewBox="0 0 100 120" aria-hidden="true"><path d="M50 8 C26 8 16 28 16 54 L16 104 Q24 96 31 106 Q38 116 45 106 Q50 98 55 106 Q62 116 69 106 Q76 96 84 104 L84 54 C84 28 74 8 50 8 Z" fill="#9fe7ff"></path></svg>
+        <h2 style="margin: 0; font-family: 'IM Fell English', Georgia, serif; font-weight: 400; font-style: italic; font-size: 22px">The ghost remembers…</h2>
+        <span style="margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #b9b6a3">AI · from the facts above</span>
+      </div>
+      <p style="margin: 0; font-family: 'IM Fell English', Georgia, serif; font-size: 21px; line-height: 1.6; color: #ecead9">You left me halfway through the streak counter. Your last three commits chased an off-by-one in <a class="chip" href="#facts">streak.ts</a>, and your final words were <a class="chip" href="#facts">a3f9c21</a> “wip: streak calc off by one.” There’s a TODO on <a class="chip" href="#facts">streak.ts:42</a> and an unmerged branch, <a class="chip" href="#facts">feature/reminders +2</a>. Issue <a class="chip" href="#facts">#7</a> says reminders never fire. Fix the streak first. Start there.</p>
+    </div>
+
+    <form style="display: flex; flex-direction: column; gap: 10px; margin: 0">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <label for="ask-ghost" style="font-size: 14px; font-weight: 500">Ask the ghost</label>
+        <span class="pulse" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #9fe7ff">3 questions left</span>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <input id="ask-ghost" type="text" placeholder="What was feature/reminders for?" style="flex: 1; min-width: 0; height: 44px; box-sizing: border-box; padding: 0 14px; border-radius: 10px; border: 1px solid #2c3550; background: #0d1220; color: #ecead9; font: 14px Inter, system-ui, sans-serif">
+        <button type="submit" style="height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid #9fe7ff; background: rgba(159, 231, 255, .1); color: #c9f3ff; font: 500 14px Inter, system-ui, sans-serif; cursor: pointer">Ask</button>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <button type="button" class="ask">Which dependency is furthest behind?</button>
+        <button type="button" class="ask">How much is left?</button>
+      </div>
+    </form>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 14px; border: 1px solid rgba(244, 184, 96, .35); background: rgba(244, 184, 96, .05)">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #e6cf9a">The verdict</span>
+        <span style="font-family: 'IM Fell English', Georgia, serif; font-size: 24px">Revive it</span>
+        <span style="font-size: 14px; line-height: 1.5; color: #b9b6a3">The bug is small and the next step is clear. Three short tasks gets it running again.</span>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+        <button type="button" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 20px; border-radius: 10px; border: 0; background: #f4b860; color: #1d1406; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1406" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"></path><path d="M6 11l6-6 6 6"></path></svg>
+          Revive
+        </button>
+        <button type="button" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 18px; border-radius: 10px; border: 1px solid #6b7280; background: #111827; color: #ecead9; font: 500 14px Inter, system-ui, sans-serif; cursor: pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa1ad" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+          Seal it away
+        </button>
+        <button type="button" style="min-height: 44px; padding: 0 6px; border: 0; background: none; color: #f4b860; font: 14px Inter, system-ui, sans-serif; text-decoration: underline; cursor: pointer">It was actually finished</button>
+      </div>
+    </div>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"motion":{"editor":"boolean","default":true,"section":"Scene"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var motion = this.props.motion ?? true;
+    var weeks = [2, 4, 3, 6, 5, 0, 7, 8, 4, 6, 9, 5, 3, 6, 8, 4, 7, 5, 9, 6, 3, 5, 8, 4, 6, 7, 3, 5, 2, 4, 3, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var base = 46;
+    var pts = ["0," + base];
+    weeks.forEach(function (c, i) {
+      var x = i * 10;
+      if (c === 0) {
+        pts.push((x + 10) + "," + base);
+      } else {
+        pts.push((x + 3) + "," + base);
+        pts.push((x + 5) + "," + (base - c * 4.4).toFixed(1));
+        pts.push((x + 7) + "," + (base + c * 1.2).toFixed(1));
+        pts.push((x + 10) + "," + base);
+      }
+    });
+    var candles = [
+      { left: "calc(50% - 210px)", top: "calc(50% + 140px)" },
+      { left: "calc(50% - 120px)", top: "calc(50% + 180px)" },
+      { left: "calc(50% - 10px)", top: "calc(50% + 196px)" },
+      { left: "calc(50% + 100px)", top: "calc(50% + 180px)" },
+      { left: "calc(50% + 190px)", top: "calc(50% + 140px)" }
+    ];
+    return { rootClass: motion ? "motion" : "", ekg: pts.join(" "), candles: candles };
+  }
+}
+</script>
+</body>
+</html>

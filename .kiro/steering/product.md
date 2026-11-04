@@ -18,8 +18,8 @@ A zombie means **undecided**. The goal of the app is to give developers **direct
 Most developers have a pile of half-finished side projects. Some they've forgotten exist; for the rest they have no direction: they don't know what's broken, how much is left, or whether it's even worth finishing. And the hardest part of coming back isn't the code, it's **forgetting where you left off**: what you were in the middle of, what was broken, which branch had the real work. So the projects sit there, and the developer feels vaguely guilty about all of them.
 
 ## Who it's for
-- Students and hobbyists with many side projects
-- Developers cleaning up their GitHub profile
+- **Students before recruiting season** cleaning up their GitHub profile: decide what to finish, mark what's done, seal and archive the rest (the lead use case in the pitch)
+- Developers returning to an old project who need "where was I?" answered in a minute (séance + Revive in Kiro)
 - Anyone who wants a nudge and a plan to finish one thing
 
 ## Lifecycle rules
@@ -45,8 +45,8 @@ Overrides: `finished`, `scrapped`, `revived`, or none. "Mark as unfinished" just
 
 ### Signals
 - Forks are excluded. Organizations work too (same rules).
-- **Finished signals** (computed from the single bulk query, no extra calls): has at least one release; has a homepage/live URL; README larger than a stub (~1 KB); last commit subject sounds final ("v1.0", "release", "final", "done", "ship"); is popular (stars at or above the "popular" threshold, default 50 — a widely-starred shipped project like `resque` or `unicorn` reads as finished even without a GitHub Release). ("Few open issues" is deliberately NOT a signal: almost every solo side project has zero issues, finished or not.)
-- **Unfinished signals:** last commit subject contains "wip", "todo", "temp", "fix later"; an explicitly empty README (0 bytes) — a README we simply could not find is neutral, not a strike, because older repos often use `README.rdoc`, `README.markdown`, `README.mkd`, etc., which the two bulk-query lookups (`README.md`/`readme.md`) don't see, and we won't add more lookups (they timed the query out); open issues ≥ the "many issues" threshold, but only for non-popular repos (stars below the "popular" threshold) — a popular project accumulates open issues precisely because people use it, so its backlog is not treated as a sign of abandonment.
+- **Finished signals** (computed from the single bulk query, no extra calls): has at least one release; has a homepage/live URL; README larger than a stub (~1 KB); last commit subject sounds final ("v1.0", "release", "final", "done", "ship"). ("Few open issues" is deliberately NOT a signal: almost every solo side project has zero issues, finished or not.)
+- **Unfinished signals:** last commit subject contains "wip", "todo", "temp", "fix later"; no README; open issues ≥ the "many issues" threshold.
 - **Rule:** finished iff (finished signals − unfinished signals) ≥ 2.
 - **Days quiet** = whole days between last push and now, floored, never negative. Missing push date → use the created date.
 - **Scrapped** is about intent, so the only automatic guess is rule 3 (archived with no finished signals).
@@ -81,18 +81,45 @@ Reviving can't change GitHub, so it's a promise. A risen zombie stands up, glows
    - Seal → a eulogy README section (what it was, what was learned). Copy button. The repo moves to the crypt.
    - Users can also mark a zombie **finished** ("it was actually done") → tombstone with an epitaph.
 8. **Summon me later**: after reviving, "Summon me in 7 days" downloads a calendar reminder (.ics) linking back to the repo's page. Accountability with no accounts or servers.
+9. **Revive in Kiro** (the headline feature): reviving a zombie (or "Resume in Kiro" on a ghost) produces a ready-to-use Kiro spec for that repo, so the user drops it into the old project, opens Kiro, and starts at task 1. It turns "where you left off" into work Kiro can execute.
+   - Files (built by a pure function, `lib/kiroExport.ts`, from the facts and the revival plan the app already has; no extra LLM call):
+     - `.kiro/specs/revive-<repo>/requirements.md`: one EARS requirement per piece of unfinished business (the wip commit, each TODO/FIXME, each unmerged branch, each open issue, max 8), each with an `Evidence:` line (SHA, file:line, branch or issue number).
+     - `.kiro/specs/revive-<repo>/design.md`: current state (language, last push, what the README says it is), the dependency upgrade order, and which branch to merge first.
+     - `.kiro/specs/revive-<repo>/tasks.md`: Kiro task format (`- [ ] 1. …`), the 3 revival-plan tasks first, then dependency upgrades, then merging branches, each task referencing its requirement and evidence.
+     - `.kiro/steering/revival.md` (`inclusion: always`): the project's story in a few lines ("resurrected after N days quiet; you left off in streak.ts; finish, don't rewrite").
+   - UI: a "Revive in Kiro" modal shows a file tree and a preview of each file, then **Download .zip** (built in the browser) and per-file **Copy** buttons, plus 3 numbered instructions: unzip into the repo root, open the folder in Kiro, open the spec and start task 1.
+   - Read-only as always: nothing is pushed to GitHub.
+   - The Haunted Estate has a pre-built export for one zombie so judges can try it without an account.
+10. **Haunt your README**: every detail panel offers a badge snippet. The badge (`/badge/[user]/[repo]`) is a small SVG showing the creature, its state and days quiet ("ghost · flickering · 44 days"), so the warning lives where the user already looks. A profile card (`/card/[user]`) shows a mini graveyard for a profile README. Badges link back to the repo's page.
+11. **Owner mode (Sign in with GitHub)**: anyone can view any graveyard without logging in. Signing in proves you own a graveyard and lets you correct it:
+   - On your own graveyard, every creature's menu gains **Mark finished**, **Seal it away**, **Revive** and **Undo**, and creatures can be dragged between zones. Changes play their moment (Rest, Seal, Revive) and are saved server-side, so they follow you across devices and show for every visitor, on your badges, profile card and share card.
+   - A small "Tended by its owner" seal in the header shows the verdicts came from the owner, not from guesses.
+   - Login asks for **identity only** (no repository access). The app still never changes anything on GitHub.
+   - Logged out, overrides still work but stay in this browser only, with a gentle "Sign in to make this permanent" prompt.
+   - Visitors never see edit controls on someone else's graveyard. The Haunted Estate never requires login.
+12. **Share card**: each graveyard has an Open Graph image of the scene, so a shared link unfurls as a picture.
+13. **Graveyards opened counter**: the landing page shows how many graveyards have been opened (one Redis counter, no usernames stored).
+
+### The return loop
+Warned (turning-soon notice, badge in the README) → Revive in Kiro → push → the ghost heals on the next visit (and on the badge). "Summon me" reminders bring the user back in between.
+
+### graveyard-mcp (a companion for developers in Kiro)
+A small MCP server in `mcp/` that exposes the graveyard to AI coding tools, including Kiro itself. It calls the deployed app's public JSON API (no GitHub token in the MCP server). Tools:
+- `list_graveyard(username)`: counts and every creature with state, decay level and days quiet
+- `turning_soon(username, withinDays = 30)`: ghosts about to turn, soonest first
+- `seance_facts(owner, repo)`: the grounded séance facts (commits, TODOs, branches, issues), no LLM prose
+- `revive_spec(owner, repo)`: the same file map as the Revive in Kiro export
+It's configured for this workspace in `.kiro/settings/mcp.json` and used by the `graveyard-keeper` custom agent ("what should I work on before it dies?").
 
 ## Should-have (week 4, if the MVP is solid)
 - **The Coroner's Ledger**: a graveyard-wide report of your patterns, from data the app already has: median project lifespan (created → last push), how many weeks in most projects go quiet, which languages your zombies are in, revive vs seal counts, and a one-line pattern drawn only from those numbers (e.g. "most of your projects go quiet within 3 weeks of being created"). Presented as an old ledger page.
 
 ## Stretch features (only after the MVP is deployed and polished)
 In priority order:
-1. **Haunted badges**: public SVG endpoints for a repo badge (`/badge/[user]/[repo].svg`, "flickering, 41 days") and a profile card (`/card/[user].svg`, a mini graveyard for a profile README). Read-only and cheap; GitHub profile widgets are hugely popular, and every embed is free distribution.
-2. **Share image**: a dynamic Open Graph image of each user's graveyard, so a shared link unfurls as a picture of the scene (helps the Social Blitz prize).
-3. Sign in with GitHub (GitHub App, user picks repos) for private repos; overrides saved server-side
-4. "Create these 3 issues" button for revival plans
-5. "Seal" button that commits the eulogy to the README and archives the repo
-6. Tiny browser extension that adds ghost/zombie/tombstone badges next to repos on github.com
+1. Private repos (needs repository access; opt-in only, and only if there's time)
+2. "Create these 3 issues" button for revival plans
+3. "Seal" button that commits the eulogy to the README and archives the repo
+4. Tiny browser extension that adds ghost/zombie/tombstone badges next to repos on github.com
 
 Every write action must show a preview of exactly what will change and require an explicit click. Nothing is ever changed automatically.
 
