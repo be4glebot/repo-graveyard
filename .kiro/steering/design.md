@@ -155,9 +155,20 @@ Same scene, populated from fixtures, with a small brass plaque in the corner: "S
 Performance: SVG filters are costly; use them on hovered, on-screen hero creatures, not all 100 (see tech.md performance budget).
 
 **Painted art, data-driven motion.** The look is rough and dreary (scratchy ink, charcoal, grime), never smooth vector, cute or realistic.
-- Creature and backdrop images live in `public/art/` as WebP, named exactly as in `docs/ART_PROMPTS.md`: `ghost-0`…`ghost-3`, `zombie-0`…`zombie-4`, `risen`, `tomb-{arch|cross|gothic}-{fresh|old}`, `coffin`, `mausoleum`, `bg-sky`, `bg-castle`, `bg-hills`, `mg-fence`, `fg-frame`, `tex-grime`.
+- Creature and backdrop images live in `public/art/` as WebP, named: `ghost-0`…`ghost-3`, `zombie-0`…`zombie-4`, `risen`, `tomb-arch-fresh` (more tombstone variants may be added as `tomb-{arch|cross|gothic}-{fresh|old}`; until then old stones reuse `tomb-arch-fresh` darker and tilted), `coffin`, `mausoleum`, and three parallax plates: `bg-far` (sky + castle + hills, opaque), `mg-fence` (gate centerpiece) with `mg-fence-tile` repeated horizontally to fill the width, and `fg-frame` (tree + thorns, transparent). Reference composition: `docs/design-canvas/ArtPreview.dc.html`.
 - Creature components choose the image from state + decay level (the data), then add motion in code: ghosts bob and sway, flicker by decay, glow by recency; zombies shamble with speed by decay; risen pulses cyan. Use `next/image` with explicit sizes.
-- Depth: the backdrop plates are parallax layers (sky slowest, foreground frame fastest) that move with the pointer and scroll; off with reduced motion. `tex-grime` overlays everything at low opacity with the grain.
+- Depth: `bg-far` moves least, `mg-fence` more, `fg-frame` most, following the pointer (and a slow idle drift); off with reduced motion. Darken plates with filters so creatures stay the brightest thing on screen. Film grain stays code-drawn.
+- **Behavior encodes decay too** (all transform/opacity, so it stays cheap; see `docs/design-canvas/ArtPreview.dc.html`):
+  - ghost 0 healthy: slow drifting path across its patch of sky, breathing scale, a soft animated ripple (SVG turbulence) on the shroud
+  - ghost 1 fading: drifts the other way, opacity slowly pulses
+  - ghost 2 flickering: blinks out and reappears a short distance away, with a stutter as it returns
+  - ghost 3 about to turn: sinks toward the ground and glitches with a brief red/cyan split every few seconds
+  - zombies 0–2: lurch in place (rotate from the feet, a step forward, pull back), slower as decay rises
+  - zombies 3–4: mostly still, with a sudden twitch every few seconds
+  - Hover/focus: the creature turns slightly toward the pointer and its glow brightens; never a lunge or jumpscare.
+  - Ambient events (at most one every ~20 s, data-driven like whispers): a healthy ghost glides across the sky, a zombie stops and turns its head, a candle gutters on an old tombstone.
+  - Stagger every loop with per-creature delays so nothing moves in sync. Reduced motion: all of it stops; decay still shows through the image and opacity.
+  - Optional upgrade if time allows: cut the hero zombie into layers (head, reaching arm, body) for a head loll and arm reach, or rig it in Rive. Time-box to 2 days.
 - Moon (color = health), fog (density = zombies) and lightning (frequency = ancient zombies) stay drawn in code because they show data.
 - Until an image exists, fall back to the placeholder vector creatures in `docs/design-canvas/` so nothing is blocked on art.
 

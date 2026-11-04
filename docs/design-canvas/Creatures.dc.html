@@ -18,7 +18,7 @@ body{margin:0;background:#06070b}
 .flicker-slow{animation:flickerSlow 4.2s steps(1,end) infinite}
 .flicker-fast{animation:flickerFast 2.1s steps(1,end) infinite}
 @media (prefers-reduced-motion: reduce){*{animation:none!important}}
-.card{border:1px solid #1e1c25;border-radius:6px;background:radial-gradient(ellipse at 50% 35%,#121320,#08090d 75%);padding:22px 12px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:250px;box-sizing:border-box;justify-content:flex-end}
+.card{border:1px solid #1e1c25;border-radius:6px;background:radial-gradient(ellipse at 50% 35%,#121320,#08090d 75%);padding:22px 12px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:290px;box-sizing:border-box;justify-content:flex-end}
 .t{font-family:Cinzel,Georgia,serif;font-weight:700;font-size:14px;letter-spacing:.5px;color:#ecead9}
 .s{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;color:#8d897b}
 h2{margin:0;font-family:Cinzel,Georgia,serif;font-weight:700;font-size:22px;letter-spacing:3px;text-transform:uppercase}
@@ -27,7 +27,7 @@ h2{margin:0;font-family:Cinzel,Georgia,serif;font-weight:700;font-size:22px;lett
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
 </style>
 </helmet>
-<div style="min-height: 1260px; box-sizing: border-box; padding: 56px 64px; background: #06070b; color: #ecead9; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 22px">
+<div style="min-height: 1380px; box-sizing: border-box; padding: 56px 64px; background: #06070b; color: #ecead9; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 22px">
   <svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs>
       <linearGradient id="ghostfade" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#eef9ff" stop-opacity=".96"></stop>
@@ -56,20 +56,7 @@ h2{margin:0;font-family:Cinzel,Georgia,serif;font-weight:700;font-size:22px;lett
   <div class="grid">
     <sc-for list="{{ghosts}}" as="g" hint-placeholder-count="4">
       <div class="card">
-        <div class="{{g.flicker}}" style="opacity: {{g.opacity}}; filter: {{g.glow}}"><svg viewBox="0 0 120 170" width="120" height="170" aria-hidden="true" style="overflow: visible">
-                <g filter="{{g.svgFilter}}">
-                  <path d="M34 80 C18 90 8 104 0 124 C10 116 18 114 26 116 C22 108 26 96 34 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
-                  <path d="M86 80 C102 90 112 104 120 124 C110 116 102 114 94 116 C98 108 94 96 86 90 Z" fill="url(#ghostfade)" opacity=".85"></path>
-                  <path d="{{g.path}}" fill="url(#ghostfade)"></path>
-                  <ellipse cx="60" cy="56" rx="30" ry="38" fill="url(#ghosthood)"></ellipse>
-                </g>
-                <ellipse cx="48" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(-14 48 50)"></ellipse>
-                <ellipse cx="72" cy="50" rx="6.5" ry="12" fill="#04060b" transform="rotate(14 72 50)"></ellipse>
-                <circle cx="49" cy="54" r="1.6" fill="#9fe7ff" opacity="{{g.glint}}"></circle>
-                <circle cx="71" cy="54" r="1.6" fill="#9fe7ff" opacity="{{g.glint}}"></circle>
-                <path d="M54 72 C54 66 66 66 66 72 L65 92 C63 98 57 98 55 92 Z" fill="#04060b" opacity=".92"></path>
-                <path d="M46 62 L45 74 M74 62 L75 76" stroke="#04060b" stroke-width="1.4" opacity="{{g.drip}}" stroke-linecap="round"></path>
-              </svg></div>
+        <div class="{{g.flicker}}" style="opacity: {{g.opacity}}; filter: {{g.glow}}"><img src="{{g.img}}" alt="" width="180" height="200" style="display: block; object-fit: contain; filter: {{g.imgFilter}}"></div>
         <span class="t">{{g.label}}</span><span class="s">{{g.range}}</span>
       </div>
     </sc-for>
@@ -79,35 +66,7 @@ h2{margin:0;font-family:Cinzel,Georgia,serif;font-weight:700;font-size:22px;lett
   <div class="grid">
     <sc-for list="{{zombies}}" as="z" hint-placeholder-count="5">
       <div class="card">
-        <svg viewBox="0 0 130 180" width="122" height="168" aria-hidden="true" style="overflow: visible">
-                <ellipse cx="62" cy="176" rx="40" ry="5" fill="#000" opacity=".5"></ellipse>
-                <path d="M54 118 L46 146 L36 172" stroke="#14161d" stroke-width="12" stroke-linecap="round" fill="none"></path>
-                <path d="M30 172 L44 174" stroke="#0b0c10" stroke-width="7" stroke-linecap="round"></path>
-                <path d="M68 118 L76 146 L74 172" stroke="#1a1c24" stroke-width="12" stroke-linecap="round" fill="none"></path>
-                <path d="M72 172 L86 174" stroke="#0b0c10" stroke-width="7" stroke-linecap="round"></path>
-                <path d="M50 76 L40 100 L42 124" stroke="{{z.skin}}" stroke-width="7" stroke-linecap="round" fill="none" opacity="{{z.arm2}}"></path>
-                <path d="M42 124 L38 132 M42 124 L44 133 M42 124 L48 130" stroke="{{z.skin}}" stroke-width="2.4" stroke-linecap="round" opacity="{{z.arm2}}"></path>
-                <path d="M50 76 L44 90" stroke="{{z.skin}}" stroke-width="7" stroke-linecap="round" opacity="{{z.stump}}"></path>
-                <path d="M46 72 C40 92 42 110 48 122 L52 116 L56 124 L60 116 L64 125 L68 117 L74 123 C80 104 80 86 74 66 C66 58 52 60 46 72 Z" fill="{{z.shirt}}"></path>
-                <path d="M54 82 L60 96 M66 78 L62 90" stroke="#07080b" stroke-width="2" opacity="{{z.tears}}"></path>
-                <g opacity="{{z.ribs}}"><path d="M54 84 Q62 80 70 84 M53 92 Q62 88 71 92 M54 100 Q62 96 70 100" stroke="#cfc8ad" stroke-width="2" fill="none" stroke-linecap="round"></path></g>
-                <circle cx="66" cy="96" r="4" fill="#4a1418" opacity="{{z.wound}}"></circle>
-                <path d="M70 72 L94 86 L114 90" stroke="{{z.skin}}" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-                <path d="M114 90 L126 86 M114 90 L127 91 M114 90 L125 96 M113 92 L120 100" stroke="{{z.skin}}" stroke-width="2.4" stroke-linecap="round"></path>
-                <path d="M68 66 L76 58" stroke="{{z.skin}}" stroke-width="8" stroke-linecap="round"></path>
-                <g transform="rotate(22 82 48)">
-                  <ellipse cx="82" cy="46" rx="15" ry="18" fill="{{z.head}}"></ellipse>
-                  <path d="M70 34 C74 26 86 24 94 32 M72 30 L68 22 M80 28 L80 18 M88 29 L92 21" stroke="#0c0d10" stroke-width="2" fill="none" stroke-linecap="round" opacity="{{z.hair}}"></path>
-                  <ellipse cx="76" cy="44" rx="4.6" ry="5.6" fill="#050507"></ellipse>
-                  <ellipse cx="89" cy="44" rx="4.6" ry="5.6" fill="#050507"></ellipse>
-                  <circle cx="76.5" cy="45" r="1.3" fill="{{z.eye}}"></circle>
-                  <circle cx="88.5" cy="45" r="1.3" fill="{{z.eye}}"></circle>
-                  <path d="M82 50 L80 55 L84 55 Z" fill="#050507" opacity="{{z.skull}}"></path>
-                  <path d="M74 58 C76 68 88 68 90 58 Z" fill="#050507"></path>
-                  <path d="M77 59 V62 M80 59 V63 M83 59 V63 M86 59 V62" stroke="#cfc8ad" stroke-width="1.4"></path>
-                  <path d="M92 40 C96 44 96 50 92 54" stroke="#4a1418" stroke-width="2.5" fill="none" opacity="{{z.wound}}"></path>
-                </g>
-              </svg>
+        <img src="{{z.img}}" alt="" width="190" height="190" style="display: block; object-fit: contain">
         <span class="t">{{z.label}}</span><span class="s">{{z.range}}</span>
       </div>
     </sc-for>
@@ -115,50 +74,16 @@ h2{margin:0;font-family:Cinzel,Georgia,serif;font-weight:700;font-size:22px;lett
 
   <div class="row"><h2 style="color: #e6cf9a">Decided</h2><span class="lead">What every zombie becomes: revived, laid to rest, or sealed away.</span></div>
   <div class="grid">
-    <div class="card"><div style="filter: drop-shadow(0 0 18px rgba(159, 231, 255, .55))"><svg viewBox="0 0 130 190" width="116" height="170" aria-hidden="true" style="overflow: visible">
-              <path d="M10 182 C24 162 106 162 120 182 Z" fill="#1a1612"></path>
-              <path d="M22 176 C40 168 90 168 108 176" stroke="#2a221b" stroke-width="3" fill="none"></path>
-              <path d="M56 124 L54 172 M72 124 L74 172" stroke="#14161d" stroke-width="12" stroke-linecap="round"></path>
-              <path d="M50 76 L36 104 L32 128 M80 76 L94 104 L98 128" stroke="#9aa597" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-              <path d="M32 128 L28 136 M32 128 L33 138 M98 128 L102 136 M98 128 L97 138" stroke="#9aa597" stroke-width="2.4" stroke-linecap="round"></path>
-              <path d="M50 70 C44 92 46 112 52 128 L58 122 L64 130 L70 122 L76 128 C82 112 84 92 78 70 C70 62 58 62 50 70 Z" fill="#23262f"></path>
-              <path d="M64 66 V56" stroke="#9aa597" stroke-width="8" stroke-linecap="round"></path>
-              <ellipse cx="64" cy="40" rx="15" ry="18" fill="#9aa597"></ellipse>
-              <ellipse cx="58" cy="38" rx="4.6" ry="5.4" fill="#050507"></ellipse>
-              <ellipse cx="70" cy="38" rx="4.6" ry="5.4" fill="#050507"></ellipse>
-              <circle cx="58" cy="39" r="2.2" fill="#9fe7ff"></circle>
-              <circle cx="70" cy="39" r="2.2" fill="#9fe7ff"></circle>
-              <path d="M58 52 C60 56 68 56 70 52" stroke="#050507" stroke-width="2.4" fill="none"></path>
-            </svg></div><span class="t">Risen</span><span class="s">revived · push within 14 days</span></div>
+    <div class="card"><div style="filter: drop-shadow(0 0 18px rgba(159, 231, 255, .55))"><img src="art/risen.webp" alt="" width="150" height="190" style="display: block; object-fit: contain"></div><span class="t">Risen</span><span class="s">revived · push within 14 days</span></div>
     <sc-for list="{{tombs}}" as="t" hint-placeholder-count="2">
-      <div class="card"><svg viewBox="0 0 100 130" width="112" height="146" aria-hidden="true" style="overflow: visible">
-              <ellipse cx="48" cy="126" rx="44" ry="5" fill="#000" opacity=".55"></ellipse>
-              <g transform="rotate({{t.tilt}} 48 124)">
-                <path d="{{t.shape}}" fill="#2b2c35" stroke="#3a3b46" stroke-width="2"></path>
-                <path d="M20 24 C26 16 36 14 40 14" stroke="#4a4b58" stroke-width="2" fill="none" opacity=".6"></path>
-                <path d="M30 70 H66 M34 78 H62 M36 86 H60" stroke="#191a21" stroke-width="2.4" stroke-linecap="round"></path>
-                <path d="M58 20 L52 36 L58 46 L52 60" fill="none" stroke="#111218" stroke-width="2" opacity="{{t.crack}}"></path>
-                <g opacity="{{t.moss}}"><path d="M14 124 C16 108 22 104 26 112 C28 100 34 104 34 124 Z M62 124 C64 112 72 110 76 124 Z M14 76 C10 84 12 96 16 100 Z" fill="#33452a"></path></g>
-                <rect x="6" y="120" width="84" height="7" rx="2" fill="#16171d"></rect>
-              </g>
-              <rect x="88" y="108" width="7" height="14" rx="1" fill="#d9d4c0"></rect>
-              <path class="flame" d="M91.5 95 C95 100 95 104 91.5 107 C88 104 88 100 91.5 95 Z" fill="#f4b860" style="filter: drop-shadow(0 0 6px #f4b860)"></path>
-            </svg><span class="t">{{t.label}}</span><span class="s">{{t.range}}</span></div>
+      <div class="card"><img src="art/tomb-arch-fresh.webp" alt="" width="140" height="170" style="display: block; object-fit: contain; transform: rotate({{t.tilt}}deg); filter: {{t.imgFilter}}"><span class="t">{{t.label}}</span><span class="s">{{t.range}}</span></div>
     </sc-for>
-    <div class="card"><div style="padding-bottom: 30px"><svg viewBox="0 0 130 70" width="150" height="80" aria-hidden="true">
-              <path d="M8 35 L28 10 L104 14 L122 35 L104 56 L28 60 Z" fill="#241713" stroke="#3a2620" stroke-width="2"></path>
-              <path d="M22 35 L34 18 L98 21 L110 35 L98 49 L34 52 Z" fill="none" stroke="#2f1f1a" stroke-width="1.5"></path>
-              <path d="M54 30 H76 M65 22 V48" stroke="#1a100d" stroke-width="3"></path>
-              <path d="M24 14 L108 56" stroke="#7d8492" stroke-width="3.5" stroke-dasharray="6 3"></path>
-              <path d="M24 56 L108 14" stroke="#7d8492" stroke-width="3.5" stroke-dasharray="6 3"></path>
-              <path d="M61 30 V26 A4 4 0 0 1 69 26 V30" fill="none" stroke="#9aa1ad" stroke-width="2"></path>
-              <rect x="57" y="30" width="16" height="12" rx="2" fill="#5b6270"></rect>
-            </svg></div><span class="t">Chained coffin</span><span class="s">scrapped on purpose · at peace</span></div>
+    <div class="card"><div style="padding-bottom: 10px"><img src="art/coffin.webp" alt="" width="200" height="130" style="display: block; object-fit: contain"></div><span class="t">Chained coffin</span><span class="s">scrapped on purpose · at peace</span></div>
   </div>
   <p style="margin: 8px 0 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #8d897b; line-height: 1.8">Moon: pale when the living lead, blood-red when the undead outnumber them · Fog density = number of undecided zombies · Lightning frequency = ancient zombies · Tombstone shape varies by repo, moss and cracks = years at rest</p>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1260}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1380}}'>
 var GHOST_LOOK = [
   { op: 1, glow: "drop-shadow(0 0 26px rgba(159,231,255,0.7))", path: "M60 8 C36 8 26 28 26 52 C26 68 22 80 16 94 C10 108 14 120 20 130 C20 144 22 156 28 168 C34 160 38 156 42 160 C46 166 50 168 54 160 C58 154 62 154 66 162 C70 168 74 166 78 158 C82 152 88 154 92 164 C98 156 100 144 100 130 C106 120 110 108 104 94 C98 80 94 68 94 52 C94 28 84 8 60 8 Z", filt: "url(#wisp)", flicker: "", glint: 1, drip: 0 },
   { op: 0.78, glow: "drop-shadow(0 0 16px rgba(159,231,255,0.45))", path: "M60 8 C36 8 26 28 26 52 C26 68 22 80 16 94 C10 108 14 120 20 130 C20 144 22 156 28 168 C34 160 38 156 42 160 C46 166 50 168 54 160 C58 154 62 154 66 162 C70 168 74 166 78 158 C82 152 88 154 92 164 C98 156 100 144 100 130 C106 120 110 108 104 94 C98 80 94 68 94 52 C94 28 84 8 60 8 Z", filt: "url(#tatter-a)", flicker: "", glint: 0.7, drip: 0 },
@@ -178,11 +103,11 @@ class Component extends DCLogic {
     var gl = [["0 · Healthy", "under 14 days quiet"], ["1 · Fading", "14–30 days quiet"], ["2 · Flickering", "30–60 days quiet"], ["3 · About to turn", "60–90 days quiet"]];
     var zl = [["0 · Fresh", "3–6 months quiet"], ["1 · Rotting", "6–12 months quiet"], ["2 · Decayed", "1–2 years quiet"], ["3 · Skeletal", "2–3 years quiet"], ["4 · Ancient", "3+ years quiet"]];
     return {
-      ghosts: GHOST_LOOK.map(function (k, i) { return { label: gl[i][0], range: gl[i][1], opacity: k.op, glow: k.glow, path: k.path, svgFilter: k.filt, flicker: k.flicker, glint: k.glint, drip: k.drip }; }),
-      zombies: ZOMBIE_LOOK.map(function (k, i) { var o = Object.assign({}, k); o.label = zl[i][0]; o.range = zl[i][1]; return o; }),
+      ghosts: GHOST_LOOK.map(function (k, i) { return { img: "art/ghost-" + i + ".webp", imgFilter: "none", label: gl[i][0], range: gl[i][1], opacity: k.op, glow: k.glow, path: k.path, svgFilter: k.filt, flicker: k.flicker, glint: k.glint, drip: k.drip }; }),
+      zombies: ZOMBIE_LOOK.map(function (k, i) { var o = Object.assign({}, k); o.img = "art/zombie-" + i + ".webp"; o.label = zl[i][0]; o.range = zl[i][1]; return o; }),
       tombs: [
-        { label: "Tombstone, fresh", range: "finished · a candle burns", shape: TOMB_SHAPE.arch, tilt: 0, crack: 0, moss: 0 },
-        { label: "Tombstone, old", range: "moss + cracks = years at rest", shape: TOMB_SHAPE.gothic, tilt: -5, crack: 1, moss: 1 }
+        { label: "Tombstone, fresh", range: "finished · a candle burns", tilt: 0, imgFilter: "none" },
+        { label: "Tombstone, old", range: "moss + cracks = years at rest", tilt: -6, imgFilter: "brightness(.6) sepia(.35) contrast(1.1)" }
       ]
     };
   }
