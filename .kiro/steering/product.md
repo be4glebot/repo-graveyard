@@ -35,7 +35,7 @@ Most developers have a pile of half-finished side projects. Some they've forgott
 
 ### Precedence (first rule that matches wins)
 1. **User override** `finished` → Tombstone; `scrapped` → Coffin.
-2. **User override** `revived`: if the repo was pushed after the revive date → Ghost (override clears itself). Else if fewer than 14 days since reviving → **Risen**. Else → back to Zombie (override clears itself; the revival lapsed).
+2. **User override** `revived`: if fewer than 14 days since reviving and no push since → **Risen**. Otherwise (a push happened after reviving, or 14+ days passed without one) the override clears itself and classification continues with rule 3 as if there were no override.
 3. **Archived on GitHub** → Tombstone if it has finished signals, else Coffin.
 4. **Pushed within the last 90 days** → Ghost. (Activity beats a "finished" guess: a maintained, finished project that's still being pushed to is alive.)
 5. **Finished guess** (see signals) → Tombstone.
@@ -45,8 +45,10 @@ Overrides: `finished`, `scrapped`, `revived`, or none. "Mark as unfinished" just
 
 ### Signals
 - Forks are excluded. Organizations work too (same rules).
-- **Finished signals** (computed from the single bulk query, no extra calls): has at least one release, has a homepage/live URL, README larger than a stub (~1 KB), few open issues, or last commit message sounds final ("v1.0", "release", "final", "done", "ship"). Two or more signals = finished.
-- **Unfinished signals:** last commit message contains "wip", "todo", "temp", "fix later"; no README; many open issues. These can veto a single weak finished signal.
+- **Finished signals** (computed from the single bulk query, no extra calls): has at least one release; has a homepage/live URL; README larger than a stub (~1 KB); last commit subject sounds final ("v1.0", "release", "final", "done", "ship"). ("Few open issues" is deliberately NOT a signal: almost every solo side project has zero issues, finished or not.)
+- **Unfinished signals:** last commit subject contains "wip", "todo", "temp", "fix later"; no README; open issues ≥ the "many issues" threshold.
+- **Rule:** finished iff (finished signals − unfinished signals) ≥ 2.
+- **Days quiet** = whole days between last push and now, floored, never negative. Missing push date → use the created date.
 - **Scrapped** is about intent, so the only automatic guess is rule 3 (archived with no finished signals).
 - **The user always has the final say.** Overrides are set by dragging a creature into a zone (cemetery, crypt) or from a keyboard-accessible menu, and stored in the browser (localStorage, keyed by username), wrapped in try/catch. They're per device and per viewer; that's fine for the MVP.
 
