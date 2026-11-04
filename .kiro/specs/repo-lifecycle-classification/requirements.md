@@ -14,8 +14,8 @@ This feature implements the core repository lifecycle classification system for 
 - **Days quiet**: `floor((now − pushedAt) / 1 day)`, clamped to a minimum of 0. If `pushedAt` is null or absent, `createdAt` is used in its place.
 - **Decay level**: An integer sub-classification within a state indicating how far the repo has progressed through that state's range.
 - **Override**: A user-set `finished`, `scrapped`, or `revived` intent, stored per repo as `{ type, setAt }` in localStorage keyed by lowercased username; at most one per repo.
-- **Finished signals**: At least one release; non-empty homepageUrl; README larger than `readmeMinBytes`; last commit subject contains v1.0, release, final, done, or ship.
-- **Unfinished signals**: Last commit subject contains wip, todo, temp, or fix later; README size zero or missing; open issues at or above `manyIssues`. A repository is finished iff finished count minus unfinished count is at least 2.
+- **Finished signals**: At least one release; non-empty homepageUrl; README larger than `readmeMinBytes`; last commit subject contains v1.0, release, final, done, or ship; `stargazerCount` at or above `popularStars`.
+- **Unfinished signals**: Last commit subject contains wip, todo, temp, or fix later; README size exactly zero (a not-found README is neutral); open issues at or above `manyIssues` while `stargazerCount` is below `popularStars`. A repository is finished iff finished count minus unfinished count is at least 2.
 - **Lifecycle_Engine**: The pure classification module (`lib/lifecycle.ts`) that maps a repo and "now" to a lifecycle state and decay level.
 - **Finished_Detector**: The pure signal evaluation module (`lib/finished.ts`) that scores finished and unfinished signals.
 - **Override_Store**: The localStorage abstraction (`lib/overrides.ts`) that reads and writes per-username overrides.
@@ -100,10 +100,10 @@ This feature implements the core repository lifecycle classification system for 
 
 #### Acceptance Criteria
 
-1. THE Finished_Detector SHALL evaluate the following finished signals for a repository: (a) the repository has at least one release, (b) the repository has a non-empty `homepageUrl`, (c) the repository's README size is greater than the `readmeMinBytes` threshold (default 1024 bytes) from Lifecycle_Config, (d) the last commit's subject line (first line of the commit message) contains any of the strings "v1.0", "release", "final", "done", or "ship", matched case-insensitively.
-2. THE Finished_Detector SHALL evaluate the following unfinished signals for a repository: (a) the last commit's subject line (first line of the commit message) contains any of the strings "wip", "todo", "temp", or "fix later", matched case-insensitively, (b) the README size is zero bytes or the README is absent, (c) the open issue count is greater than or equal to the `manyIssues` threshold (default 10) from Lifecycle_Config.
+1. THE Finished_Detector SHALL evaluate the following finished signals for a repository: (a) the repository has at least one release, (b) the repository has a non-empty `homepageUrl`, (c) the repository's README size is greater than the `readmeMinBytes` threshold (default 1024 bytes) from Lifecycle_Config, (d) the last commit's subject line (first line of the commit message) contains any of the strings "v1.0", "release", "final", "done", or "ship", matched case-insensitively, (e) the repository's `stargazerCount` is greater than or equal to the `popularStars` threshold (default 50) from Lifecycle_Config.
+2. THE Finished_Detector SHALL evaluate the following unfinished signals for a repository: (a) the last commit's subject line (first line of the commit message) contains any of the strings "wip", "todo", "temp", or "fix later", matched case-insensitively, (b) the README size is exactly zero bytes (a not-found README, where `readmeBytes` is null, is neutral and does NOT count as an unfinished signal, since the repository may have a README in a format the two bulk-query lookups cannot see), (c) the open issue count is greater than or equal to the `manyIssues` threshold (default 10) from Lifecycle_Config AND the repository's `stargazerCount` is less than the `popularStars` threshold (default 50) from Lifecycle_Config (a popular repository's open-issue backlog does not count as an unfinished signal).
 3. THE Finished_Detector SHALL return true if and only if (finished signal count − unfinished signal count) ≥ 2.
-4. THE Finished_Detector SHALL read the `readmeMinBytes` and `manyIssues` thresholds from Lifecycle_Config and SHALL NOT use magic numbers.
+4. THE Finished_Detector SHALL read the `readmeMinBytes`, `manyIssues`, and `popularStars` thresholds from Lifecycle_Config and SHALL NOT use magic numbers.
 
 ---
 

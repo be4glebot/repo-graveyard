@@ -45,8 +45,8 @@ Overrides: `finished`, `scrapped`, `revived`, or none. "Mark as unfinished" just
 
 ### Signals
 - Forks are excluded. Organizations work too (same rules).
-- **Finished signals** (computed from the single bulk query, no extra calls): has at least one release; has a homepage/live URL; README larger than a stub (~1 KB); last commit subject sounds final ("v1.0", "release", "final", "done", "ship"). ("Few open issues" is deliberately NOT a signal: almost every solo side project has zero issues, finished or not.)
-- **Unfinished signals:** last commit subject contains "wip", "todo", "temp", "fix later"; no README; open issues ≥ the "many issues" threshold.
+- **Finished signals** (computed from the single bulk query, no extra calls): has at least one release; has a homepage/live URL; README larger than a stub (~1 KB); last commit subject sounds final ("v1.0", "release", "final", "done", "ship"); is popular (stars at or above the "popular" threshold, default 50 — a widely-starred shipped project like `resque` or `unicorn` reads as finished even without a GitHub Release). ("Few open issues" is deliberately NOT a signal: almost every solo side project has zero issues, finished or not.)
+- **Unfinished signals:** last commit subject contains "wip", "todo", "temp", "fix later"; an explicitly empty README (0 bytes) — a README we simply could not find is neutral, not a strike, because older repos often use `README.rdoc`, `README.markdown`, `README.mkd`, etc., which the two bulk-query lookups (`README.md`/`readme.md`) don't see, and we won't add more lookups (they timed the query out); open issues ≥ the "many issues" threshold, but only for non-popular repos (stars below the "popular" threshold) — a popular project accumulates open issues precisely because people use it, so its backlog is not treated as a sign of abandonment.
 - **Rule:** finished iff (finished signals − unfinished signals) ≥ 2.
 - **Days quiet** = whole days between last push and now, floored, never negative. Missing push date → use the created date.
 - **Scrapped** is about intent, so the only automatic guess is rule 3 (archived with no finished signals).

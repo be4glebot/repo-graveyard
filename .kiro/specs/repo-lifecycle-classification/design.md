@@ -142,6 +142,7 @@ export const LIFECYCLE_CONFIG = {
   reviveWindowDays: 14,
   readmeMinBytes: 1024,
   manyIssues: 10,
+  popularStars: 50, // stars >= this: finished signal, and suppresses many-issues
   finishedCommitKeywords: ["v1.0", "release", "final", "done", "ship"],
   unfinishedCommitKeywords: ["wip", "todo", "temp", "fix later"],
   finishedMargin: 2,
@@ -217,8 +218,8 @@ export function isFinished(repo: RepoFacts): boolean; // finished - unfinished >
 
 Signal evaluation:
 
-- Finished: `releaseCount >= 1`; `homepageUrl` non-empty after trim; `readmeBytes > readmeMinBytes`; commit subject (first line of `lastCommitMessage`) contains any finished keyword, case-insensitive. The commit counts as at most one finished signal even if several keywords match.
-- Unfinished: commit subject contains any unfinished keyword (at most one signal); `readmeBytes` is `null` or `0`; `openIssueCount >= manyIssues`.
+- Finished: `releaseCount >= 1`; `homepageUrl` non-empty after trim; `readmeBytes > readmeMinBytes`; commit subject (first line of `lastCommitMessage`) contains any finished keyword, case-insensitive (at most one finished signal from the commit even if several keywords match); `stargazerCount >= popularStars`.
+- Unfinished: commit subject contains any unfinished keyword (at most one signal); `readmeBytes === 0` (an explicitly empty README; `readmeBytes === null` is **neutral**, not unfinished, because a non-`.md` README may exist that the two bulk lookups can't see — and adding more lookups is off the table, it timed out the query); `openIssueCount >= manyIssues` **and** `stargazerCount < popularStars` (a popular repo's open-issue backlog is a sign of use, not abandonment, so many-issues does not count against it).
 - Returns `finished - unfinished >= 2`.
 
 ### `lib/overrides.ts` (client only)

@@ -9,7 +9,7 @@
         "command": "npm test -- --run --passWithNoTests"
       },
       "description": "Runs the Vitest suite (unit + property tests) after every spec task so regressions are caught immediately",
-      "timeout": 0,
+      "timeout": 90,
       "enabled": true
     }
   ]
