@@ -24,7 +24,14 @@
  * interactive. It hardcodes no hex; all color and type come from `@theme`
  * tokens.
  *
- * Requirements: 7.1, 7.2, 7.3, 7.5, 7.6, 7.7, 9.4, 13.1, 13.2
+ * Chrome treatment to match the painted boards (Req 15): the wordmark keeps the
+ * blackletter `font-wordmark` face (Req 15.1); the username renders in a
+ * bordered Cinzel badge/pill — uppercase, letter-spaced — in place of the old
+ * plain muted span (Req 15.2); the `SummaryLine` carries its own letter-spaced
+ * Cinzel treatment (Req 15.3); and the Lights-on and Sound toggles use the
+ * styled bordered `Toggle` treatment (Req 15.4).
+ *
+ * Requirements: 7.1, 7.2, 7.3, 7.5, 7.6, 7.7, 9.4, 13.1, 13.2, 15.1, 15.2, 15.3, 15.4
  */
 
 import { useRouter } from "next/navigation";
@@ -115,7 +122,10 @@ export default function Header({
           </span>
         ) : null}
         {username ? (
-          <span className="font-fact text-sm text-scene-fg-muted">
+          <span
+            data-testid="header-username-badge"
+            className="rounded-full border border-scene-fg-faint bg-night-sky/60 px-3 py-0.5 font-heading text-xs font-bold uppercase tracking-[2px] text-scene-fg"
+          >
             {username}
           </span>
         ) : null}

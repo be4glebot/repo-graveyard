@@ -2,16 +2,18 @@
  * Component / integration tests for the scene entry (`components/scene/SceneView`).
  *
  * `SceneView` is the stateful shell that owns scene interaction state and hands
- * derived view-model values to the presentational `Scene` (and, with the lights
- * on, `LightsOnTable`). These tests pin the interactive behavior that is not
+ * derived view-model values to the two navigation levels — the `EstateMap`
+ * (default) and a `PlaceView` for a single place — plus the `LightsOnTable`
+ * when the lights are on. These tests pin the interactive behavior that is not
  * covered by the pure view-model property tests:
  *
- *   - selecting a creature single-selects it and moves selection off the
- *     previous one (Req 9.6);
- *   - a deep-link `initialRepo` pre-selects the matching creature on the first
- *     paint, case-insensitively (Req 1.2);
- *   - the Lights-on toggle swaps the scene for the accessible register table
- *     and back (Req 10.6, and the readable register itself, Req 13.1 chrome);
+ *   - selecting a creature inside a place single-selects it and moves selection
+ *     off the previous one (Req 9.6);
+ *   - a deep-link `initialRepo` opens the place that holds the matching row and
+ *     pre-selects that creature on the first paint, case-insensitively
+ *     (Req 1.2, 11.1, 11.3);
+ *   - the Lights-on toggle swaps the current view for the accessible register
+ *     table and back (Req 10.6, 14.1);
  *   - the Sound toggle reflects its state without loading or playing any audio
  *     (Req 13.1, 13.2).
  *
@@ -19,12 +21,17 @@
  * vitest checks (aria-pressed/aria-checked attributes, querySelector), matching
  * the pattern in `tests/dom/Creature.test.tsx` and `tests/landing-form.test.tsx`.
  *
- * The Header (rendered inside `Scene`) calls `useRouter` from `next/navigation`,
- * which has no provider under jsdom, so we mock it to a no-op `push` exactly as
- * the landing-form test does. `next/image` works unmocked here (as it does in
- * `Creature.test.tsx`).
+ * The Header (rendered by SceneView over both views) calls `useRouter` from
+ * `next/navigation`, which has no provider under jsdom, so we mock it to a
+ * no-op `push` exactly as the landing-form test does. `next/image` works
+ * unmocked here (as it does in `Creature.test.tsx`).
  *
- * Requirements: 1.2, 9.6, 10.6, 13.1, 13.2
+ * Creatures are only selectable inside a `PlaceView` (the map shows decorative,
+ * `aria-hidden` representatives). Tests that exercise selection therefore render
+ * straight into a place with `at`, or arrive via a deep link; no travel
+ * transition plays on that initial resolution, so no timers need advancing.
+ *
+ * Requirements: 1.2, 9.6, 10.6, 13.1, 13.2, 14.1
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
@@ -74,17 +81,20 @@ function makeRepo(overrides: Partial<RepoFacts> & { name: string }): RepoFacts {
 }
 
 /**
- * A small set of repositories spanning several lifecycle states so the scene
+ * A small set of repositories spanning several lifecycle states so each place
  * renders a handful of creatures to interact with:
- *   - `fresh-ghost`  → ghost (pushed 1 day ago; daysLeft 89, so NOT turning-soon)
- *   - `old-zombie`   → zombie (quiet ~300 days, no finished signals)
- *   - `Done-Project` → tombstone (archived + a release => finished)
- * `Done-Project` carries mixed case on purpose so the case-insensitive deep
- * link can be exercised against it.
+ *   - `fresh-ghost`  → ghost  → sky   (pushed 1 day ago; NOT turning-soon)
+ *   - `old-zombie`   → zombie → gate  (quiet ~300 days, no finished signals)
+ *   - `Older-Zombie` → zombie → gate  (quiet ~320 days)
+ *   - `Done-Project` → coffin → crypt (archived + a release => finished)
+ * `old-zombie`/`Older-Zombie` share the gate so a single place view can hold two
+ * selectable creatures. `Done-Project` carries mixed case on purpose so the
+ * case-insensitive deep link can be exercised against it.
  */
 const REPOS: RepoFacts[] = [
   makeRepo({ name: "fresh-ghost", pushedAt: daysAgo(1) }),
   makeRepo({ name: "old-zombie", pushedAt: daysAgo(300) }),
+  makeRepo({ name: "Older-Zombie", pushedAt: daysAgo(320) }),
   makeRepo({
     name: "Done-Project",
     pushedAt: daysAgo(400),
@@ -112,8 +122,12 @@ function creatureButton(repoName: string): HTMLButtonElement {
   return screen.getByRole("button", { name: nameFor(repoName) }) as HTMLButtonElement;
 }
 
-/** Renders SceneView in live mode with the shared fixture; `initialRepo` optional. */
-function renderScene(initialRepo?: string) {
+/**
+ * Renders SceneView in live mode with the shared fixture. `initialRepo` is the
+ * deep-link `[repo]` segment; `at` is the initial `?at=` place. Opening a place
+ * on the initial resolution plays no travel, so tests need not advance timers.
+ */
+function renderScene(options: { initialRepo?: string; at?: string } = {}) {
   return render(
     <SceneView
       rows={initialRows()}
@@ -122,7 +136,8 @@ function renderScene(initialRepo?: string) {
       username="octocat"
       renderedAt={NOW}
       mode="live"
-      initialRepo={initialRepo}
+      initialRepo={options.initialRepo}
+      at={options.at}
     />,
   );
 }
@@ -148,70 +163,75 @@ afterEach(() => {
 });
 
 describe("SceneView", () => {
-  it("single-selects a creature and moves selection off the previous one (9.6)", async () => {
+  it("single-selects a creature inside a place and moves selection off the previous one (9.6)", async () => {
     const user = userEvent.setup();
-    renderScene();
+    // The gate holds both zombies, so one place view shows two selectable
+    // creatures. Opening a place on the initial resolution plays no travel.
+    renderScene({ at: "gate" });
 
-    const ghost = creatureButton("fresh-ghost");
     const zombie = creatureButton("old-zombie");
+    const olderZombie = creatureButton("Older-Zombie");
 
     // Nothing is selected before any interaction.
-    expect(ghost.getAttribute("aria-pressed")).toBe("false");
     expect(zombie.getAttribute("aria-pressed")).toBe("false");
+    expect(olderZombie.getAttribute("aria-pressed")).toBe("false");
 
-    // Activating the ghost selects it.
-    await user.click(ghost);
-    expect(creatureButton("fresh-ghost").getAttribute("aria-pressed")).toBe("true");
-    expect(creatureButton("old-zombie").getAttribute("aria-pressed")).toBe("false");
-
-    // Activating another creature moves the single selection; the ghost is no
-    // longer pressed (Req 9.6 — single-select replaces the previous).
-    await user.click(creatureButton("old-zombie"));
+    // Activating one zombie selects it.
+    await user.click(zombie);
     expect(creatureButton("old-zombie").getAttribute("aria-pressed")).toBe("true");
-    expect(creatureButton("fresh-ghost").getAttribute("aria-pressed")).toBe("false");
+    expect(creatureButton("Older-Zombie").getAttribute("aria-pressed")).toBe("false");
+
+    // Activating another creature moves the single selection; the first is no
+    // longer pressed (Req 9.6 — single-select replaces the previous).
+    await user.click(creatureButton("Older-Zombie"));
+    expect(creatureButton("Older-Zombie").getAttribute("aria-pressed")).toBe("true");
+    expect(creatureButton("old-zombie").getAttribute("aria-pressed")).toBe("false");
   });
 
-  it("deep-link initialRepo pre-selects the matching creature on first paint, case-insensitively (1.2)", () => {
-    // The fixture repo is `Done-Project`; the deep link arrives uppercased to
-    // prove the match is case-insensitive (Req 1.2).
-    renderScene("DONE-PROJECT");
+  it("deep-link initialRepo opens the holding place with the matching creature pre-selected, case-insensitively (1.2, 11.1)", () => {
+    // The fixture repo is `Done-Project` (archived + a release → coffin →
+    // crypt); the deep link arrives uppercased to prove the match is
+    // case-insensitive (Req 1.2). With no `?at=`, the view resolves to the place
+    // that holds the row (crypt) with the creature selected (Req 11.1/11.3).
+    renderScene({ initialRepo: "DONE-PROJECT" });
+
+    // The place view opened on the row's place.
+    expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
+      "crypt",
+    );
 
     // The matched creature is selected on the very first render — no click.
     expect(creatureButton("Done-Project").getAttribute("aria-pressed")).toBe("true");
-
-    // The others stay unselected: exactly one creature is pre-selected.
-    expect(creatureButton("fresh-ghost").getAttribute("aria-pressed")).toBe("false");
-    expect(creatureButton("old-zombie").getAttribute("aria-pressed")).toBe("false");
   });
 
-  it("Lights-on toggle reveals the accessible register table and hides the scene, then toggles back (10.6)", async () => {
+  it("Lights-on toggle reveals the accessible register table and hides the view, then toggles back (10.6, 14.1)", async () => {
     const user = userEvent.setup();
     renderScene();
 
-    // The scene is shown and the register is not, initially.
-    expect(screen.queryByTestId("scene-root")).not.toBeNull();
+    // The estate map is shown and the register is not, initially.
+    expect(screen.queryByTestId("estate-map")).not.toBeNull();
     expect(screen.queryByTestId("lights-on-view")).toBeNull();
     expect(screen.queryByRole("table")).toBeNull();
 
     // There may be more than one "Lights on" switch on screen over the test's
-    // life (the scene's header has one; the register's control bar has another),
-    // so always grab the currently-rendered one.
+    // life (the header has one; the register's control bar has another), so
+    // always grab the currently-rendered one.
     const lightsOn = () =>
       screen.getAllByRole("switch", { name: /lights on/i })[0] as HTMLButtonElement;
 
     await user.click(lightsOn());
 
-    // The accessible register table is now shown and the scene is gone.
+    // The accessible register table is now shown and the map is gone.
     expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
     expect(screen.queryByRole("table")).not.toBeNull();
-    expect(screen.queryByTestId("scene-root")).toBeNull();
+    expect(screen.queryByTestId("estate-map")).toBeNull();
 
     // The register carries its own Lights-on switch so the reader can return to
-    // the scene with the same data (Req 10.6).
+    // the view with the same data (Req 10.6).
     await user.click(lightsOn());
 
-    // Back to the scene, register gone.
-    expect(screen.queryByTestId("scene-root")).not.toBeNull();
+    // Back to the map, register gone.
+    expect(screen.queryByTestId("estate-map")).not.toBeNull();
     expect(screen.queryByTestId("lights-on-view")).toBeNull();
     expect(screen.queryByRole("table")).toBeNull();
   });
@@ -235,5 +255,74 @@ describe("SceneView", () => {
     // the Audio constructor was never invoked (Req 13.2 — sound is deferred).
     expect(document.querySelector("audio")).toBeNull();
     expect(audioSpy).not.toHaveBeenCalled();
+  });
+
+  // --- Lights-on preserve/restore (estate-map Req 14.4, 14.5, 14.6) --------
+  //
+  // Toggling the lights on freezes the interactive state; toggling them back
+  // off restores the exact prior view with a plain swap and no travel. These
+  // tests exercise the invariant from inside a place: the selected creature and
+  // the place view survive the on→off cycle, and the swap back is instant with
+  // no travel transition overlay.
+  describe("lights-on preserve/restore", () => {
+    it("restores the selected creature and place after a lights on then off cycle, with no travel (14.4, 14.5, 14.6)", async () => {
+      const user = userEvent.setup();
+      // Start inside the gate so a creature can be selected and the prior view
+      // (a place) is non-trivial.
+      renderScene({ at: "gate" });
+
+      const lightsOn = () =>
+        screen.getAllByRole("switch", { name: /lights on/i })[0] as HTMLButtonElement;
+
+      // Select a creature in the place; this is the state that must survive the
+      // lights-on round trip (Req 14.4).
+      await user.click(creatureButton("old-zombie"));
+      expect(creatureButton("old-zombie").getAttribute("aria-pressed")).toBe("true");
+
+      // Turn the lights on: the register replaces the place. Selection is held
+      // only in state, not shown in the register, so nothing is observable here
+      // beyond the place being gone.
+      await user.click(lightsOn());
+      expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
+      expect(screen.queryByTestId("place-view")).toBeNull();
+
+      // Turn the lights back off: the place view returns instantly...
+      await user.click(lightsOn());
+      expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
+        "gate",
+      );
+      expect(screen.queryByTestId("lights-on-view")).toBeNull();
+
+      // ...with the swap running NO travel transition (Req 14.6) — the overlay
+      // is never mounted on a lights-off restore.
+      expect(screen.queryByTestId("travel-transition")).toBeNull();
+
+      // ...and the previously selected creature is still selected (Req 14.5):
+      // the single selection was preserved across the whole cycle, and no other
+      // creature became selected.
+      expect(creatureButton("old-zombie").getAttribute("aria-pressed")).toBe("true");
+      expect(creatureButton("Older-Zombie").getAttribute("aria-pressed")).toBe("false");
+    });
+
+    it("restores the no-selection map when nothing was selected before lights-on (14.5)", async () => {
+      const user = userEvent.setup();
+      renderScene();
+
+      const lightsOn = () =>
+        screen.getAllByRole("switch", { name: /lights on/i })[0] as HTMLButtonElement;
+
+      // The map is the starting view with nothing selected.
+      expect(screen.queryByTestId("estate-map")).not.toBeNull();
+
+      // Lights on, then off again.
+      await user.click(lightsOn());
+      expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
+      await user.click(lightsOn());
+
+      // Back on the map instantly with no travel: the empty selection is
+      // preserved just as a non-empty one would be.
+      expect(screen.queryByTestId("estate-map")).not.toBeNull();
+      expect(screen.queryByTestId("travel-transition")).toBeNull();
+    });
   });
 });

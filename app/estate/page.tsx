@@ -44,7 +44,16 @@ import { buildRows } from "@/lib/graveyard-view";
  * boundary: it captures the single `renderedAt` timestamp, loads the bundled
  * estate fixture, and renders either the full-page error state or the scene.
  */
-async function EstateContent() {
+interface EstatePageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+async function EstateContent({ searchParams }: EstatePageProps) {
+  // Read `?at=` only here, during the initial server render; after hydration
+  // SceneView owns the view and this value is never read again (Req 10.4).
+  const { at: atParam } = await searchParams;
+  const at = Array.isArray(atParam) ? atParam[0] : atParam;
+
   // Capture the render instant exactly once. `connection()` opts this subtree
   // into dynamic rendering so the unstable clock read is allowed, matching the
   // live route's clock discipline.
@@ -73,15 +82,16 @@ async function EstateContent() {
       renderedAt={renderedAt}
       mode="estate"
       estateOverrides={overrides}
+      at={at}
     />
   );
 }
 
-export default function EstatePage() {
+export default function EstatePage({ searchParams }: EstatePageProps) {
   return (
     <main className="flex flex-1 flex-col">
       <Suspense fallback={null}>
-        <EstateContent />
+        <EstateContent searchParams={searchParams} />
       </Suspense>
     </main>
   );

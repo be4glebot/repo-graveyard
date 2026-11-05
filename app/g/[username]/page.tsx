@@ -45,6 +45,7 @@ import { buildRows } from "@/lib/graveyard-view";
 
 interface GraveyardPageProps {
   params: Promise<{ username: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 /**
@@ -74,8 +75,13 @@ function resetInMinutesFrom(
  * loads the graveyard, and renders either the in-scene error state or the
  * live scene.
  */
-async function GraveyardContent({ params }: GraveyardPageProps) {
+async function GraveyardContent({ params, searchParams }: GraveyardPageProps) {
   const { username } = await params;
+
+  // Read `?at=` only here, during the initial server render; after hydration
+  // SceneView owns the view and this value is never read again (Req 10.4).
+  const { at: atParam } = await searchParams;
+  const at = Array.isArray(atParam) ? atParam[0] : atParam;
 
   // Capture the render instant exactly once, after awaiting params so the read
   // sits in the dynamic request scope. `connection()` opts this subtree into
@@ -110,11 +116,12 @@ async function GraveyardContent({ params }: GraveyardPageProps) {
       username={username}
       renderedAt={renderedAt}
       mode="live"
+      at={at}
     />
   );
 }
 
-export default function GraveyardPage({ params }: GraveyardPageProps) {
+export default function GraveyardPage({ params, searchParams }: GraveyardPageProps) {
   return (
     <Suspense
       fallback={
@@ -123,7 +130,7 @@ export default function GraveyardPage({ params }: GraveyardPageProps) {
         </main>
       }
     >
-      <GraveyardContent params={params} />
+      <GraveyardContent params={params} searchParams={searchParams} />
     </Suspense>
   );
 }

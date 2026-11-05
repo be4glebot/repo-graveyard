@@ -1,0 +1,665 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create `lib/estate-view.ts` with types, place metadata, and constants": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666292
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899674514
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900052467
+      }
+    ],
+    "1.2 Add shared estate arbitraries to `tests/property/arbitraries.ts`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666392
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900058318
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900192995
+      }
+    ],
+    "2.1 Implement `placeOf` in `lib/estate-view.ts`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666525
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900059264
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900194006
+      }
+    ],
+    "2.2 Write property test for `placeOf`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666581
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900199020
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900279082
+      }
+    ],
+    "3.1 Implement `orderForPlace` in `lib/estate-view.ts`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666635
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900199657
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900280085
+      }
+    ],
+    "3.2 Write property test for `orderForPlace`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666696
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900284482
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900431266
+      }
+    ],
+    "4.1 Implement `paginate` in `lib/estate-view.ts`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666761
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900285544
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900432145
+      }
+    ],
+    "4.2 Write property test for `paginate`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666845
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900436785
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900590110
+      }
+    ],
+    "5.1 Implement `plaqueCopy` and a shared pluralization helper in `lib/estate-view.ts`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899666901
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900435860
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900524468
+      }
+    ],
+    "5.2 Write property test for `plaqueCopy`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667055
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900594817
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900818679
+      }
+    ],
+    "5.3 Write unit snapshot tests for exact plaque copy strings": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667109
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900596185
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900817668
+      }
+    ],
+    "6. Checkpoint - Ensure all pure-function tests pass": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667162
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900827840
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900877335
+      }
+    ],
+    "7.1 Add `parsePlaceId` and deep-link resolution to `lib/estate-view.ts`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667220
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900597151
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900819727
+      }
+    ],
+    "7.2 Write unit tests for `parsePlaceId` and deep-link precedence": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667285
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900887256
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901342439
+      }
+    ],
+    "7.3 Add `view`/`plotIndex`/`activeFilter` state and client-only history wiring to `SceneView`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667362
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900888345
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901343288
+      }
+    ],
+    "7.4 Forward `?at=` from the server pages for initial render only": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667419
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901350160
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901771653
+      }
+    ],
+    "7.5 Write integration tests for client-side routing": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667474
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902242260
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793904172316
+      }
+    ],
+    "8.1 Implement `EstateMap` and `Place` components": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667531
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901351146
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901766702
+      }
+    ],
+    "8.2 Write component tests for `EstateMap`/`Place`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667593
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901778494
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902236558
+      }
+    ],
+    "9.1 Implement `PlaceView`, `PlaceHeading`, `DepthRows`, `FilterChips`, `Pager`, `ReturnToGate`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667648
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901352544
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901768474
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793904200809
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793905086087
+      }
+    ],
+    "9.2 Write component tests for `PlaceView` and its controls": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667726
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901779413
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902234744
+      }
+    ],
+    "10.1 Implement `TravelTransition` and run it on place entry": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667815
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901777050
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902233871
+      }
+    ],
+    "10.2 Write component tests for travel": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667877
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793905090442
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793905359338
+      }
+    ],
+    "11.1 Add the \"Go to it\" action to the map turning-soon notice": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899667951
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793905091307
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793905360198
+      }
+    ],
+    "11.2 Write integration test for \"Go to it\"": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668005
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793908190867
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793908957458
+      }
+    ],
+    "12.1 Add a sortable Place column to `LightsOnTable` and preserve/restore view state": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668055
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901353923
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901769430
+      }
+    ],
+    "12.2 Write tests for the lights-on Place column and restore": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668102
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901781532
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902232463
+      }
+    ],
+    "13.1 Update `Header`, `SummaryLine`, and `Footer`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668151
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901354875
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901770822
+      }
+    ],
+    "13.2 Write component tests for chrome fixes": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668212
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793901780824
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902235715
+      }
+    ],
+    "14.1 Switch `SceneView` to render `EstateMap` / `PlaceView` / `LightsOnTable` by state": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668297
+      },
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793905366737
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793907151739
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793908180622
+      },
+      {
+        "executionId": "ee3cc408-efb5-4912-9db7-20cd162f6a05",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793910554731
+      },
+      {
+        "executionId": "ee3cc408-efb5-4912-9db7-20cd162f6a05",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793910922709
+      }
+    ],
+    "14.2 Write end-to-end integration tests for the wired routes": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668360
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793908966342
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793909268387
+      }
+    ],
+    "15. Final checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793899668438
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793909274572
+      },
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793909625620
+      }
+    ],
+    "1. Scaffold the pure view-model module and its arbitraries": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900193073
+      }
+    ],
+    "2. Implement `placeOf` (pure)": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900279148
+      }
+    ],
+    "3. Implement `orderForPlace` (pure)": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900431369
+      }
+    ],
+    "4. Implement `paginate` (pure)": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900590163
+      }
+    ],
+    "5. Implement `plaqueCopy` (pure)": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793900818832
+      }
+    ],
+    "12. Extend lights-on register for map and place": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902232887
+      }
+    ],
+    "9. Build the place view and its controls": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902235155
+      }
+    ],
+    "13. Fix header, summary, and footer chrome": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902235828
+      }
+    ],
+    "8. Build the estate map and place plaques": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793902237047
+      }
+    ],
+    "7. Wire derived view state and routing into `SceneView`": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793904172498
+      }
+    ],
+    "10. Implement the travel transition and wire it to place entry": [
+      {
+        "executionId": "c779c1d9-b1fc-42a1-bec3-0ead2a85bf5a",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793905359465
+      }
+    ],
+    "11. Wire the turning-soon \"Go to it\" jump": [
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793908960122
+      }
+    ],
+    "14. Integration - replace the single-scene rendering with map/place views": [
+      {
+        "executionId": "5ede9494-e437-4901-8f16-3530025af931",
+        "chatSessionId": "sess_8a9cec1c-661c-4269-8755-f0f5d1a02578",
+        "timestamp": 1793909269907
+      }
+    ]
+  }
+}

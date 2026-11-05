@@ -389,3 +389,48 @@ export const arbGraveyardRows: fc.Arbitrary<GraveyardRow[]> = fc.oneof(
   // Free-form lists covering the rest of the space.
   fc.array(arbGraveyardRow, { maxLength: 60 }),
 );
+
+// ---------------------------------------------------------------------------
+// Shared estate arbitraries (estate-map-places, Requirement 3.6)
+//
+// The estate feature's pure functions (`placeOf`, `orderForPlace`, `paginate`,
+// `plaqueCopy`) consume the same `GraveyardRow` / `GraveyardRow[]` inputs the
+// scene functions do, so they REUSE `arbGraveyardRow` / `arbGraveyardRows`
+// above rather than redefining them: those already span empty lists, counts
+// below/at/above `PLOT_SIZE` (the zone cap is also 12), and mixed states
+// including both `risen` and `zombie`. Only the two estate-specific generators
+// are added here: a place-id generator and a "count" generator for the
+// arbitrary numeric size inputs `paginate`/`plaqueCopy` must survive.
+// ---------------------------------------------------------------------------
+
+import { type PlaceId } from "@/lib/estate-view";
+
+/** A generator over the four place ids in display order (sky, gate, ground, crypt). */
+export const arbPlaceId: fc.Arbitrary<PlaceId> = fc.constantFrom(
+  "sky",
+  "gate",
+  "ground",
+  "crypt",
+);
+
+/**
+ * A generator for the arbitrary numeric size/count inputs that `paginate`
+ * (plot size) and `plaqueCopy` (count / risenCount) must normalize without
+ * throwing. It deliberately mixes:
+ *  - the small exact integers around the 0/1/2 grammar + pagination boundaries,
+ *  - a broad band of ordinary finite integers,
+ *  - negative integers (which both functions clamp),
+ *  - fractional values (which both functions truncate),
+ *  - and the non-finite edge cases `NaN`, `Infinity`, `-Infinity`.
+ */
+export const arbCount: fc.Arbitrary<number> = fc.oneof(
+  // Exact small integers around the grammar / pagination boundaries.
+  fc.constantFrom(-2, -1, 0, 1, 2, 3, 12, 13),
+  // Ordinary finite integers, including negatives.
+  fc.integer({ min: -1000, max: 1000 }),
+  // Fractional values, including negatives, that must be truncated.
+  fc.double({ min: -1000, max: 1000, noNaN: true }),
+  fc.constantFrom(-0.5, 0.5, 1.5, 2.9, -1.1, 11.99),
+  // Non-finite edge cases.
+  fc.constantFrom(Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY),
+);

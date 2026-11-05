@@ -16,7 +16,12 @@
  * Lights-on toggle) or leave it purely reflective (the deferred sound toggle,
  * Req 13.1, 13.2).
  *
- * Requirements: 7.7, 9.4, 13.1, 13.2
+ * The control wears the styled bordered-button treatment to match the painted
+ * boards (Req 15.4): a bordered pill with a dark fill, the label in the
+ * letter-spaced Cinzel face, and the on/off track + knob inside it. The border
+ * and fill warm toward candle when the switch is on.
+ *
+ * Requirements: 7.7, 9.4, 13.1, 13.2, 15.4
  */
 
 import { useId, type KeyboardEvent } from "react";
@@ -75,10 +80,14 @@ export default function Toggle({
       aria-label={label}
       onClick={toggle}
       onKeyDown={handleKeyDown}
+      data-testid="styled-toggle"
       className={
-        "inline-flex items-center gap-2 rounded-full px-1 py-1 font-ui text-sm " +
+        "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm " +
         "text-scene-fg transition-colors " +
-        "focus:outline-none focus-visible:outline-none " +
+        (pressed
+          ? "border-candle-400 bg-candle-400/15"
+          : "border-scene-fg-faint bg-night-sky/60 hover:bg-candle-400/10") +
+        " focus:outline-none focus-visible:outline-none " +
         "focus-visible:ring-2 focus-visible:ring-candle-400 focus-visible:ring-offset-2 " +
         "focus-visible:ring-offset-night-sky"
       }
@@ -104,7 +113,7 @@ export default function Toggle({
           }
         />
       </span>
-      <span className="font-ui">
+      <span className="font-heading text-xs font-bold uppercase tracking-[1.5px]">
         {label}
         <span className="ml-1 text-scene-fg-muted">
           {pressed ? onLabel : offLabel}

@@ -35,6 +35,7 @@ import { buildRows } from "@/lib/graveyard-view";
 
 interface GraveyardRepoPageProps {
   params: Promise<{ username: string; repo: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 /**
@@ -63,9 +64,19 @@ function resetInMinutesFrom(
  * graveyard, and renders either the in-scene error state or the scene seeded
  * with the deep-linked repo.
  */
-async function GraveyardRepoContent({ params }: GraveyardRepoPageProps) {
+async function GraveyardRepoContent({
+  params,
+  searchParams,
+}: GraveyardRepoPageProps) {
   // Next already URL-decodes dynamic segments, so `repo` is the plain name.
   const { username, repo } = await params;
+
+  // Read `?at=` only here, during the initial server render; after hydration
+  // SceneView owns the view and this value is never read again (Req 10.4). When
+  // a valid `at` is present it takes precedence over the deep-linked repo
+  // place (Req 11.2), which SceneView resolves.
+  const { at: atParam } = await searchParams;
+  const at = Array.isArray(atParam) ? atParam[0] : atParam;
 
   // Capture the render instant exactly once, after awaiting params so the read
   // sits in the dynamic request scope. `connection()` opts this subtree into
@@ -97,15 +108,19 @@ async function GraveyardRepoContent({ params }: GraveyardRepoPageProps) {
       renderedAt={renderedAt}
       mode="live"
       initialRepo={repo}
+      at={at}
     />
   );
 }
 
-export default function GraveyardRepoPage({ params }: GraveyardRepoPageProps) {
+export default function GraveyardRepoPage({
+  params,
+  searchParams,
+}: GraveyardRepoPageProps) {
   return (
     <main className="min-h-dvh w-full">
       <Suspense fallback={<div className="min-h-dvh w-full bg-night-sky" />}>
-        <GraveyardRepoContent params={params} />
+        <GraveyardRepoContent params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );

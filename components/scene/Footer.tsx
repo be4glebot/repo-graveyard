@@ -15,17 +15,24 @@
  * The legend/key names the five lifecycle states with their scene labels
  * (ghost · risen · zombie · at rest · sealed), matching the Scene_Summary
  * wording so "at rest" = tombstones and "sealed" = coffins read consistently.
- * It is marked up as a list for assistive tech.
+ * Per this design the five states are grouped under their four places (Req
+ * 15.8): each place from `PLACES` heads a group listing the scene labels of the
+ * states it holds, so the gate shows both "zombie" and "risen" while the three
+ * single-state places show one label each. `PLACES` is the single source of
+ * truth for the place names and their member states, so the legend and the
+ * estate map always tell the same story. It is marked up as a nested list for
+ * assistive tech.
  *
  * No interactivity lives here, so this stays a shared / server component (no
  * `"use client"`). All color comes from `@theme` tokens and all type from the
  * scene font tokens — the plaque in the narrative face, the legend in the UI
  * face — with no hardcoded hex.
  *
- * Requirements: 7.10, 10.1, 10.2
+ * Requirements: 7.10, 10.1, 10.2, 15.8
  */
 
 import { type LifecycleState } from "@/lib/lifecycle";
+import { PLACE_ORDER, PLACES } from "@/lib/estate-view";
 
 /** The scene render modes; the plaque is shown only for the sample estate. */
 export type SceneMode = "live" | "estate";
@@ -34,17 +41,18 @@ export type SceneMode = "live" | "estate";
 const ESTATE_PLAQUE_TEXT = "Sample estate. Enter your own name at the gate.";
 
 /**
- * The five lifecycle states in display order, paired with their scene labels.
- * Mirrors the Scene_Summary wording (tombstone → "at rest", coffin → "sealed")
- * so the legend and the summary line stay consistent.
+ * Scene label for each lifecycle state. Mirrors the Scene_Summary wording
+ * (tombstone → "at rest", coffin → "sealed") so the legend and the summary line
+ * stay consistent. The place grouping and display order come from `PLACES` /
+ * `PLACE_ORDER`; this map only supplies each state's human label.
  */
-const LEGEND: { state: LifecycleState; label: string }[] = [
-  { state: "ghost", label: "ghost" },
-  { state: "risen", label: "risen" },
-  { state: "zombie", label: "zombie" },
-  { state: "tombstone", label: "at rest" },
-  { state: "coffin", label: "sealed" },
-];
+const STATE_LABEL: Record<LifecycleState, string> = {
+  ghost: "ghost",
+  risen: "risen",
+  zombie: "zombie",
+  tombstone: "at rest",
+  coffin: "sealed",
+};
 
 export interface FooterProps {
   /**
@@ -80,24 +88,45 @@ export default function Footer({ mode = "live" }: FooterProps) {
         <span aria-hidden="true" />
       )}
 
-      {/* Legend / key (right). */}
+      {/* Legend / key (right): the five states grouped under their four places
+          (Req 15.8). Each place heads a group; the gate lists both of its
+          states ("zombie" and "risen"), the other three list one each. */}
       <ul
         data-testid="scene-footer-legend"
         aria-label="Lifecycle legend"
         className={[
-          "flex flex-wrap items-center gap-x-3 gap-y-1",
+          "flex flex-wrap items-start gap-x-4 gap-y-1",
           "font-[family-name:var(--font-ui)] text-xs",
         ].join(" ")}
       >
-        {LEGEND.map(({ state, label }) => (
-          <li
-            key={state}
-            data-legend-state={state}
-            className="whitespace-nowrap"
-          >
-            {label}
-          </li>
-        ))}
+        {PLACE_ORDER.map((placeId) => {
+          const place = PLACES[placeId];
+          return (
+            <li
+              key={placeId}
+              data-legend-place={placeId}
+              className="flex flex-col gap-0.5"
+            >
+              <span
+                className="font-[family-name:var(--font-heading)] uppercase tracking-[1.5px]"
+                style={{ color: "var(--color-candle-tan)" }}
+              >
+                {place.name}
+              </span>
+              <ul className="flex flex-wrap items-center gap-x-2">
+                {place.states.map((state) => (
+                  <li
+                    key={state}
+                    data-legend-state={state}
+                    className="whitespace-nowrap"
+                  >
+                    {STATE_LABEL[state]}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          );
+        })}
       </ul>
     </footer>
   );

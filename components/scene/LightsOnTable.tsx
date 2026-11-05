@@ -14,6 +14,12 @@
  * and can render on the server. Interactivity (the Lights-on toggle,
  * column-header re-sorting) lives in the owning client component.
  *
+ * The register carries a **Place** column (`PLACES[placeOf(row)].name`)
+ * alongside the existing Repository, State, Quiet-for, and Decay columns, so
+ * the full list reads clearly across all four places (estate-map Req 14.2,
+ * 14.3). `placeOf` is the frozen, pure state→place mapping, so the column stays
+ * presentational and server-renderable — no client state or clock is needed.
+ *
  * Styling uses the warm-paper register tokens from `app/globals.css`
  * (`--color-paper-*`, `--color-ink-*`, `--color-candle-tan`) and the scene
  * font tokens only — no hardcoded hex. Accessibility: a real `<table>` with a
@@ -21,12 +27,13 @@
  * headers for the repository, and links with discernible text, so the data is
  * fully navigable and determinable for screen readers (Req 9.6).
  *
- * Requirements: 11.7, 9.6
+ * Requirements: 11.7, 9.6, estate-map 14.2, 14.3
  */
 
 import type { CSSProperties } from "react";
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
+import { PLACES, placeOf } from "@/lib/estate-view";
 import type { LifecycleState } from "@/lib/lifecycle";
 
 export interface LightsOnTableProps {
@@ -151,6 +158,13 @@ export default function LightsOnTable({ rows, username }: LightsOnTableProps) {
                   className="border-b px-6 py-4 font-[family-name:var(--font-fact)] text-[11px] font-medium uppercase tracking-[1.5px]"
                   style={headCellStyle}
                 >
+                  Place
+                </th>
+                <th
+                  scope="col"
+                  className="border-b px-6 py-4 font-[family-name:var(--font-fact)] text-[11px] font-medium uppercase tracking-[1.5px]"
+                  style={headCellStyle}
+                >
                   State
                 </th>
                 <th
@@ -173,7 +187,7 @@ export default function LightsOnTable({ rows, username }: LightsOnTableProps) {
               {rows.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-6 py-10 text-center font-narrative text-base italic"
                     style={{ color: "var(--color-ink-600)" }}
                   >
@@ -196,6 +210,12 @@ export default function LightsOnTable({ rows, username }: LightsOnTableProps) {
                         {row.name}
                       </a>
                     </th>
+                    <td
+                      className="border-b px-6 py-3 font-[family-name:var(--font-fact)] text-sm"
+                      style={bodyCellStyle}
+                    >
+                      {PLACES[placeOf(row)].name}
+                    </td>
                     <td
                       className="border-b px-6 py-3"
                       style={bodyCellStyle}
