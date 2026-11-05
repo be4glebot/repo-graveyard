@@ -1,0 +1,183 @@
+"use client";
+
+/**
+ * Scene header / chrome (client component).
+ *
+ * Renders, in one strip:
+ * - the "Repo Graveyard" wordmark in UnifrakturMaguntia with the crimson glow
+ *   (Req 7.1);
+ * - a "Haunted Estate" status badge when `mode === "estate"` (Req 7.2);
+ * - the `SummaryLine` built from the graveyard rows (Req 7.3, 7.4);
+ * - a visit `<input>` accepting a 1–39 char GitHub username that navigates to
+ *   that username's scene on a non-empty submit (Req 7.5) and shows a
+ *   "username is required" validation message on an empty/whitespace submit
+ *   (Req 7.6); and
+ * - the Lights-on and Sound toggles, each showing its on/off state (Req 7.7).
+ *
+ * The toggle boolean state lives in the parent (`SceneView`); this component is
+ * presentational over that state. The Lights-on toggle is wired to its handler.
+ * The Sound toggle is STATE-ONLY: it reflects `soundOn` and calls
+ * `onSoundChange`, but this component — and the whole feature — loads, decodes,
+ * and plays no audio; sound is deferred (Req 13.1, 13.2).
+ *
+ * This is a client component because the visit input and the toggles are
+ * interactive. It hardcodes no hex; all color and type come from `@theme`
+ * tokens.
+ *
+ * Requirements: 7.1, 7.2, 7.3, 7.5, 7.6, 7.7, 9.4, 13.1, 13.2
+ */
+
+import { useRouter } from "next/navigation";
+import { useId, useState, type FormEvent } from "react";
+
+import SummaryLine from "@/components/ui/SummaryLine";
+import Toggle from "@/components/ui/Toggle";
+import type { GraveyardRow } from "@/lib/graveyard-view";
+import type { SummaryCounts } from "@/lib/scene-view";
+import { isValidUsername, USERNAME_MAX_LENGTH } from "@/lib/username";
+
+/** Which scene the header sits above; drives the "Haunted Estate" badge. */
+export type HeaderMode = "live" | "estate";
+
+const EMPTY_MESSAGE = "A username is required";
+const INVALID_MESSAGE = "That doesn't look like a valid GitHub username";
+
+export interface HeaderProps {
+  /** Rows to summarize; ignored when `counts` is provided. */
+  rows?: GraveyardRow[];
+  /** Precomputed summary counts; takes precedence over `rows`. */
+  counts?: SummaryCounts;
+  /** The graveyard owner's username (shown as context). */
+  username: string;
+  /** Scene mode; "estate" renders the "Haunted Estate" badge (Req 7.2). */
+  mode?: HeaderMode;
+
+  /** Lights-on toggle state and handler (wired to real behavior). */
+  lightsOn: boolean;
+  onLightsOnChange: (next: boolean) => void;
+
+  /** Sound toggle state and handler (state-only; sound is deferred). */
+  soundOn: boolean;
+  onSoundChange: (next: boolean) => void;
+}
+
+export default function Header({
+  rows,
+  counts,
+  username,
+  mode = "live",
+  lightsOn,
+  onLightsOnChange,
+  soundOn,
+  onSoundChange,
+}: HeaderProps) {
+  const router = useRouter();
+  const [value, setValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const inputId = useId();
+  const errorId = useId();
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const next = value.trim();
+
+    // Empty or whitespace-only submit stays on the current scene and shows the
+    // "required" validation message (Req 7.6).
+    if (next.length === 0) {
+      setError(EMPTY_MESSAGE);
+      return;
+    }
+    if (!isValidUsername(next)) {
+      setError(INVALID_MESSAGE);
+      return;
+    }
+
+    // Non-empty, valid submit navigates to that username's scene (Req 7.5).
+    setError(null);
+    router.push(`/g/${encodeURIComponent(next)}`);
+  }
+
+  const hasError = error !== null;
+
+  return (
+    <header className="flex flex-col gap-3 font-ui text-scene-fg">
+      <div className="flex flex-wrap items-baseline gap-3">
+        <h1
+          className="font-wordmark text-3xl leading-none text-crimson-400"
+          style={{ textShadow: "0 0 12px var(--color-crimson-glow)" }}
+        >
+          Repo Graveyard
+        </h1>
+        {mode === "estate" ? (
+          <span className="rounded-full border border-crimson-400 px-2 py-0.5 font-ui text-xs uppercase tracking-wide text-crimson-200">
+            Haunted Estate
+          </span>
+        ) : null}
+        {username ? (
+          <span className="font-fact text-sm text-scene-fg-muted">
+            {username}
+          </span>
+        ) : null}
+      </div>
+
+      <SummaryLine rows={rows} counts={counts} />
+
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="flex flex-col gap-1 sm:flex-row sm:items-end sm:gap-2"
+      >
+        <div className="flex flex-col gap-1">
+          <label htmlFor={inputId} className="font-ui text-xs text-scene-fg-muted">
+            Visit another graveyard
+          </label>
+          <input
+            id={inputId}
+            name="visit-username"
+            type="text"
+            inputMode="text"
+            autoComplete="off"
+            maxLength={USERNAME_MAX_LENGTH}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            aria-invalid={hasError}
+            aria-describedby={hasError ? errorId : undefined}
+            placeholder="octocat"
+            className={
+              "w-full rounded-md border border-scene-fg-faint bg-night-sky/60 px-3 py-2 " +
+              "font-fact text-scene-fg placeholder:text-scene-fg-faint sm:w-56 " +
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
+              "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
+            }
+          />
+        </div>
+        <button
+          type="submit"
+          className={
+            "rounded-md border border-candle-400 px-4 py-2 font-ui text-scene-fg " +
+            "transition-colors hover:bg-candle-400/20 " +
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
+            "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
+          }
+        >
+          Visit
+        </button>
+      </form>
+      {hasError ? (
+        <p id={errorId} role="alert" className="font-ui text-sm text-crimson-200">
+          {error}
+        </p>
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Toggle
+          label="Lights on"
+          pressed={lightsOn}
+          onChange={onLightsOnChange}
+        />
+        <Toggle label="Sound" pressed={soundOn} onChange={onSoundChange} />
+      </div>
+    </header>
+  );
+}

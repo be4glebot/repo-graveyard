@@ -10,42 +10,69 @@
  *
  * Clock discipline (Req 8.6): `renderedAt` is read exactly once, and only AFTER
  * `await params`. A single server-captured timestamp is threaded into
- * `GraveyardView` so the client's first paint classifies against the same
- * instant and hydration stays stable. Reading the clock after awaiting params
- * keeps the read inside the dynamic (request-time) scope rather than at module
- * scope or during static prerender. If `next build` flags the clock read as
- * needing an explicit dynamic opt-in, call `await connection()` from
- * `next/server` just before reading the clock to force this subtree to render
- * dynamically.
+ * `SceneView` (as `now`) and used to build the initial, no-override rows, so
+ * the client's first paint classifies against the same instant and hydration
+ * stays stable. Reading the clock after awaiting params keeps the read inside
+ * the dynamic (request-time) scope rather than at module scope or during static
+ * prerender. `await connection()` forces this subtree to render dynamically so
+ * the unstable clock read is allowed under Cache Components.
  *
- * On a failed load we render `LoadErrorMessage` with the `LoadError`; on
- * success we hand the raw facts, `truncated` flag, `username`, and `renderedAt`
- * to `GraveyardView`, which owns override-aware re-classification. The
- * truncation notice is driven entirely by the `truncated` flag flowing through
- * `GraveyardView` → `GraveyardList`.
+ * On a failed load we render `SceneErrorState` inside the darkened scene frame,
+ * keyed by `LoadError["kind"]` — never a partial scene (Req 1.5). For the
+ * `rate-limited` case we derive `resetInMinutes` from the error's `resetAt`
+ * relative to `renderedAt` (whole minutes until reset, floored at 0) when a
+ * reset time is known, and omit it otherwise so the countdown clause is dropped.
  *
- * This module imports only `lib/graveyard-loader` (server) for data and the two
- * presentational components; it never imports `lib/overrides` directly (that is
- * a client-only concern owned by `GraveyardView`).
+ * On success we build the initial classified rows with no overrides
+ * (`buildRows(repos, {}, renderedAt)`) to satisfy `SceneViewProps.rows`, then
+ * hand the raw facts, `truncated` flag, `username`, and `renderedAt` to
+ * `SceneView` in `live` mode, which owns override-aware re-classification and
+ * all interactive scene state.
  *
- * Requirements: 8.1, 8.2, 8.3, 8.4, 8.6, 8.7, 8.8, 8.9
+ * The scene is full-bleed, so this page's wrapper lets the scene fill the
+ * viewport rather than centering a narrow column (the old list layout).
+ *
+ * Requirements: 1.1, 1.4, 1.5, 8.6
  */
 
 import { Suspense } from "react";
 import { connection } from "next/server";
 
-import GraveyardView from "@/components/graveyard/GraveyardView";
-import LoadErrorMessage from "@/components/graveyard/LoadErrorMessage";
+import SceneView from "@/components/scene/SceneView";
+import SceneErrorState from "@/components/scene/SceneErrorState";
 import { loadGraveyard } from "@/lib/graveyard-loader";
+import { buildRows } from "@/lib/graveyard-view";
 
 interface GraveyardPageProps {
   params: Promise<{ username: string }>;
 }
 
 /**
+ * Derives whole minutes until a rate-limit reset relative to the render instant.
+ * Returns `undefined` when the reset time is unknown or unparseable, so the
+ * caller omits `resetInMinutes` entirely. Never returns a negative number: a
+ * reset already in the past floors to 0.
+ */
+function resetInMinutesFrom(
+  resetAt: string | null,
+  renderedAt: string,
+): number | undefined {
+  if (resetAt === null) {
+    return undefined;
+  }
+  const resetMs = Date.parse(resetAt);
+  const nowMs = Date.parse(renderedAt);
+  if (Number.isNaN(resetMs) || Number.isNaN(nowMs)) {
+    return undefined;
+  }
+  return Math.max(0, Math.floor((resetMs - nowMs) / 60_000));
+}
+
+/**
  * Async child that performs all request-time work inside the Suspense
  * boundary: it awaits `params`, captures the single `renderedAt` timestamp,
- * loads the graveyard, and renders either the error message or the view.
+ * loads the graveyard, and renders either the in-scene error state or the
+ * live scene.
  */
 async function GraveyardContent({ params }: GraveyardPageProps) {
   const { username } = await params;
@@ -60,29 +87,43 @@ async function GraveyardContent({ params }: GraveyardPageProps) {
   const result = await loadGraveyard(username);
 
   if (!result.ok) {
-    return <LoadErrorMessage error={result.error} />;
+    const { error } = result;
+    const resetInMinutes =
+      error.kind === "rate-limited"
+        ? resetInMinutesFrom(error.resetAt, renderedAt)
+        : undefined;
+    return <SceneErrorState kind={error.kind} resetInMinutes={resetInMinutes} />;
   }
 
   const { repos, truncated } = result.value;
 
+  // Initial, no-override rows classified against the single server clock; these
+  // satisfy SceneViewProps.rows and make the first paint hydration-stable.
+  // SceneView recomputes override-aware rows during render.
+  const rows = buildRows(repos, {}, renderedAt);
+
   return (
-    <GraveyardView
+    <SceneView
+      rows={rows}
       repos={repos}
       truncated={truncated}
       username={username}
       renderedAt={renderedAt}
+      mode="live"
     />
   );
 }
 
 export default function GraveyardPage({ params }: GraveyardPageProps) {
   return (
-    <main className="flex flex-1 flex-col bg-background px-6 py-16 font-sans text-foreground">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-        <Suspense fallback={<p className="text-base text-foreground/60">Loading the graveyard…</p>}>
-          <GraveyardContent params={params} />
-        </Suspense>
-      </div>
-    </main>
+    <Suspense
+      fallback={
+        <main className="flex min-h-dvh flex-col items-center justify-center bg-background text-foreground">
+          <p className="text-base text-foreground/60">Loading the graveyard…</p>
+        </main>
+      }
+    >
+      <GraveyardContent params={params} />
+    </Suspense>
   );
 }

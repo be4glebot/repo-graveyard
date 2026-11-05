@@ -271,3 +271,121 @@ export const arbRepoName: fc.Arbitrary<string> = fc.constantFrom(
   "delta",
   "epsilon",
 );
+
+// ---------------------------------------------------------------------------
+// Shared scene arbitraries (haunted-graveyard-scene, Requirement 4.6)
+//
+// These generators build the view-model inputs the scene's pure functions
+// consume: lifecycle states, decay levels consistent with each state, single
+// display rows, and whole lists of rows. They reuse `arbRepoFacts`, `arbIso`,
+// and `arbOverride` defined above rather than redefining raw repo facts.
+// ---------------------------------------------------------------------------
+
+import { type LifecycleState } from "@/lib/lifecycle";
+import { type GraveyardRow } from "@/lib/graveyard-view";
+
+/** The zone rendering cap the scene applies per state (`capZone` default). */
+const ZONE_CAP = 12;
+
+/** A generator over all five lifecycle states. */
+export const arbLifecycleState: fc.Arbitrary<LifecycleState> = fc.constantFrom(
+  "ghost",
+  "risen",
+  "zombie",
+  "tombstone",
+  "coffin",
+);
+
+/**
+ * A generator for a decay level consistent with a given state: ghost rows
+ * carry 0–3, zombie rows carry 0–4, and every other state carries `null`.
+ * This mirrors the `decayLevel` contract on `Classification` / `GraveyardRow`.
+ */
+export const arbDecayLevel = (
+  state: LifecycleState,
+): fc.Arbitrary<number | null> => {
+  if (state === "ghost") {
+    return fc.integer({ min: 0, max: 3 });
+  }
+  if (state === "zombie") {
+    return fc.integer({ min: 0, max: 4 });
+  }
+  return fc.constant(null);
+};
+
+/**
+ * A generator for a single `GraveyardRow`. The `decayLevel` is always drawn
+ * from `arbDecayLevel(state)` so it stays consistent with the row's state
+ * (ghost 0–3, zombie 0–4, null otherwise). `daysQuiet` is a non-negative
+ * integer spanning the ghost, zombie, and well-aged bands.
+ */
+export const arbGraveyardRow: fc.Arbitrary<GraveyardRow> = arbLifecycleState.chain(
+  (state) =>
+    fc.record({
+      name: fc.string({ minLength: 1, maxLength: 40 }),
+      url: fc.constant("https://github.com/owner/repo"),
+      state: fc.constant(state),
+      daysQuiet: fc.oneof(
+        fc.integer({ min: 0, max: 89 }), // ghost band
+        fc.integer({ min: 90, max: 2000 }), // zombie / aged band
+      ),
+      decayLevel: arbDecayLevel(state),
+    }),
+);
+
+/**
+ * A single zombie `GraveyardRow`, used to build lists that hit the specific
+ * zombie-count thresholds the fog and lightning knobs care about.
+ */
+const arbZombieRow: fc.Arbitrary<GraveyardRow> = fc.record({
+  name: fc.string({ minLength: 1, maxLength: 40 }),
+  url: fc.constant("https://github.com/owner/repo"),
+  state: fc.constant<LifecycleState>("zombie"),
+  daysQuiet: fc.integer({ min: 182, max: 2000 }),
+  decayLevel: arbDecayLevel("zombie"),
+});
+
+/**
+ * A generator for lists of `GraveyardRow`. It deliberately spans the structural
+ * boundaries the scene's pure functions key off of:
+ *  - empty lists,
+ *  - lists below, at, and above the per-zone cap of 12,
+ *  - zombie counts spanning 0, the strictly-interior 1–19 fog band, and the
+ *    saturated ≥20 band.
+ * The free-form arm keeps the rest of the input space covered.
+ */
+export const arbGraveyardRows: fc.Arbitrary<GraveyardRow[]> = fc.oneof(
+  // Empty graveyard.
+  fc.constant<GraveyardRow[]>([]),
+  // Below / at / above the zone cap, any mix of states.
+  fc.array(arbGraveyardRow, { minLength: 1, maxLength: ZONE_CAP - 1 }),
+  fc.array(arbGraveyardRow, { minLength: ZONE_CAP, maxLength: ZONE_CAP }),
+  fc.array(arbGraveyardRow, { minLength: ZONE_CAP + 1, maxLength: ZONE_CAP * 3 }),
+  // No zombies at all (fog density 0).
+  fc.array(
+    arbGraveyardRow.filter((row) => row.state !== "zombie"),
+    { minLength: 0, maxLength: ZONE_CAP },
+  ),
+  // Strictly-interior fog band: 1–19 zombies (optionally with other rows).
+  fc
+    .tuple(
+      fc.array(arbZombieRow, { minLength: 1, maxLength: 19 }),
+      fc.array(
+        arbGraveyardRow.filter((row) => row.state !== "zombie"),
+        { minLength: 0, maxLength: ZONE_CAP },
+      ),
+    )
+    .map(([zombies, others]) => [...zombies, ...others]),
+  // Saturated fog band: >= 20 zombies.
+  fc
+    .tuple(
+      fc.array(arbZombieRow, { minLength: 20, maxLength: 40 }),
+      fc.array(
+        arbGraveyardRow.filter((row) => row.state !== "zombie"),
+        { minLength: 0, maxLength: ZONE_CAP },
+      ),
+    )
+    .map(([zombies, others]) => [...zombies, ...others]),
+  // Free-form lists covering the rest of the space.
+  fc.array(arbGraveyardRow, { maxLength: 60 }),
+);
