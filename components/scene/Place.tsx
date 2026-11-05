@@ -53,6 +53,14 @@ import Coffin from "@/components/creatures/Coffin";
  */
 interface ConcreteCreatureProps {
   row: GraveyardRow;
+  /**
+   * Render the creature as a non-interactive, `aria-hidden` decorative element
+   * instead of a focusable button. The representatives on a `Place` plaque use
+   * this so they do not nest a `<button>` inside the `Place` link's own
+   * `<button>` (an invalid-DOM / hydration error); the `Place` stays the single
+   * focusable control and owns the accessible name.
+   */
+  decorative?: boolean;
 }
 
 /** Maps a lifecycle state to the concrete creature component that renders it. */
@@ -152,7 +160,9 @@ export default function Place({ place, rows, onEnter }: PlaceProps) {
       >
         {representatives.map((row) => {
           const Creature = CREATURE_BY_STATE[row.state];
-          return <Creature key={row.name} row={row} />;
+          // Decorative: non-interactive and aria-hidden, so the representatives
+          // never nest a <button> inside this Place link's <button>.
+          return <Creature key={row.name} row={row} decorative />;
         })}
       </span>
 

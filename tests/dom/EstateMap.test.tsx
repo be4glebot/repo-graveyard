@@ -189,14 +189,17 @@ describe("EstateMap", () => {
         .slice(0, 3)
         .map((r) => r.name);
 
-      // The representatives group holds one creature button per representative.
-      // The place link's own button wraps them, so scope the query to the
-      // representatives container and read its creatures.
+      // The representatives are DECORATIVE (aria-hidden, non-interactive) so
+      // they never nest a <button> inside the Place link's <button>. They carry
+      // no accessible name; their identity/order is exposed via data-name for
+      // this assertion. Scope the query to the representatives container.
       const repGroup = screen.getByTestId(`estate-place-${place}-representatives`);
-      const creatures = repGroup.querySelectorAll("button");
-      const renderedNames = Array.from(creatures).map((el) =>
-        (el.getAttribute("aria-label") ?? "").split(",")[0],
+      const creatures = repGroup.querySelectorAll('[data-decorative="true"]');
+      const renderedNames = Array.from(creatures).map(
+        (el) => el.getAttribute("data-name") ?? "",
       );
+      // They are not buttons: the Place link is the single focusable control.
+      expect(repGroup.querySelectorAll("button").length).toBe(0);
 
       // Count is min(3, rowCount): capped at 3, never fewer than one when rows
       // exist (Req 2.4), and exactly the head of orderForPlace (Req 2.5).
@@ -214,7 +217,9 @@ describe("EstateMap", () => {
     renderMap();
 
     const repGroup = screen.getByTestId("estate-place-crypt-representatives");
-    expect(repGroup.querySelectorAll("button").length).toBe(3);
+    // Representatives are decorative (not buttons); count the decorative nodes.
+    expect(repGroup.querySelectorAll('[data-decorative="true"]').length).toBe(3);
+    expect(repGroup.querySelectorAll("button").length).toBe(0);
   });
 
   it("raises onEnterPlace(place) on mouse click (1.5)", async () => {
@@ -397,5 +402,74 @@ describe("EstateMap atmosphere layers (data-encoding regression guard)", () => {
   it("renders no Whisper region when there are no whisper lines (8.3)", () => {
     renderMap({ whispers: [] });
     expect(screen.queryByTestId("scene-whisper")).toBeNull();
+  });
+});
+
+describe("EstateMap nested-button / focusable regression guard", () => {
+  // Guards the fix for the estate-map hydration error where `Place` rendered
+  // creature `<button>`s inside its own `<button>`. The representatives are now
+  // decorative (aria-hidden, non-interactive), so no button may nest inside
+  // another button, and each Place must expose exactly one focusable element —
+  // the Place link itself.
+
+  /** Elements that are focusable by default in this tree (native buttons or
+   * anything with a non-negative tabindex). The map heading is tabIndex={-1}
+   * (programmatic focus only) so it is intentionally excluded. */
+  function focusableWithin(root: ParentNode): HTMLElement[] {
+    const candidates = Array.from(
+      root.querySelectorAll<HTMLElement>("button, [tabindex]"),
+    );
+    return candidates.filter((el) => {
+      if (el.tagName === "BUTTON") {
+        const tabindex = el.getAttribute("tabindex");
+        // A button with tabindex="-1" would be removed from the tab order.
+        return tabindex === null || Number(tabindex) >= 0;
+      }
+      return Number(el.getAttribute("tabindex")) >= 0;
+    });
+  }
+
+  it("never nests a <button> inside another <button> (no hydration error)", () => {
+    // A populated map across all four places, plus a turning-soon notice, is
+    // the densest button arrangement the map renders.
+    renderMap({ turningSoon: { name: "ghost-top", daysLeft: 3 } });
+
+    const nested = document.querySelectorAll("button button");
+    expect(nested.length).toBe(0);
+  });
+
+  it("exposes exactly one focusable element per Place (the Place link)", () => {
+    renderMap();
+
+    for (const place of PLACE_ORDER) {
+      const link = screen.getByTestId(`estate-place-${place}`);
+      // The Place link itself is a focusable <button>...
+      expect(link.tagName).toBe("BUTTON");
+      // ...and it has NO focusable descendants (the decorative representatives
+      // contribute no tab stops), so the Place exposes exactly one focusable
+      // element in total: the link itself.
+      const descendantFocusable = focusableWithin(link);
+      expect(descendantFocusable).toEqual([]);
+      const totalFocusable = [link, ...descendantFocusable];
+      expect(totalFocusable).toEqual([link]);
+    }
+  });
+
+  it("renders representatives as decorative, aria-hidden, non-focusable nodes (not buttons)", () => {
+    renderMap();
+
+    for (const place of PLACE_ORDER) {
+      const repGroup = screen.getByTestId(`estate-place-${place}-representatives`);
+      // The representatives container is aria-hidden and holds no buttons.
+      expect(repGroup.getAttribute("aria-hidden")).not.toBeNull();
+      expect(repGroup.querySelectorAll("button").length).toBe(0);
+      // Every representative node is the decorative variant with no tab stop.
+      for (const rep of Array.from(
+        repGroup.querySelectorAll('[data-decorative="true"]'),
+      )) {
+        expect(rep.getAttribute("aria-hidden")).toBe("true");
+        expect(rep.getAttribute("tabindex")).toBeNull();
+      }
+    }
   });
 });

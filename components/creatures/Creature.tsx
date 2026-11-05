@@ -56,6 +56,17 @@ export interface CreatureProps {
    */
   filterHero?: boolean;
   /**
+   * Render as a non-interactive, decorative creature instead of a focusable
+   * button. When true the shell renders the SAME art, motion wrapper, and glow
+   * inside an `aria-hidden` `<div>` with no accessible name, no `tabIndex`,
+   * and no click/key handlers — so it can sit inside another interactive
+   * control (e.g. a `Place` link on the estate map) without nesting a
+   * `<button>` inside a `<button>` (an invalid-DOM / hydration error). The
+   * enclosing control owns the accessible name and the interaction. Defaults to
+   * `false` (the normal interactive creature).
+   */
+  decorative?: boolean;
+  /**
    * Per-creature animated inner layers supplied by the concrete creature
    * component (e.g. the breathing/ripple layers for a decay-0 ghost). They sit
    * on top of the base image inside the staggered animation wrapper.
@@ -83,6 +94,7 @@ export default function Creature({
   row,
   onSelect,
   selected = false,
+  decorative = false,
   children,
   animationClassName,
   style,
@@ -109,6 +121,50 @@ export default function Creature({
     [activate],
   );
 
+  // The art + per-decay motion wrapper is identical in both modes; only the
+  // enclosing element (interactive button vs. decorative div) differs.
+  const inner = (
+    <span
+      className={animationClassName}
+      style={{ animationDelay: `${delaySeconds}s` }}
+    >
+      <Image
+        src={`/art/${basename}.webp`}
+        alt=""
+        aria-hidden
+        width={CREATURE_ART_SIZE}
+        height={CREATURE_ART_SIZE}
+        draggable={false}
+        className="pointer-events-none select-none"
+      />
+      {children}
+    </span>
+  );
+
+  // Decorative mode: same art, motion, and glow, but NON-interactive. It is an
+  // `aria-hidden` `<div>` with no accessible name, no `tabIndex`, and no
+  // click/key handlers, so it never takes focus and never nests a `<button>`
+  // inside an enclosing interactive control (e.g. a `Place` link). The glow is
+  // kept as a group-hover/focus-within effect so the creature still lifts when
+  // the surrounding control is hovered/focused, but it is never a tab stop.
+  if (decorative) {
+    return (
+      <div
+        aria-hidden="true"
+        data-decorative="true"
+        data-name={row.name}
+        style={style}
+        className={[
+          "group relative border-0 bg-transparent p-0",
+          "pointer-events-none",
+          "transition-[transform,filter] duration-200 ease-out",
+        ].join(" ")}
+      >
+        {inner}
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -132,21 +188,7 @@ export default function Creature({
         "outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-candle-400)] focus-visible:ring-offset-0",
       ].join(" ")}
     >
-      <span
-        className={animationClassName}
-        style={{ animationDelay: `${delaySeconds}s` }}
-      >
-        <Image
-          src={`/art/${basename}.webp`}
-          alt=""
-          aria-hidden
-          width={CREATURE_ART_SIZE}
-          height={CREATURE_ART_SIZE}
-          draggable={false}
-          className="pointer-events-none select-none"
-        />
-        {children}
-      </span>
+      {inner}
     </button>
   );
 }
