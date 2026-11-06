@@ -3,62 +3,78 @@
 /**
  * Place view (client component) — the in-place scene.
  *
- * Shows one place's creatures laid out in depth rows across paginated plots,
- * with the decay-word filter chips, the plot pager, and the return-to-the-gate
- * control. It reuses the shared backdrop stack (`Backdrop` / `Sky` / `Moon` /
- * `Atmosphere`) so a place reads like the same painted estate as the map, then
- * composites the place chrome over it.
+ * Shows one place's creatures laid out as an organic seeded scatter across
+ * paginated plots, with the decay-word filter chips, the plot pager, and the
+ * return-to-the-gate control. The 2C polish pass replaces the old reused
+ * `Sky`/`Backdrop`/`Moon` stack with a per-place painted `PlaceBackground`
+ * (the Sky `Moon` nested inside it on the sky place), straddles the creatures
+ * with a two-site `Fog`, swaps the flex `DepthRows` flow for the absolute
+ * `DepthScatter`, and overlays the lights-off `LanternCursor`, all driven by
+ * pointer `useParallax` on the scene root.
  *
- * ## Gate atmosphere layers
+ * ## Scene-root band stack (back → front, matching design.md's depth table)
  *
- * The gate is the zombie/risen place, so it — and only it — carries the
- * data-encoding `Fog` (density = the gate's zombie count, Req 3.3) and
- * `Lightning` (cadence = the gate's ancient-zombie count, Req 3.4/3.5), driven
- * by the place's own rows and placed in the old scene's band order (fog on a
- * z-30 wrapper under the depth rows / over the backdrop, lightning in the z-40
- * atmosphere band). `Lightning` self-hides when the ancient count is 0, so it
- * is rendered unconditionally for the gate; both are suppressed entirely for
- * the other places. Whispers stay map-only and are never rendered here. `Fog`
- * is motion-agnostic and `Lightning` reads `prefers-reduced-motion` itself, so
- * neither takes a `reducedMotion` prop.
+ * The root `div` carries `data-scene-root` + a `ref` and runs
+ * `useParallax(rootRef, { reducedMotion })`, which writes `--px`/`--py` (each in
+ * `[-1, 1]`) on the root. Each band reads those vars through a `translate3d`
+ * `calc()` with the pinned per-band maxima — background moves least, near fog
+ * most — so a farther layer never out-travels a nearer one (Req 2.5). The
+ * chrome and the lantern take NO parallax transform.
+ *
+ *   | Band        | z  | Contents                              | Max offset |
+ *   | ----------- | -- | ------------------------------------- | ---------- |
+ *   | Background  | 0  | `PlaceBackground` (+ nested Sky `Moon`)| ≈ 8px      |
+ *   | Far fog     | 10 | `Fog layer="dense"` (below creatures) | ≈ 16px     |
+ *   | Creatures   | 20 | `DepthScatter` creatures (internal)   | ≈ 16px     |
+ *   | Near fog    | 25 | `Fog layer="thin"` (above creatures)  | ≈ 26px     |
+ *   | Plaques     | 30 | `DepthScatter` plaques (internal)     | ≈ 16px     |
+ *   | Lantern     | 35 | `LanternCursor` (below chrome)        | none       |
+ *   | Chrome      | 40+| chips / pager / return / heading      | none       |
+ *
+ * `DepthScatter` paints its own creatures (z 20) and plaque (z 30) sub-layers,
+ * so the creatures and plaques bands above are a single `DepthScatter` wrapper
+ * carrying the ≈16px creature-band transform; the near fog is a separate z-25
+ * sibling between them.
+ *
+ * ## Fog (two sites, data-encoded)
+ *
+ * Fog encodes the zombie population and renders at the gate and on hallowed
+ * ground (Req 6.1); the sky and crypt carry no fog. Both the far (`dense`,
+ * z 10, below creatures) and near (`thin`, z 25, above creatures) layers derive
+ * their opacity from the SAME `fogDensity(zombieCount)` call and are null iff
+ * the zombie count is 0 — so on hallowed ground (0 zombies) both collapse to
+ * nothing while the band structure stays uniform. The gate keeps its
+ * ancient-zombie `Lightning` in the atmosphere band (self-hiding at count 0).
  *
  * ## Derivation pipeline
  *
  * The rows for the place (already `placeOf`-filtered by `SceneView`) flow
- * through three pure steps, in this order:
- *
- *   1. apply the active filter (a decay word, the gate's "Risen", or "all");
- *   2. `orderForPlace(place, filtered)` — the place's narrative ordering;
- *   3. `paginate(ordered, PLOT_SIZE)` — fixed-size plots (Req 5.4).
- *
- * The clamped plot is handed to `DepthRows`, which lays it across up to three
- * depth rows (front largest/brightest, back smaller/dimmer, Req 5.1/5.2) using
- * the reused `creatureScale` for per-row sizing (Req 5.3). Every creature in
- * the plot is rendered individually — no "+N more" collapse (Req 5.5).
- *
- * The decay word of a row is read from its existing `decayLevel` (the index
- * into the place's decay-word array) — no decay threshold is recomputed here.
+ * through three pure steps: apply the active filter (a decay word, the gate's
+ * "Risen", or "all"); `orderForPlace(place, filtered)`; `paginate(ordered,
+ * PLOT_SIZE)`. The clamped plot is handed to `DepthScatter`, which scatters it
+ * (Req 5.1). Every creature in the plot is rendered individually — no "+N more"
+ * collapse. The decay word of a row is read from its existing `decayLevel`.
  *
  * ## Focus on arrival
  *
  * On mount the view moves keyboard focus to the `PlaceHeading` (a
  * `tabIndex={-1}` target) so screen-reader and keyboard users land on the
- * place's name (Req 9.3 / 13.5). The travel transition (task 10) performs the
- * same move on `done`; this mount focus covers the reduced-motion / no-travel
- * path and deep-link arrivals.
+ * place's name (Req 9.3 / 13.5). The travel transition performs the same move
+ * on `done`; this mount focus covers the reduced-motion / no-travel path and
+ * deep-link arrivals.
  *
- * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 8.1–8.11, 9.1, 9.2, 9.3
+ * Requirements: 2.1, 2.5, 3.1, 3.7, 4.1, 4.2, 4.3, 4.4, 4.9, 5.1, 6.1, 8.2, 8.3
  */
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 
 import Atmosphere from "@/components/scene/Atmosphere";
-import Backdrop from "@/components/scene/Backdrop";
+import DepthScatter from "@/components/scene/DepthScatter";
 import Fog from "@/components/scene/Fog";
+import LanternCursor from "@/components/scene/LanternCursor";
 import Lightning from "@/components/scene/Lightning";
-import Moon from "@/components/scene/Moon";
-import Sky from "@/components/scene/Sky";
-import DepthRows from "@/components/scene/DepthRows";
+import PlaceBackground from "@/components/scene/PlaceBackground";
+import useParallax from "@/components/scene/useParallax";
 import FilterChips from "@/components/scene/FilterChips";
 import Pager from "@/components/scene/Pager";
 import PlaceHeading from "@/components/scene/PlaceHeading";
@@ -77,6 +93,27 @@ import {
   type PlaceId,
 } from "@/lib/estate-view";
 import { ancientZombieCount, summaryCounts } from "@/lib/scene-view";
+
+/**
+ * Per-band parallax transforms, pinned to the design's depth maxima (Req 2.5):
+ * the background moves ≈8px, the creatures / plaques / far fog ≈16px, and the
+ * near fog ≈26px at `|--px| = 1`. Each is a GPU-friendly `translate3d` reading
+ * `--px`/`--py` (default 0 so SSR/first paint is neutral); only `transform`
+ * animates, keeping the parallax on the compositor (Req 9.1). The chrome and
+ * the lantern deliberately carry none.
+ */
+const BG_PARALLAX: CSSProperties = {
+  transform:
+    "translate3d(calc(var(--px,0) * 8px), calc(var(--py,0) * 8px), 0)",
+};
+const CREATURE_PARALLAX: CSSProperties = {
+  transform:
+    "translate3d(calc(var(--px,0) * 16px), calc(var(--py,0) * 16px), 0)",
+};
+const NEAR_FOG_PARALLAX: CSSProperties = {
+  transform:
+    "translate3d(calc(var(--px,0) * 26px), calc(var(--py,0) * 26px), 0)",
+};
 
 export interface PlaceViewProps {
   /** Which place this view shows. */
@@ -99,8 +136,23 @@ export interface PlaceViewProps {
   onReturn: () => void;
   /** Names allowed the expensive filter effects (from `pickFilterHeroes`). */
   filterHeroes?: Set<string>;
-  /** Whether reduced motion is active (threaded to shared layers). */
+  /** Whether reduced motion is active (threaded to the polish layers). */
   reducedMotion?: boolean;
+  /**
+   * Mirror of `SceneView`'s lights state. Threaded to `LanternCursor`, which
+   * renders nothing while the lights are on (Req 3.7). Defaults to lights-off
+   * (the readable lantern mode) when omitted so standalone renders/tests still
+   * get the overlay.
+   */
+  lightsOn?: boolean;
+  /**
+   * Travel-transition hint (visual fix r3 travel). While `active`, the place
+   * pauses its pointer parallax (so the zoom origin can't drift) and fades its
+   * chrome (heading / chips / pager / plaques) in via `--travel-chrome-fade`,
+   * so the chrome arrives LAST after the destination zoom settles. Absent when
+   * no travel is running.
+   */
+  travel?: { active: boolean };
 }
 
 /**
@@ -156,6 +208,9 @@ export default function PlaceView({
   onSelect,
   onReturn,
   filterHeroes,
+  reducedMotion = false,
+  lightsOn = false,
+  travel,
 }: PlaceViewProps) {
   const meta = PLACES[place];
 
@@ -184,13 +239,30 @@ export default function PlaceView({
     return plaqueCopy(place, rows.length);
   }, [place, rows]);
 
-  // Gate-only atmosphere inputs, derived from the gate's own rows (the gate's
-  // placeOf-filtered rows include zombie + risen; `summaryCounts.zombie` counts
-  // only zombies, which is exactly the fog driver). Both collapse to a benign 0
-  // for the other places, but the layers are gate-gated in the render anyway.
+  // Fog renders at the gate AND on hallowed ground (Req 6.1); sky/crypt get no
+  // fog. The fog density is the place's zombie count (`summaryCounts.zombie`),
+  // which is the gate's zombie population and 0 on the ground — so both fog
+  // layers there collapse to null while the band structure stays uniform.
+  const hasFog = place === "gate" || place === "ground";
+  const zombieCount = hasFog ? summaryCounts(rows).zombie : 0;
+
+  // Gate-only lightning cadence, derived from the gate's ancient-zombie count;
+  // it self-hides at 0 and renders only for the gate.
   const isGate = place === "gate";
-  const zombieCount = isGate ? summaryCounts(rows).zombie : 0;
   const ancientCount = isGate ? ancientZombieCount(rows) : 0;
+
+  // Scene root for pointer parallax: `useParallax` writes `--px`/`--py` here on
+  // a coalesced rAF tick, which the band transforms below read through calc().
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Pause parallax during a travel transition so the zoom origin stays put.
+  useParallax(rootRef, { reducedMotion, paused: travel?.active ?? false });
+
+  // During a travel transition the place chrome fades in LAST, driven by the
+  // `--travel-chrome-fade` var the `travel-stage` sets (visual fix r3 travel).
+  // Idle (no travel) the chrome is fully opaque.
+  const chromeFadeStyle: CSSProperties = travel?.active
+    ? { opacity: "var(--travel-chrome-fade, 1)" }
+    : {};
 
   // Move focus to the heading on arrival so keyboard/screen-reader users land
   // on the place's name (Req 9.3 / 13.5). Runs once per place entry.
@@ -201,57 +273,106 @@ export default function PlaceView({
 
   return (
     <div
+      ref={rootRef}
+      data-scene-root
       data-testid="place-view"
       data-place={place}
-      className="relative h-dvh w-full overflow-hidden"
+      className="relative min-h-dvh w-full overflow-x-hidden overflow-y-auto"
       style={{ backgroundColor: "var(--color-night-sky)" }}
     >
-      {/* --- Reused backdrop stack (same painted estate as the map). These are
-          decorative full-cover layers, so each is `pointer-events-none` — only
-          the real place chrome (heading/return, chips, depth rows, pager) takes
-          clicks. --- */}
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <Sky />
-      </div>
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <Backdrop />
-      </div>
-      <div className="pointer-events-none absolute inset-0 z-10">
-        <Moon rows={rows} />
+      {/* --- Background band (z 0): the per-place painted cover with its top/
+          bottom legibility gradients and solid fallback fill. On the sky place
+          the data `Moon` is nested INSIDE `PlaceBackground` so it shares the
+          painting's transform and stays locked over the painted moon. The band
+          moves least under parallax (≈8px). Decorative, so the layer is
+          `pointer-events-none` (handled inside PlaceBackground). --- */}
+      <div className="pointer-events-none absolute inset-0 z-0" style={BG_PARALLAX}>
+        <PlaceBackground place={place} rows={rows} />
       </div>
 
-      {/* --- Gate-only fog: density encodes the gate's zombie count (Req 3.3).
-          Placed on a z-30 wrapper under the depth rows and over the backdrop,
-          matching the old scene's band order; suppressed for other places.
-          Decorative, so `pointer-events-none` — otherwise it would swallow the
-          clicks meant for the depth-row creatures beneath it. --- */}
-      {isGate ? (
-        <div className="pointer-events-none absolute inset-0 z-30">
-          <Fog zombieCount={zombieCount} />
+      {/* --- Far fog (z 10): the dense layer behind the creatures, density =
+          the place's zombie count (gate/ground only; null iff 0 zombies).
+          Shares the creature-band ≈16px offset. Decorative/pointer-events-none
+          (the Fog root sets that itself). --- */}
+      {hasFog ? (
+        <div className="pointer-events-none absolute inset-0 z-10" style={CREATURE_PARALLAX}>
+          <Fog zombieCount={zombieCount} layer="dense" reducedMotion={reducedMotion} />
         </div>
       ) : null}
 
-      {/* --- Atmosphere (+ gate-only lightning) in the z-40 band. Lightning
-          cadence encodes the gate's ancient-zombie count (Req 3.4/3.5) and
-          self-hides at count 0; it renders only for the gate. This z-40 layer
-          sits above the depth rows and chips, so it MUST be
-          `pointer-events-none` or it swallows every click in the place. --- */}
+      {/* --- Creatures + plaques band (z 20): the organic seeded scatter.
+          `DepthScatter` paints its own creatures (z 20) and plaque (z 30)
+          sub-layers; the near fog (z 25) is a sibling between them. The band
+          carries the ≈16px creature-band parallax offset. It is centred and
+          sized so the scatter has room to spread (the old depth-rows wrapper
+          sat at the vertical centre; the scatter fills a generous box). --- */}
+      <div
+        className="absolute inset-x-0 top-0 z-20 h-full"
+        style={CREATURE_PARALLAX}
+      >
+        <div className="relative mx-auto h-full w-full max-w-[1440px] px-6">
+          <DepthScatter
+            place={place}
+            plot={currentPlot}
+            selectedName={selectedName}
+            onSelect={onSelect}
+            filterHeroes={filterHeroes}
+            reducedMotion={reducedMotion}
+            // The plaque layer fades in with the rest of the chrome during a
+            // travel transition; creatures underneath keep animating in.
+            plaqueStyle={travel?.active ? chromeFadeStyle : undefined}
+          />
+        </div>
+      </div>
+
+      {/* --- Near fog (z 25): the thin layer in front of the creatures' feet
+          and below the plaques, a quarter of the dense opacity from the SAME
+          `fogDensity` call (null iff 0 zombies). Moves most under parallax
+          (≈26px). --- */}
+      {hasFog ? (
+        <div className="pointer-events-none absolute inset-0 z-[25]" style={NEAR_FOG_PARALLAX}>
+          <Fog zombieCount={zombieCount} layer="thin" reducedMotion={reducedMotion} />
+        </div>
+      ) : null}
+
+      {/* --- Lantern band (z 35): the lights-off lantern cursor / static
+          vignette, BELOW all chrome so it dims only the scene and creatures,
+          never the controls. Renders nothing while the lights are on. No
+          parallax transform. --- */}
+      <LanternCursor lightsOn={lightsOn} reducedMotion={reducedMotion} />
+
+      {/* --- Atmosphere (+ gate-only lightning) in the z-40 chrome band.
+          Lightning cadence encodes the gate's ancient-zombie count and
+          self-hides at count 0; it renders only for the gate. This layer sits
+          above the scene, so it MUST be `pointer-events-none` or it swallows
+          every click in the place. --- */}
       <div className="pointer-events-none absolute inset-0 z-40">
         <Atmosphere />
         {isGate ? <Lightning ancientCount={ancientCount} /> : null}
       </div>
 
-      {/* --- Place chrome: heading + return control (top band). --- */}
-      <div className="absolute inset-x-0 top-0 z-50 flex items-center justify-between gap-4 p-6">
+      {/* --- Return control: pinned top-left, in its own row below the site
+          header band (never over the stats line, visual fix 2C). --- */}
+      <div
+        data-testid="place-chrome"
+        className="absolute left-0 z-50 p-6"
+        style={{ top: "var(--site-header-h)", ...chromeFadeStyle }}
+      >
         <ReturnToGate onReturn={onReturn} />
-        <PlaceHeading ref={headingRef} name={meta.name} copy={copy} />
-        {/* Spacer so the heading stays centered between the return control and
-            this edge; the real lights/sound chrome rides SceneView's wrapper. */}
-        <div aria-hidden className="h-11 w-[160px]" />
       </div>
 
-      {/* --- Filter chips (below the heading). --- */}
-      <div className="absolute inset-x-0 top-28 z-40 flex justify-center px-6">
+      {/* --- Place title block: the heading, its subtitle, and the filter chips
+          are ONE centered flow column (title, then subtitle, then chips) with a
+          16px gap — normal flow, never absolutely stacked over each other, at
+          every width >= 360 (visual fix r3 #1). The whole column is positioned
+          below the site header; `PlaceHeading` renders the title + subtitle and
+          the chips follow it in the same column. --- */}
+      <div
+        data-testid="place-title-block"
+        className="absolute inset-x-0 z-40 flex flex-col items-center gap-4 px-6"
+        style={{ top: "var(--site-header-h)", ...chromeFadeStyle }}
+      >
+        <PlaceHeading ref={headingRef} name={meta.name} copy={copy} />
         <FilterChips
           place={place}
           rows={rows}
@@ -260,18 +381,11 @@ export default function PlaceView({
         />
       </div>
 
-      {/* --- Depth rows for the current plot (center stage). --- */}
-      <div className="absolute inset-x-0 top-1/2 z-30 flex -translate-y-1/2 justify-center px-6">
-        <DepthRows
-          plot={currentPlot}
-          selectedName={selectedName}
-          onSelect={onSelect}
-          filterHeroes={filterHeroes}
-        />
-      </div>
-
       {/* --- Pager (bottom band). --- */}
-      <div className="absolute inset-x-0 bottom-16 z-40 flex justify-center px-6">
+      <div
+        className="absolute inset-x-0 bottom-16 z-40 flex justify-center px-6"
+        style={chromeFadeStyle}
+      >
         <Pager
           plotIndex={clampedIndex}
           plotCount={plotCount}

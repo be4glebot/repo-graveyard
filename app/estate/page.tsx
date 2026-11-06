@@ -39,6 +39,13 @@ import { loadEstate } from "@/lib/estate-loader";
 import { resolveEstate } from "@/lib/estate";
 import { buildRows } from "@/lib/graveyard-view";
 
+import type { Metadata } from "next";
+
+/** The estate has no owner, so it reads as the sample graveyard (visual fix 2C). */
+export const metadata: Metadata = {
+  title: "Repo Graveyard — Sample Estate",
+};
+
 /**
  * Async child that performs all request-time work inside the Suspense
  * boundary: it captures the single `renderedAt` timestamp, loads the bundled

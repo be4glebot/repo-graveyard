@@ -43,6 +43,20 @@ import SceneErrorState from "@/components/scene/SceneErrorState";
 import { loadGraveyard } from "@/lib/graveyard-loader";
 import { buildRows } from "@/lib/graveyard-view";
 
+import type { Metadata } from "next";
+
+/**
+ * Per-user page title: "Repo Graveyard — {username}" (visual fix 2C), replacing
+ * the framework default. Awaits `params` for the username, mirroring the page's
+ * own param handling.
+ */
+export async function generateMetadata({
+  params,
+}: GraveyardPageProps): Promise<Metadata> {
+  const { username } = await params;
+  return { title: `Repo Graveyard — ${username}` };
+}
+
 interface GraveyardPageProps {
   params: Promise<{ username: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

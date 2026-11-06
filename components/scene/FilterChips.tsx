@@ -141,16 +141,20 @@ export default function FilterChips({
             disabled={disabled}
             onClick={() => onFilterChange(chip.filter)}
             className={[
-              "inline-flex h-9 items-center gap-2 rounded-full border px-4",
-              "font-ui text-sm transition-colors",
+              // Bevelled plaque chip from the boards (.chip2); the active
+              // filter adds .chip2.on for the crimson, visually-distinct state
+              // (Req 7.2, 7.3). The base class owns the box, font, border, and
+              // background; the utilities below carry only interaction state
+              // (focus ring, hover, disabled) and the inner count gap.
+              "chip2 gap-2 transition-colors",
               "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
-              active
-                ? "border-crimson-500 bg-crimson-900/50 text-scene-fg"
-                : "border-scene-fg-faint bg-night-sky/80 text-scene-fg-muted",
+              active ? "on" : null,
               disabled
                 ? "cursor-not-allowed opacity-40"
                 : "cursor-pointer hover:border-candle-400",
-            ].join(" ")}
+            ]
+              .filter(Boolean)
+              .join(" ")}
           >
             <span>{chip.label}</span>
             <span className="font-fact text-xs text-scene-fg-muted">

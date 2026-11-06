@@ -30,7 +30,7 @@
  * Requirements: 1.5, 1.6, 2.1, 2.2, 2.3, 2.4, 2.5
  */
 
-import { type ComponentType, type KeyboardEvent } from "react";
+import { type ComponentType, type CSSProperties, type KeyboardEvent } from "react";
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
 import { type LifecycleState } from "@/lib/lifecycle";
@@ -96,9 +96,16 @@ export interface PlaceProps {
    * within the otherwise `pointer-events-none` places band.
    */
   className?: string;
+  /**
+   * Extra inline style merged onto the place button. Used by the travel
+   * transition to fade the NON-target places (an `opacity` var) while the view
+   * zooms into the target (visual fix r3 travel). Merged AFTER the base opacity
+   * so a provided `opacity` wins.
+   */
+  style?: CSSProperties;
 }
 
-export default function Place({ place, rows, onEnter, className }: PlaceProps) {
+export default function Place({ place, rows, onEnter, className, style }: PlaceProps) {
   const meta = PLACES[place];
   const hasRows = rows.length > 0;
 
@@ -149,7 +156,7 @@ export default function Place({ place, rows, onEnter, className }: PlaceProps) {
       aria-label={`${meta.name}. ${countLine}. ${meta.cta}`}
       onClick={() => onEnter(place)}
       onKeyDown={handleKeyDown}
-      style={{ opacity: hasRows ? POPULATED_OPACITY : EMPTY_OPACITY }}
+      style={{ opacity: hasRows ? POPULATED_OPACITY : EMPTY_OPACITY, ...style }}
       className={[
         "group relative flex cursor-pointer flex-col items-center gap-3",
         "border-0 bg-transparent p-0 text-center",

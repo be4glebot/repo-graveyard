@@ -205,6 +205,15 @@ describe("SceneView — turning-soon 'Go to it' jump (task 11.2)", () => {
       fireEvent.click(goTo);
     });
 
+    // The jump starts the inward travel transition; the destination (sky) view
+    // mounts at the CUT, under the fog. Skip the transition (Esc) so it jumps
+    // straight to the arrived state and the sky place is mounted for the
+    // assertions below (the overlay is purely visual and changes none of the
+    // asserted state).
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    });
+
     // The sky place view opened (Req 12.2).
     const placeView = screen.getByTestId("place-view");
     expect(placeView.getAttribute("data-place")).toBe("sky");
@@ -230,12 +239,6 @@ describe("SceneView — turning-soon 'Go to it' jump (task 11.2)", () => {
       screen.queryByRole("button", { name: nameFor(rows, TARGET) }),
     ).not.toBeNull();
 
-    // Settle the travel overlay deterministically: a keydown skips it so no
-    // pending timer leaks past the test (the overlay is purely visual and does
-    // not change the asserted state).
-    act(() => {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-    });
   }, 20_000);
 
   it("renders no 'Go to it' action when no ghost qualifies as turning-soon (12.6)", () => {

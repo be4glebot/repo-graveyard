@@ -44,6 +44,14 @@ export interface MoonProps {
   rows: GraveyardRow[];
   /** Extra classes for the moon wrapper (e.g. positioning within the Scene). */
   className?: string;
+  /**
+   * Optional absolute placement in the parent element's coordinate space,
+   * computed by `coverRect` for the sky place so the disc sits exactly over
+   * the painted moon. When provided, the disc is positioned at `cx`/`cy`
+   * (centre, px) sized to `diameter` (px) instead of the fixed map position;
+   * when absent, the moon keeps its existing map placement unchanged.
+   */
+  placement?: { cx: number; cy: number; diameter: number };
 }
 
 /**
@@ -58,7 +66,7 @@ function undeadShare(rows: GraveyardRow[]): number {
   return (zombie + risen) / souls;
 }
 
-export default function Moon({ rows, className }: MoonProps) {
+export default function Moon({ rows, className, placement }: MoonProps) {
   const treatment = moonTreatment(rows);
   const isBlood = treatment === "blood-red";
 
@@ -81,13 +89,33 @@ export default function Moon({ rows, className }: MoonProps) {
     ? BLOOD_GLOW_BASE_SPREAD + BLOOD_GLOW_MAX_EXTRA_SPREAD * share
     : PALE_GLOW_SPREAD;
 
+  // Placement: when the sky place supplies a `coverRect` result, position the
+  // disc at cx/cy (centre) sized to `diameter` in the parent's coordinate space.
+  // Otherwise keep the fixed map position (`right-[24%] top-[8%]`, 130px disc).
+  const positionClass = placement
+    ? "absolute"
+    : "absolute right-[24%] top-[8%] h-[130px] w-[130px]";
+  const positionStyle = placement
+    ? {
+        left: `${placement.cx}px`,
+        top: `${placement.cy}px`,
+        width: `${placement.diameter}px`,
+        height: `${placement.diameter}px`,
+        // cx/cy are the disc centre; shift the top-left corner by half the disc.
+        transform: "translate(-50%, -50%)",
+      }
+    : undefined;
+
   return (
     <div
       aria-hidden="true"
-      className={`pointer-events-none absolute right-[24%] top-[8%] h-[130px] w-[130px] rounded-full${
+      className={`pointer-events-none ${positionClass} rounded-full${
         className ? ` ${className}` : ""
       }`}
       style={{
+        ...positionStyle,
+        // Health-encoding fill + glow stay identical in both placements, so the
+        // disc remains visually distinct from the painted moon beneath it.
         backgroundColor: fill,
         boxShadow: `0 0 ${Math.round(blur)}px ${Math.round(spread)}px ${glowColor}`,
       }}

@@ -1,15 +1,18 @@
 /**
- * Component tests for `PlaceView` and its controls (task 9.2).
+ * Component tests for `PlaceView` and its controls (tasks 9.2 + 9.1).
  *
  * `PlaceView` is the in-place scene: it applies the active filter, orders the
  * rows with `orderForPlace`, paginates them into fixed-size plots with
- * `paginate(ordered, PLOT_SIZE)`, and renders the current plot across up to
- * three `DepthRows` with `FilterChips`, a `Pager`, a `ReturnToGate` control,
- * and a focusable `PlaceHeading`. These tests pin the interactive and layout
- * behavior not covered by the pure view-model property tests:
+ * `paginate(ordered, PLOT_SIZE)`, and renders the current plot through the
+ * organic `DepthScatter` (one `scatter-creature` per row, a `scatter-plaque`
+ * per creature) with `FilterChips`, a `Pager`, a `ReturnToGate` control, and a
+ * focusable `PlaceHeading`, all under the 2C polish layers (`PlaceBackground`,
+ * two-site `Fog`, `LanternCursor`, pointer `useParallax`). These tests pin the
+ * interactive and layout behavior not covered by the pure view-model property
+ * tests:
  *
- *   - depth rows: at most three, with non-increasing scale and brightness from
- *     the front (row 0) to the back (Req 5.1, 5.2);
+ *   - the scatter renders one creature per plotted row (Req 5.1) and every
+ *     creature carries a depth-band brightness in (0, 1] (Req 5.2);
  *   - plots hold up to `PLOT_SIZE` (12) creatures with no "+N more" collapse
  *     (Req 5.5);
  *   - filter chips change the visible set and show counts; zero-count chips are
@@ -94,61 +97,51 @@ function renderPlace(
   );
 }
 
-/**
- * The rendered depth rows ordered front-to-back by their logical row index
- * (`depth-row-<i>`, front row is index 0). `DepthRows` paints the rows
- * back-to-front in the DOM so nearer rows stack over farther ones, so DOM
- * order is not front-to-back; sort by the data-testid index to recover it.
- */
-function depthRows(): HTMLElement[] {
-  const rows = Array.from(
+/** The `scatter-creature` elements `DepthScatter` paints, in DOM order. */
+function scatterCreatures(): HTMLElement[] {
+  return Array.from(
     screen
-      .getByTestId("depth-rows")
-      .querySelectorAll("[data-testid^='depth-row-']"),
+      .getByTestId("depth-scatter")
+      .querySelectorAll("[data-testid='scatter-creature']"),
   ) as HTMLElement[];
-  const indexOf = (el: HTMLElement) =>
-    Number((el.getAttribute("data-testid") ?? "").replace("depth-row-", ""));
-  return rows.sort((a, b) => indexOf(a) - indexOf(b));
 }
 
-/** Reads a depth row's numeric scale from its data-row-scale attribute. */
-function rowScale(row: HTMLElement): number {
-  return Number(row.getAttribute("data-row-scale"));
+/**
+ * Reads a scatter creature's depth-band brightness from the `filter:
+ * brightness(x)` inline style `DepthScatter` sets on each creature wrapper.
+ * Returns `NaN` if no brightness filter is present.
+ */
+function creatureBrightness(el: HTMLElement): number {
+  const match = /brightness\(([\d.]+)\)/.exec(el.style.filter ?? "");
+  return match ? Number(match[1]) : NaN;
 }
 
-/** Reads a depth row's numeric brightness from its data-row-brightness attribute. */
-function rowBrightness(row: HTMLElement): number {
-  return Number(row.getAttribute("data-row-brightness"));
-}
-
-/** Counts the creature buttons rendered across every depth row. */
+/** Counts the creatures rendered by the scatter for the current plot. */
 function renderedCreatureCount(): number {
-  return screen.getByTestId("depth-rows").querySelectorAll("button").length;
+  return scatterCreatures().length;
 }
 
-describe("PlaceView depth rows (5.1, 5.2)", () => {
-  it("renders at most three depth rows even for a full plot", () => {
-    // A full plot of PLOT_SIZE (12) creatures must still lay out in <= 3 rows.
+describe("PlaceView depth scatter (5.1, 5.2)", () => {
+  it("renders one creature per plotted row for a full plot", () => {
+    // A full plot of PLOT_SIZE (12) creatures scatters one creature per row.
     renderPlace({ rows: makeRows(PLOT_SIZE, "ghost") });
 
-    const rows = depthRows();
-    expect(rows.length).toBeGreaterThan(0);
-    expect(rows.length).toBeLessThanOrEqual(3);
+    expect(renderedCreatureCount()).toBe(PLOT_SIZE);
   });
 
-  it("orders rows by non-increasing scale and brightness front-to-back", () => {
+  it("gives every creature a depth-band brightness in (0, 1]", () => {
     renderPlace({ rows: makeRows(PLOT_SIZE, "ghost") });
 
-    const rows = depthRows();
-    // Row 0 is the front row: largest scale, full brightness.
-    for (let i = 1; i < rows.length; i += 1) {
-      expect(rowScale(rows[i])).toBeLessThanOrEqual(rowScale(rows[i - 1]));
-      expect(rowBrightness(rows[i])).toBeLessThanOrEqual(
-        rowBrightness(rows[i - 1]),
-      );
+    const brightnesses = scatterCreatures().map(creatureBrightness);
+    expect(brightnesses.length).toBe(PLOT_SIZE);
+    for (const b of brightnesses) {
+      expect(Number.isFinite(b)).toBe(true);
+      expect(b).toBeGreaterThan(0);
+      expect(b).toBeLessThanOrEqual(1);
     }
-    // The front row is the brightest (full brightness == 1).
-    expect(rowBrightness(rows[0])).toBe(1);
+    // The depth bands dim toward the back, so not every creature is at full
+    // brightness — the scatter carries a visible depth gradient (Req 5.2).
+    expect(Math.min(...brightnesses)).toBeLessThan(Math.max(...brightnesses));
   });
 });
 
@@ -374,5 +367,66 @@ describe("PlaceView atmosphere layers (data-encoding regression guard)", () => {
   it("never renders the whisper region in a place (whispers are map-only)", () => {
     renderPlace({ place: "gate", rows: gateRows() });
     expect(screen.queryByTestId("scene-whisper")).toBeNull();
+  });
+});
+
+
+describe("PlaceView title block: heading, subtitle, chips are one centered flow column (visual fix r3 #1)", () => {
+  it("renders title, then subtitle, then the chip row in normal document flow, in that order", () => {
+    renderPlace({ place: "gate", rows: makeRows(4, "zombie", 0) });
+
+    const block = screen.getByTestId("place-title-block");
+    const heading = screen.getByTestId("place-heading");
+    const chips = screen.getByTestId("filter-chips");
+
+    // The heading (title + subtitle) and the chip row are BOTH children of the
+    // one title-block column (normal flow), not absolutely stacked over each
+    // other.
+    expect(block.contains(heading)).toBe(true);
+    expect(block.contains(chips)).toBe(true);
+
+    // The column flows top-to-bottom with a gap (flex-col + gap-4 = 16px), and
+    // its items are not individually absolutely positioned.
+    expect(block.className).toContain("flex-col");
+    expect(block.className).toContain("items-center");
+    expect(block.className).toContain("gap-4");
+    expect(heading.className).not.toContain("absolute");
+    expect(chips.className).not.toContain("absolute");
+
+    // Order: the heading precedes the chips in document order, and INSIDE the
+    // heading the title (<h1>) precedes the subtitle (<p>) ? title, subtitle,
+    // then chips, reading top to bottom.
+    expect(
+      heading.compareDocumentPosition(chips) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    const title = heading.querySelector("h1");
+    const subtitle = heading.querySelector("p");
+    expect(title).not.toBeNull();
+    expect(subtitle).not.toBeNull();
+    expect(
+      title!.compareDocumentPosition(subtitle!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // And the subtitle precedes the chip row (subtitle -> chips, in flow).
+    expect(
+      subtitle!.compareDocumentPosition(chips) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("keeps the same flow column with no chips (ground/crypt): heading + subtitle still flow, chips absent", () => {
+    renderPlace({ place: "ground", rows: makeRows(3, "tombstone", null) });
+    const block = screen.getByTestId("place-title-block");
+    const heading = screen.getByTestId("place-heading");
+    expect(block.contains(heading)).toBe(true);
+    expect(screen.queryByTestId("filter-chips")).toBeNull();
+    // The title still precedes its subtitle in flow.
+    const title = heading.querySelector("h1");
+    const subtitle = heading.querySelector("p");
+    expect(
+      title!.compareDocumentPosition(subtitle!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

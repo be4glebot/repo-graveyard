@@ -33,6 +33,20 @@ import SceneErrorState from "@/components/scene/SceneErrorState";
 import { loadGraveyard } from "@/lib/graveyard-loader";
 import { buildRows } from "@/lib/graveyard-view";
 
+import type { Metadata } from "next";
+
+/**
+ * Per-user page title: "Repo Graveyard — {username}" (visual fix 2C). The deep
+ * link names a repo, but the title stays keyed to the owner so it matches the
+ * base route. Awaits `params` for the username.
+ */
+export async function generateMetadata({
+  params,
+}: GraveyardRepoPageProps): Promise<Metadata> {
+  const { username } = await params;
+  return { title: `Repo Graveyard — ${username}` };
+}
+
 interface GraveyardRepoPageProps {
   params: Promise<{ username: string; repo: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

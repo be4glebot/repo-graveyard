@@ -1,0 +1,607 @@
+{
+  "pbtResults": {
+    "7.2 Write fog-opacity property test (Property 3)": {
+      "status": "passed",
+      "lastRunTimestamp": 1793930208380
+    }
+  },
+  "executionHistory": {
+    "1.1 Add layout constants and the `PAINTED_MOON` / `PARALLAX_MAX_*` values": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950047
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928958057
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929124235
+      }
+    ],
+    "1.2 Implement `coverRect` pure cover-math helper": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950171
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929130138
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929484428
+      }
+    ],
+    "1.3 Implement `scatterLayout` with `xmur3`/`mulberry32` and tombstone tilt": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950260
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929131540
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929486770
+      }
+    ],
+    "1.4 Write property tests for `coverRect` and `scatterLayout` determinism/shape": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950332
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929627388
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930091726
+      }
+    ],
+    "1.5 Write property test for no plaque overlap at 1440 and 1280": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950389
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929628345
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930093109
+      }
+    ],
+    "2.1 Add `@theme` tokens and `.btn2` / `.chip2` / `.chip2.on` / `.plq` classes": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950511
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928959511
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929125629
+      }
+    ],
+    "2.2 Add parallax / fog / flicker keyframes (transform & opacity only)": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950590
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928960516
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929126490
+      }
+    ],
+    "3.1 Create `components/ui/Plaque.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950669
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929132954
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929482088
+      }
+    ],
+    "3.2 Restyle `FilterChips`, `ReturnToGate`, and `Pager`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950726
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929495691
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929623772
+      }
+    ],
+    "3.3 Write `tests/dom/UiPolish.test.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950792
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929629735
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930094512
+      }
+    ],
+    "4.1 Create `components/scene/useParallax.ts`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950862
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929133920
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929483515
+      }
+    ],
+    "4.2 Write `tests/dom/Parallax.test.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950924
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929631216
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930095506
+      }
+    ],
+    "5.1 Create `components/scene/LanternCursor.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928950977
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929631859
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930096399
+      }
+    ],
+    "5.2 Write `tests/dom/LanternCursor.test.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951032
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930335682
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930574818
+      }
+    ],
+    "6.1 Create `components/scene/PlaceBackground.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951105
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930100138
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930329422
+      }
+    ],
+    "6.2 Nest the Sky `Moon` inside `PlaceBackground` using `coverRect`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951180
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930333396
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930575756
+      }
+    ],
+    "6.3 Change `Moon` to accept an optional `coverRect` placement": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951235
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930101502
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930328020
+      }
+    ],
+    "6.4 Write `tests/dom/PlaceBackground.test.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951317
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930580150
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930774574
+      }
+    ],
+    "7.1 Extend `components/scene/Fog.tsx` to a `layer` prop with two render sites": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951396
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929134930
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929485871
+      }
+    ],
+    "7.2 Write fog-opacity property test (Property 3)": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951454
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930103860
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930325695
+      }
+    ],
+    "7.3 Write `tests/dom/Fog.test.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951500
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930104550
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930327077
+      }
+    ],
+    "8.1 Create `components/scene/DepthScatter.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951567
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930102456
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930330221
+      }
+    ],
+    "8.2 Add width branch and gate fresh-zombie wander to `DepthScatter`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951715
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930334829
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930576784
+      }
+    ],
+    "8.3 Write `tests/dom/DepthScatter.test.tsx`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951770
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930581149
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930775375
+      }
+    ],
+    "8.4 Checkpoint: run the suite before integration": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951822
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930778517
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930840374
+      }
+    ],
+    "9.0 Implement the Requirement 1 layout fixes (scroll + place fit + header)": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951873
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930843799
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931105955
+      }
+    ],
+    "9.1 Wire `PlaceView` to the new polish layers": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951924
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931109398
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931523814
+      }
+    ],
+    "9.2 Wire `EstateMap` to the new polish layers": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928951995
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931110448
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931722506
+      }
+    ],
+    "9.3 Thread `lightsOn`/`reducedMotion` from `SceneView` and preload in `TravelTransition`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928952058
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931725895
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931863653
+      }
+    ],
+    "9.4 Write layout-robustness and performance-budget DOM assertions": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928952111
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793931867787
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793932126275
+      }
+    ],
+    "10.1 Run the full suite, lint, and build; confirm preservation": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793928952170
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793932129560
+      },
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793932290983
+      }
+    ],
+    "2. Theme tokens, UI-polish classes, and polish keyframes in `app/globals.css`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793929126545
+      }
+    ],
+    "1. Pure layout logic and constants in `lib/estate-view.ts`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930093172
+      }
+    ],
+    "3. `Plaque` component and restyled chips/buttons": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930094573
+      }
+    ],
+    "4. `useParallax` hook and its DOM test": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930095665
+      }
+    ],
+    "7. Two-site `Fog` and its tests (frozen density contract)": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930327133
+      }
+    ],
+    "5. `LanternCursor` overlay and its DOM test": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930574905
+      }
+    ],
+    "6. `PlaceBackground` + Sky `Moon` placement and DOM tests": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930774751
+      }
+    ],
+    "8. `DepthScatter` renderer and its DOM tests": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793930840437
+      }
+    ],
+    "9. Integration into `PlaceView`, `EstateMap`, `SceneView`, and `TravelTransition`": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793932126405
+      }
+    ],
+    "10. Final verification and preservation checkpoint": [
+      {
+        "executionId": "b6328eb1-d2fc-4560-87fc-31ef46188843",
+        "chatSessionId": "sess_f42e8083-7b74-422a-ba79-798e4266a5f3",
+        "timestamp": 1793932291034
+      }
+    ]
+  }
+}

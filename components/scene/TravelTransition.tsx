@@ -1,127 +1,208 @@
 "use client";
 
 /**
- * Travel transition overlay (client component).
+ * Travel transition (controller hook + fog overlay) \u2014 the "pulled in" transition
+ * that animates the REAL scenes between the estate map and a place.
  *
- * The short, skippable parallax-zoom-plus-fog transition that plays when the
- * user travels from the estate map into a place (`onEnterPlace`). It is an
- * `aria-hidden` overlay owned by `SceneView`, mounted only during the
- * transition window and unmounted when it reports `done`. It is purely a
- * visual flourish over the already-committed navigation: `SceneView` has
- * already pushed `?at=place` and set `view` by the time this mounts, so the
- * overlay never changes application state — it only runs the motion and then
- * calls `onDone` so the owner can clear the transitioning flag and move focus
- * to the place heading.
+ * ## Why a controller, not an overlay of copies
  *
- * ## Two paths
+ * The earlier version animated empty copy layers OVER an already-switched
+ * scene, so the destination was visible under the overlay before any zoom and
+ * the "zoom" layer had no real content. This version inverts that: `SceneView`
+ * keeps the SOURCE view mounted and applies the zoom transform to the real
+ * view's wrapper (`travel-stage`), switches `view` to the destination only at
+ * the CUT (while the fog fully covers the screen), then animates the real
+ * DESTINATION view in. Nothing is a copy; every value is exactly at rest before
+ * the overlay is removed, so there is no end jump.
  *
- * **Motion path (≈`TRAVEL_MS` = 1200 ms, ±100).** Four overlapping beats from
- * `Travel.dc.html`:
- *   1. parallax-zoom — two backdrop plates (`layer-bg-far` and
- *      `layer-fg-frame`) scale toward the place at *distinct* rates, so the
- *      foreground rushes past faster than the far plate (depth);
- *   2. fog wipe — a radial fog layer rises to full occlusion (opacity 1) before
- *      the content swap, hiding the map→place cut;
- *   3. title fade — the place name fades in;
- *   4. creature raise — stand-in motes rise on a fixed per-creature stagger
- *      computed from the reused `animationDelay`, scaled so every raise *starts*
- *      (and so finishes) before the end of the window.
+ * `useTravel` owns the clock (rAF + a safety-net timer so it is deterministic
+ * under fake timers) and exposes the phase-driven `stageStyle` (applied by
+ * `SceneView` to the mounted real view), the `cut` flag (SceneView switches the
+ * rendered view when it flips), per-scene fade hints (`othersFade` for the map's
+ * non-target places, `chromeFade` for the destination chrome), and the `fog`
+ * state consumed by `<TravelFog>`. It calls `onCut` once at the cut and `onDone`
+ * once at the end (or on a skip).
  *
- * **Reduced-motion path (`TRAVEL_CROSSFADE_MS` = 300 ms).** A single opacity
- * crossfade with no zoom, no fog, and no stagger — consistent with the scene's
- * reduced-motion discipline and the global `prefers-reduced-motion` CSS rule.
+ * ## Timeline (forward, map -> place; total ~2.2s; transform/opacity/filter only)
  *
- * ## Skippable
+ *   - 0\u2013900ms   source map zooms `scale 1 -> 3.2`, origin at the place centre,
+ *                ease-in (accelerating, like being pulled in); blur `0 -> 6px`
+ *                from 450ms; the OTHER three places fade to 0 by 600ms.
+ *   - 650\u20131100  fog rush rises `opacity 0 -> 1` (art `scale 1.4 -> 2.2`), fully
+ *                opaque 1050\u20131250.
+ *   - 1150       the CUT (hidden under the fog): `SceneView` switches to the place.
+ *   - 1150\u20132000  destination place `scale 1.25 -> 1`, blur `4px -> 0`, ease-out;
+ *                fog fades `1 -> 0` over 1250\u20131700.
+ *   - 1700\u20132200  destination chrome fades in; focus moves to PlaceHeading at 2200.
  *
- * While the window is open, a `keydown`/`pointerdown` anywhere jumps straight
- * to the arrived state and calls `onDone` once. The same single-fire guard
- * covers the natural timer completion, so `onDone` fires exactly once whether
- * the user skips or lets it play out.
+ * Reverse (place -> map) mirrors it: the source place `scale 1 -> 0.8` + chrome
+ * fades, fog covers, cut to the map at 1150, the map starts `scale 3.2 -> 1`
+ * (origin at the place we left) and pulls back out.
  *
- * ## Accessibility
+ * Skip (click/Esc) jumps straight to the end state. Reduced motion replaces the
+ * whole thing with a 300ms crossfade, cut at 150ms.
  *
- * The overlay is `aria-hidden` and `pointer-events-none`, so it is invisible to
- * assistive tech and never receives or traps focus. The arrival focus move
- * (to the `PlaceHeading`) is performed by `SceneView` in the `onDone` handler,
- * not here — this component only reports completion.
- *
- * Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7
+ * Requirements: 13.1\u201313.7, 9.1, 9.4
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
-import { TRAVEL_CROSSFADE_MS, TRAVEL_MS, type PlaceId, PLACES } from "@/lib/estate-view";
-import { animationDelay, ANIMATION_DELAY_MAX_SECONDS } from "@/lib/scene-view";
+import {
+  TRAVEL_CROSSFADE_MS,
+  PLACE_CENTERS,
+  PLACES,
+  type PlaceId,
+} from "@/lib/estate-view";
 
-export interface TravelTransitionProps {
-  /** The place being travelled to; drives the title and zoom target. */
+/** Which way the pull runs: into a place, or back out to the map. */
+export type TravelDirection = "in" | "out";
+
+/** Total forward/reverse motion-path duration (ms). */
+export const TRAVEL_FULL_MS = 2200;
+/** The cut instant (ms): when `SceneView` swaps the mounted view, under the fog. */
+export const TRAVEL_CUT_MS = 1150;
+/** Reduced-motion cut instant (ms), mid-crossfade. */
+export const TRAVEL_REDUCED_CUT_MS = 150;
+
+/** Ease-in (accelerate) for the inward pull; ease-out (decelerate) for arrival. */
+const EASE_IN = "cubic-bezier(.55,0,1,.45)";
+const EASE_OUT = "cubic-bezier(0,.55,.45,1)";
+
+export interface UseTravelOptions {
+  /** The place being entered ("in") or left ("out"); drives the zoom origin. */
   place: PlaceId;
-  /**
-   * Representative repo names for the stagger. Each name is hashed through the
-   * reused `animationDelay` so motes rise on a stable, spread-out stagger. May
-   * be empty (empty place) — then no motes render and only the zoom/fog/title
-   * play. Ignored entirely on the reduced-motion path.
-   */
-  creatureNames?: string[];
-  /** When true, play the 300 ms crossfade with no zoom/fog/stagger. */
+  /** Pull direction. */
+  direction: TravelDirection;
+  /** When true, use the 300ms crossfade instead of the full motion path. */
   reducedMotion: boolean;
-  /** Called exactly once when the transition finishes (or is skipped). */
+  /** Called exactly once at the cut, so `SceneView` swaps the mounted view. */
+  onCut: () => void;
+  /** Called exactly once at the end (or on a skip). */
   onDone: () => void;
 }
 
+export interface TravelState {
+  /** Has the cut happened? Before: source is mounted. After: destination. */
+  cut: boolean;
+  /** Transform/filter/opacity to apply to the mounted real view (`travel-stage`). */
+  stageStyle: CSSProperties;
+  /** 0..1 fade of the map's NON-target places (1 = fully visible, 0 = gone). */
+  othersFade: number;
+  /** 0..1 fade-in of the destination chrome (heading/chips/pager/plaques). */
+  chromeFade: number;
+  /** Fog overlay state consumed by `<TravelFog>`. */
+  fog: { opacity: number; scale: number };
+  /** True on the reduced-motion crossfade path. */
+  reduced: boolean;
+}
+
+/** Linear 0..1 progress of `elapsed` across `[start, end]` (clamped). */
+function phase(elapsed: number, start: number, end: number): number {
+  if (elapsed <= start) return 0;
+  if (elapsed >= end) return 1;
+  return (elapsed - start) / (end - start);
+}
+
+/** Accelerating ease-in (slow start, fast finish) — the "being pulled in"
+ *  feel for the source zoom. Cubic. */
+function easeIn(t: number): number {
+  return t * t * t;
+}
+
+/** Decelerating ease-out (fast start, gentle settle) — the arrival feel for the
+ *  destination zoom. Cubic. */
+function easeOut(t: number): number {
+  const u = 1 - t;
+  return 1 - u * u * u;
+}
+
 /**
- * Fraction of `TRAVEL_MS` reserved as a tail after the last creature raise
- * begins, so every raise has started before the window closes (the raises
- * themselves are short CSS fades). The per-creature `animationDelay` range
- * ([0, ANIMATION_DELAY_MAX_SECONDS)) is compressed into the leading part of the
- * window so "all raises finish before the end" (Req 13.2).
+ * The travel clock + phase model. Returns the current `TravelState` for
+ * `SceneView` to apply to the real scenes, and drives `onCut` / `onDone`.
  */
-const STAGGER_WINDOW_FRACTION = 0.6;
+export function useTravel(options: UseTravelOptions): TravelState {
+  const { place, direction, reducedMotion, onCut, onDone } = options;
+  const durationMs = reducedMotion ? TRAVEL_CROSSFADE_MS : TRAVEL_FULL_MS;
+  const cutAt = reducedMotion ? TRAVEL_REDUCED_CUT_MS : TRAVEL_CUT_MS;
 
-export default function TravelTransition({
-  place,
-  creatureNames = [],
-  reducedMotion,
-  onDone,
-}: TravelTransitionProps) {
-  const meta = PLACES[place];
+  const [elapsed, setElapsed] = useState(0);
+  const [cut, setCut] = useState(false);
 
-  // Duration is the full motion window, or the short crossfade under reduced
-  // motion.
-  const durationMs = reducedMotion ? TRAVEL_CROSSFADE_MS : TRAVEL_MS;
-
-  // `arrived` flips on once, at the end of the window or on a skip, and drives
-  // the final (fully zoomed / fully faded) visual state.
-  const [arrived, setArrived] = useState(false);
-
-  // Single-fire guard: `onDone` must run exactly once whether the timer elapses
-  // or the user skips. A ref avoids a stale-closure double fire across the
-  // timer and the event listeners.
+  // Single-fire guards for the two one-shot callbacks.
+  const cutRef = useRef(false);
   const doneRef = useRef(false);
+
+  const doCut = useCallback(() => {
+    if (cutRef.current) return;
+    cutRef.current = true;
+    setCut(true);
+    onCut();
+  }, [onCut]);
+
   const finish = useCallback(() => {
-    if (doneRef.current) {
+    doCut(); // ensure the cut has happened if we jumped straight to the end
+    if (doneRef.current) return;
+    doneRef.current = true;
+    setElapsed(durationMs);
+    onDone();
+  }, [doCut, durationMs, onDone]);
+
+  // Preload the destination place's painting (fire-and-forget, SSR-guarded).
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.Image === "undefined") {
       return;
     }
-    doneRef.current = true;
-    setArrived(true);
-    onDone();
-  }, [onDone]);
+    const img = new window.Image();
+    img.src = `/art/place-${place}.webp`;
+  }, [place]);
 
-  // Natural completion: end the transition when the window elapses.
+  // The clock: advance `elapsed` on a ~60fps interval, fire the cut at `cutAt`,
+  // finish at the end. Using `setInterval` + `Date.now()` (rather than rAF +
+  // performance.now) keeps the whole timeline deterministically advanceable
+  // under vitest fake timers, so the ORDER tests (source vs destination mounted,
+  // fog fully opaque at 1100ms) are reliable. The cut/end also have their own
+  // safety-net timers so they fire exactly on time regardless of interval drift.
   useEffect(() => {
-    const timer = window.setTimeout(finish, durationMs);
-    return () => {
-      window.clearTimeout(timer);
+    if (typeof window === "undefined") {
+      return;
+    }
+    const start = Date.now();
+    const tick = (): void => {
+      const e = Date.now() - start;
+      if (e >= cutAt) {
+        doCut();
+      }
+      if (e >= durationMs) {
+        setElapsed(durationMs);
+        finish();
+        return;
+      }
+      setElapsed(e);
     };
-  }, [durationMs, finish]);
-
-  // Skippable: any key or pointer press finishes immediately (Req 13.4). The
-  // listeners live only for the transition window (cleaned up on unmount) and
-  // are passive — they never block the key/pointer from its normal behavior.
-  useEffect(() => {
-    const onSkip = (): void => {
+    const interval = window.setInterval(tick, 16);
+    const cutTimer = window.setTimeout(doCut, cutAt);
+    const endTimer = window.setTimeout(() => {
+      setElapsed(durationMs);
       finish();
+    }, durationMs);
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(cutTimer);
+      window.clearTimeout(endTimer);
     };
+  }, [cutAt, durationMs, doCut, finish]);
+
+  // Skippable: any key (incl. Esc) or pointer press jumps to the end state.
+  useEffect(() => {
+    const onSkip = (): void => finish();
+    if (typeof window === "undefined") return;
     window.addEventListener("keydown", onSkip);
     window.addEventListener("pointerdown", onSkip);
     return () => {
@@ -130,145 +211,253 @@ export default function TravelTransition({
     };
   }, [finish]);
 
-  // --- Reduced-motion crossfade -------------------------------------------
-  // A single opacity layer, no zoom/fog/stagger (Req 13.6). The layer starts
-  // transparent and fades to opaque over the crossfade, masking the swap.
+  const centre = PLACE_CENTERS[place];
+  const originCss = `${centre.x * 100}% ${centre.y * 100}%`;
+
+  // --- Reduced-motion crossfade: the stage just fades; cut at 150ms. --------
   if (reducedMotion) {
+    // Before the cut the source fades out; after, the destination fades in.
+    const p = phase(elapsed, 0, durationMs);
+    const done = elapsed >= durationMs;
+    const stageOpacity = cut
+      ? Math.min(1, (elapsed - cutAt) / Math.max(1, durationMs - cutAt))
+      : 1 - p;
+    return {
+      cut,
+      reduced: true,
+      stageStyle: {
+        opacity: done ? 1 : Math.max(0, Math.min(1, stageOpacity)),
+        transition: "opacity 120ms linear",
+      },
+      othersFade: 1,
+      chromeFade: cut ? 1 : 0,
+      fog: { opacity: 0, scale: 1 },
+    };
+  }
+
+  // --- Full motion path -----------------------------------------------------
+  if (!cut) {
+    // Source half (0\u2013cut): zoom the real source view.
+    const zoomP = easeIn(phase(elapsed, 0, 900));
+    const blurFrom = phase(elapsed, 450, 900);
+    let scale: number;
+    let blur: number;
+    if (direction === "in") {
+      scale = 1 + 2.2 * zoomP; // map 1 -> 3.2
+      blur = blurFrom * 6;
+    } else {
+      scale = 1 - 0.2 * zoomP; // place 1 -> 0.8
+      blur = blurFrom * 6;
+    }
+    const othersFade = 1 - phase(elapsed, 0, 600); // other places gone by 600ms
+    return {
+      cut,
+      reduced: false,
+      stageStyle: {
+        transformOrigin: originCss,
+        transform: `scale(${scale})`,
+        filter: `blur(${blur}px)`,
+        willChange: "transform, filter",
+      },
+      othersFade: direction === "in" ? othersFade : 1,
+      // On "out" the leaving place's chrome fades with the zoom.
+      chromeFade: direction === "out" ? 1 - zoomP : 1,
+      fog: fogState(elapsed),
+    };
+  }
+
+  // Destination half (cut\u2013end): animate the real destination view in.
+  const enterP = easeOut(phase(elapsed, TRAVEL_CUT_MS, 2000));
+  let scale: number;
+  if (direction === "in") {
+    scale = 1.25 - 0.25 * enterP; // place 1.25 -> 1
+  } else {
+    scale = 3.2 - 2.2 * enterP; // map 3.2 -> 1, pulling back out
+  }
+  const blur = (1 - enterP) * 4; // 4px -> 0
+  const chromeFade = phase(elapsed, 1700, 2200); // chrome fades in last
+  // At the very end, pin everything exactly at rest so there is no jump.
+  const atRest = elapsed >= durationMs;
+  return {
+    cut,
+    reduced: false,
+    stageStyle: {
+      transformOrigin: originCss,
+      transform: atRest ? "none" : `scale(${scale})`,
+      filter: atRest ? "none" : `blur(${blur}px)`,
+      willChange: "transform, filter",
+    },
+    othersFade: 1,
+    chromeFade: atRest ? 1 : chromeFade,
+    fog: fogState(elapsed),
+  };
+}
+
+/** Fog opacity/scale across the transition: rise 650\u20131100, hold opaque
+ *  1050\u20131250, fall 1250\u20131700; art scales 1.4 -> 2.2 as it rises. */
+function fogState(elapsed: number): { opacity: number; scale: number } {
+  // Rise to full by 1050, hold opaque 1050-1250, then fall 1250-1700, so the
+  // cut at 1150 happens under a fully opaque fog (visual fix r3 travel).
+  const rise = phase(elapsed, 650, 1050);
+  const fall = phase(elapsed, 1250, 1700);
+  const opacity = Math.max(0, Math.min(1, rise) - fall);
+  const scale = 1.4 + 0.8 * phase(elapsed, 650, 1700);
+  return { opacity, scale };
+}
+
+export interface TravelFogProps {
+  /** Fog state from `useTravel` (opacity/scale). */
+  fog: { opacity: number; scale: number };
+  /** The destination's display NAME, shown only on the reduced-motion card.
+   *  Never the place we left on "out" \u2014 the caller passes the arrival name. */
+  destinationName?: string;
+  /** True on the reduced-motion crossfade path (renders the name card). */
+  reduced: boolean;
+  /** Direction + place for test hooks. */
+  direction: TravelDirection;
+  place: PlaceId;
+}
+
+/**
+ * The fog-rush overlay (and, on the reduced-motion path, a centred destination
+ * name card). `aria-hidden` + `pointer-events-none`. This is the ONLY overlay;
+ * the scenes themselves are the real, animated views beneath it.
+ */
+export function TravelFog({
+  fog,
+  destinationName,
+  reduced,
+  direction,
+  place,
+}: TravelFogProps) {
+  if (reduced) {
     return (
       <div
         aria-hidden="true"
         data-testid="travel-transition"
+        data-direction={direction}
         data-place={place}
         data-reduced-motion="true"
-        className="pointer-events-none fixed inset-0 z-[100]"
-        style={{
-          backgroundColor: "var(--color-night-sky)",
-          opacity: arrived ? 1 : 0,
-          transition: `opacity ${TRAVEL_CROSSFADE_MS}ms ease-in-out`,
-        }}
+        className="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center"
+        style={{ backgroundColor: "color-mix(in srgb, var(--color-night-sky) 80%, transparent)" }}
       >
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{
-            opacity: arrived ? 1 : 0,
-            transition: `opacity ${TRAVEL_CROSSFADE_MS}ms ease-in-out`,
-          }}
-        >
-          <h2 className="m-0 font-heading text-3xl font-bold uppercase tracking-[5px] text-scene-fg">
-            {meta.name}
+        {destinationName ? (
+          <h2
+            data-testid="travel-title"
+            className="m-0 font-heading text-3xl font-bold uppercase tracking-[5px] text-scene-fg"
+          >
+            {destinationName}
           </h2>
-        </div>
+        ) : null}
       </div>
     );
   }
-
-  // --- Motion path ---------------------------------------------------------
-  // The stagger compresses each name's `animationDelay` (a value in
-  // [0, ANIMATION_DELAY_MAX_SECONDS) seconds) into the leading
-  // STAGGER_WINDOW_FRACTION of the travel window, so every raise begins — and
-  // thus finishes — before the end (Req 13.2). Dividing by the max normalizes
-  // to [0, 1); scaling by the window keeps all delays inside it.
-  const staggerWindowMs = TRAVEL_MS * STAGGER_WINDOW_FRACTION;
-  const delayMsFor = (name: string): number =>
-    (animationDelay(name) / ANIMATION_DELAY_MAX_SECONDS) * staggerWindowMs;
 
   return (
     <div
       aria-hidden="true"
       data-testid="travel-transition"
+      data-direction={direction}
       data-place={place}
       data-reduced-motion="false"
       className="pointer-events-none fixed inset-0 z-[100] overflow-hidden"
-      style={{ backgroundColor: "transparent" }}
     >
-      {/* --- Parallax zoom: two plates scaling toward the place at distinct
-          rates. The far plate drifts (1.15×), the foreground frame rushes
-          (1.6×), reading as depth as the view dives into the place. --- */}
-      <div
-        data-testid="travel-zoom-far"
-        className="absolute inset-0"
-        style={{
-          transformOrigin: "50% 45%",
-          transform: arrived ? "scale(1.15)" : "scale(1)",
-          transition: `transform ${TRAVEL_MS}ms cubic-bezier(0.22, 0.61, 0.36, 1)`,
-          backgroundColor: "var(--color-night-sky)",
-          opacity: 0.9,
-        }}
-      />
-      <div
-        data-testid="travel-zoom-fg"
-        className="absolute inset-0"
-        style={{
-          transformOrigin: "50% 60%",
-          transform: arrived ? "scale(1.6)" : "scale(1)",
-          transition: `transform ${TRAVEL_MS}ms cubic-bezier(0.22, 0.61, 0.36, 1)`,
-          backgroundImage:
-            "radial-gradient(circle at 50% 55%, transparent 40%, color-mix(in srgb, var(--color-night-sky) 70%, transparent) 100%)",
-        }}
-      />
-
-      {/* --- Fog wipe: a radial fog layer rising to FULL occlusion (opacity 1)
-          before the content swap, hiding the map→place cut (Req 13.2). It
-          completes well inside the window so the title can read through on the
-          far side. --- */}
       <div
         data-testid="travel-fog"
         className="absolute inset-0"
         style={{
-          opacity: arrived ? 1 : 0,
-          transition: `opacity ${Math.round(TRAVEL_MS * 0.5)}ms ease-in ${Math.round(
-            TRAVEL_MS * 0.4,
-          )}ms`,
-          backgroundImage:
-            "radial-gradient(circle at 50% 50%, var(--color-fog) 0%, var(--color-night-sky) 75%)",
+          opacity: fog.opacity,
+          transform: `scale(${fog.scale})`,
+          transformOrigin: "center",
+          backgroundImage: "url(/art/fog-wisps.webp)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       />
-
-      {/* --- Title fade: the place name fades in near the end. --- */}
-      <div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{
-          opacity: arrived ? 1 : 0,
-          transition: `opacity ${Math.round(TRAVEL_MS * 0.3)}ms ease-out ${Math.round(
-            TRAVEL_MS * 0.6,
-          )}ms`,
-        }}
-      >
-        <h2
-          data-testid="travel-title"
-          className="m-0 font-heading text-4xl font-bold uppercase tracking-[6px] text-scene-fg"
-          style={{ textShadow: "0 1px 8px var(--color-night-sky)" }}
-        >
-          {meta.name}
-        </h2>
-      </div>
-
-      {/* --- Creature raise: stand-in motes rising on the per-creature stagger
-          from `animationDelay`, every raise starting before the window end
-          (Req 13.2). Empty places render no motes. --- */}
-      {creatureNames.length > 0 ? (
-        <div
-          data-testid="travel-raise"
-          className="absolute inset-x-0 bottom-[18%] flex items-end justify-center gap-6"
-        >
-          {creatureNames.map((name) => (
-            <span
-              key={name}
-              data-testid="travel-raise-mote"
-              className="block h-10 w-6 rounded-full bg-candle-400/70"
-              style={{
-                opacity: arrived ? 1 : 0,
-                transform: arrived ? "translateY(0)" : "translateY(28px)",
-                transition: [
-                  `opacity ${Math.round(TRAVEL_MS * 0.3)}ms ease-out`,
-                  `transform ${Math.round(TRAVEL_MS * 0.3)}ms ease-out`,
-                ].join(", "),
-                transitionDelay: `${Math.round(delayMsFor(name))}ms`,
-              }}
-            />
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }
+
+/** Convenience: the display name a direction arrives at (estate on "out"). */
+export function travelDestinationName(
+  direction: TravelDirection,
+  place: PlaceId,
+): string {
+  return direction === "in" ? PLACES[place].name : "The Estate";
+}
+
+
+export interface TravelRunnerProps {
+  /** The place being entered ("in") or left ("out"). */
+  place: PlaceId;
+  direction: TravelDirection;
+  reducedMotion: boolean;
+  /** The REAL source view (mounted before the cut). */
+  from: ReactNode;
+  /** The REAL destination view (mounted after the cut). */
+  to: ReactNode;
+  /** Switch the committed nav view at the cut (under the fog). */
+  onCut: () => void;
+  /** Clear the travel + move arrival focus at the end. */
+  onDone: () => void;
+  /**
+   * Lets `SceneView` observe the live travel state each frame (e.g. to thread
+   * `othersFade` / `chromeFade` into the mounted view). Called on every render.
+   */
+  onState?: (state: TravelState) => void;
+}
+
+/**
+ * Runs a travel transition: owns the clock via `useTravel`, mounts the REAL
+ * source view until the cut and the REAL destination after it, wraps whichever
+ * is mounted in the `travel-stage` element carrying the zoom transform, and
+ * renders the fog overlay above. The stage wraps ONLY the scene \u2014 never the
+ * site header / Lights-Sound chrome, which `SceneView` renders outside it.
+ */
+export function TravelRunner({
+  place,
+  direction,
+  reducedMotion,
+  from,
+  to,
+  onCut,
+  onDone,
+  onState,
+}: TravelRunnerProps) {
+  const state = useTravel({ place, direction, reducedMotion, onCut, onDone });
+  onState?.(state);
+
+  return (
+    <>
+      <div
+        data-testid="travel-stage"
+        className="absolute inset-0"
+        // The transform/filter/opacity live on the stage wrapper around the
+        // REAL mounted view (it always has the scene as children, never an
+        // empty copy). The per-frame value comes from the rAF clock in
+        // `useTravel`, with the easing baked into the value curve there — so no
+        // CSS `transition` is used (that would smooth/lag the exact values).
+        style={
+          {
+            ...state.stageStyle,
+            ["--travel-others-fade" as string]: String(state.othersFade),
+            ["--travel-chrome-fade" as string]: String(state.chromeFade),
+          } as CSSProperties
+        }
+      >
+        {state.cut ? to : from}
+      </div>
+      <TravelFog
+        fog={state.fog}
+        reduced={state.reduced}
+        direction={direction}
+        place={place}
+        destinationName={
+          state.reduced ? travelDestinationName(direction, place) : undefined
+        }
+      />
+    </>
+  );
+}
+
+export { EASE_IN, EASE_OUT };

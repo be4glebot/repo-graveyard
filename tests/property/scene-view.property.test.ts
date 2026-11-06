@@ -966,3 +966,114 @@ describe("Feature: haunted-graveyard-scene, Property 11: Animation delay is dete
     }
   });
 });
+
+/**
+ * The fog-opacity model, replicated here from `components/scene/Fog.tsx`. The
+ * component maps a zombie count through the FROZEN `fogDensity` and onto an
+ * on-screen opacity; `MAX_FOG_OPACITY` (0.55) and `THIN_OPACITY_FACTOR` (0.25)
+ * are module-local consts in `Fog.tsx` (not exported), so we mirror them here
+ * rather than reaching into the component. Both derivatives are built on the
+ * SAME `fogDensity(n)` call so the property validates the real data contract:
+ *
+ *   Fog_Opacity(n) = (fogDensity(n) / 100) * MAX_FOG_OPACITY   // Fog_Dense
+ *   Fog_Thin(n)    = Fog_Opacity(n) * THIN_OPACITY_FACTOR      // Fog_Thin
+ */
+const MAX_FOG_OPACITY_MODEL = 0.55;
+const THIN_OPACITY_FACTOR_MODEL = 0.25;
+
+const fogOpacity = (zombieCount: number): number =>
+  (fogDensity(zombieCount) / 100) * MAX_FOG_OPACITY_MODEL;
+
+const fogThinOpacity = (zombieCount: number): number =>
+  fogOpacity(zombieCount) * THIN_OPACITY_FACTOR_MODEL;
+
+describe("Feature: polish-pass-2c, Property 3: Fog opacity encodes zombie count", () => {
+  // `Fog_Opacity` maps a zombie count to the fog overlay's on-screen opacity,
+  // built on the frozen `fogDensity`. The contract (Req 6.4 / Property 3): the
+  // opacity is exactly 0 iff the zombie count is 0, strictly positive whenever
+  // the count is positive, non-decreasing in the count, and bounded to [0,1];
+  // the ×0.25 thin derivative shares the same density gate, so it too is 0 iff
+  // the count is 0 and otherwise positive. `fc.nat({ max: 10000 })` spans the
+  // empty case, the strictly-interior band (1..19), the full-house threshold
+  // (FOG_FULL_ZOMBIES, 20), and counts far beyond it.
+  // **Validates: Requirements 6.4**
+
+  // Arm A — iff-zero, positivity, and the [0,1] bound for both the dense
+  // opacity and its thin (×0.25) derivative, for any single count.
+  it("is 0 iff count 0, positive iff count > 0, and bounded to [0,1] for both layers", () => {
+    fc.assert(
+      fc.property(fc.nat({ max: 10000 }), (count) => {
+        const dense = fogOpacity(count);
+        const thin = fogThinOpacity(count);
+
+        // Both layers stay within the inclusive [0,1] opacity range.
+        if (!(dense >= 0 && dense <= 1)) return false;
+        if (!(thin >= 0 && thin <= 1)) return false;
+
+        if (count === 0) {
+          // An empty graveyard clears the fog: both render sites are 0, so each
+          // is absent iff the zombie count is 0 (shared density gate).
+          if (dense !== 0) return false;
+          if (thin !== 0) return false;
+        } else {
+          // Any non-empty count produces strictly positive opacity on both
+          // layers — the thin layer's quarter scaling can never round a
+          // positive density down to 0.
+          if (!(dense > 0)) return false;
+          if (!(thin > 0)) return false;
+        }
+
+        return true;
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Arm B — monotonicity: as the zombie count grows the fog never thins, on
+  // either layer. We draw two independent counts and sort them so the pair
+  // always satisfies a <= b, then assert both the dense opacity and its thin
+  // derivative are non-decreasing across the pair.
+  it("is non-decreasing in the zombie count for both layers", () => {
+    fc.assert(
+      fc.property(
+        fc
+          .tuple(fc.nat({ max: 10000 }), fc.nat({ max: 10000 }))
+          .map(([x, y]): [number, number] => (x <= y ? [x, y] : [y, x])),
+        ([a, b]) =>
+          fogOpacity(a) <= fogOpacity(b) &&
+          fogThinOpacity(a) <= fogThinOpacity(b),
+      ),
+      { numRuns: 100 },
+    );
+  });
+
+  // Arm C — the thin layer is exactly a quarter of the dense layer for the same
+  // count (both built on the SAME fogDensity call), and the full-house density
+  // pins the dense opacity to its maximum (MAX_FOG_OPACITY) — the bound is
+  // reached, confirming [0,1] is tight rather than loose. FOG_FULL_ZOMBIES and
+  // beyond exercise the pinned endpoint.
+  it("keeps the thin layer a quarter of the dense layer, pinned at the full-house maximum", () => {
+    fc.assert(
+      fc.property(fc.nat({ max: 10000 }), (count) => {
+        const dense = fogOpacity(count);
+        const thin = fogThinOpacity(count);
+
+        // Thin is exactly dense × 0.25 (same density gate, quarter scaling).
+        if (thin !== dense * THIN_OPACITY_FACTOR_MODEL) return false;
+
+        // At or above the full-house threshold the density is pinned to 100, so
+        // the dense opacity sits exactly at MAX_FOG_OPACITY and stays within
+        // [0,1]; the thin layer sits at a quarter of that.
+        if (count >= FOG_FULL_ZOMBIES) {
+          if (dense !== MAX_FOG_OPACITY_MODEL) return false;
+          if (thin !== MAX_FOG_OPACITY_MODEL * THIN_OPACITY_FACTOR_MODEL) {
+            return false;
+          }
+        }
+
+        return true;
+      }),
+      { numRuns: 100 },
+    );
+  });
+});

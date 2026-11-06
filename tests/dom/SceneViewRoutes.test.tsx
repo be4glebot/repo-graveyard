@@ -172,11 +172,11 @@ function renderEstate(options: { at?: string } = {}) {
 }
 
 /**
- * Settles the travel transition started by a place entry. `onEnterPlace` sets
- * the view synchronously (so the place view is already present), but it also
- * mounts the `TravelTransition` overlay which arms timers. The overlay documents
- * that any key press skips it to the arrived state; firing a `keydown` here
- * drains it so no timer leaks past the test.
+ * Settles the travel transition started by a place entry. Entering a place no
+ * longer switches the view synchronously — the transition keeps the source view
+ * mounted and switches to the destination at the CUT. The overlay is skippable
+ * by any key press (jumping to the arrived state), so firing a `keydown` here
+ * both reaches the destination AND drains the timers so none leak past the test.
  */
 function settleTravel(): void {
   if (screen.queryByTestId("travel-transition") === null) {
@@ -242,9 +242,11 @@ describe("route: /g/[username] (live map)", () => {
   it("enters a place from the map via a place link, playing travel (1.1, 10.2)", () => {
     renderLive();
 
-    // Activate the gate place link on the map. `onEnterPlace` sets the view
-    // synchronously, so the place view is present immediately after the click.
+    // Activate the gate place link on the map. Entering a place starts the
+    // inward travel; the destination (gate) view mounts at the CUT, so skip the
+    // transition first (its documented keydown skip) to reach the arrived state.
     fireEvent.click(screen.getByTestId("estate-place-gate"));
+    settleTravel();
 
     expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
       "gate",
@@ -327,12 +329,12 @@ describe("route: /estate (bundled estate)", () => {
     renderEstate();
 
     fireEvent.click(screen.getByTestId("estate-place-crypt"));
+    // The destination mounts at the cut; skip the travel to reach it.
+    settleTravel();
 
     expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
       "crypt",
     );
-
-    settleTravel();
   });
 });
 

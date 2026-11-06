@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Fixed height of the site header band (wordmark + stats + toggles) in the
+     scene. The place chrome (Return to the gate, title, chips) offsets itself
+     below this band so it never paints over the stats line (visual fix 2C).
+     Tall enough to clear the header's condensed two-row layout on short
+     viewports. */
+  --site-header-h: 7rem;
 }
 
 @theme inline {
@@ -117,6 +124,48 @@ body {
   --f-far: 6px;
   --f-mid: 14px;
   --f-fg: 24px;
+
+  /* --- Night cover: per-place background legibility gradient stops (Spec 2C).
+     Top/bottom dark bands keep the header and pager readable over the painted
+     place backdrops; traced to the PolishGate / PolishPlaces boards'
+     linear-gradient(rgba(0,0,0,…)) cover overlays. --color-night-cover is the
+     opaque fallback fill drawn behind a Place_Background image (= night-sky). */
+  --color-night-cover: #05060a;
+  --color-night-cover-top: rgba(0, 0, 0, 0.5); /* places top band */
+  --color-night-cover-top-gate: rgba(0, 0, 0, 0.55); /* gate top band */
+  --color-night-cover-bottom: rgba(0, 0, 0, 0.7); /* top+bottom band foot */
+
+  /* --- Iron: bevelled-iron plaque controls (.btn2). Gradient top→bottom,
+     warm-tan border + label, inset highlight + drop shadow. --- */
+  --color-iron-bg-top: #1a191f;
+  --color-iron-bg-bottom: #0c0b10;
+  --color-iron-border: rgba(230, 207, 154, 0.35);
+  --color-iron-label: #e6cf9a;
+  --color-iron-inset: rgba(255, 255, 255, 0.06);
+  --color-iron-shadow: rgba(0, 0, 0, 0.6);
+
+  /* --- Plaque: creature name panel (.plq). One Cinzel name line + one mono
+     sub-line on a dark bevelled slab. --- */
+  --color-plaque-bg-top: #1b1a20;
+  --color-plaque-bg-bottom: #0d0c11;
+  --color-plaque-border: rgba(230, 207, 154, 0.35);
+  --color-plaque-inset: rgba(255, 255, 255, 0.06);
+  --color-plaque-shadow: rgba(0, 0, 0, 0.6);
+  --color-plaque-name: #ecead9;
+  --color-plaque-sub: #a7a392;
+
+  /* --- Chip: decay-word filter control. Inactive (.chip2) iron plaque, active
+     (.chip2.on) crimson. --- */
+  --color-chip-bg-top: #17161c;
+  --color-chip-bg-bottom: #0c0b10;
+  --color-chip-border: rgba(230, 207, 154, 0.25);
+  --color-chip-label: #c9c4ae;
+  --color-chip-inset: rgba(255, 255, 255, 0.05);
+  --color-chip-on-bg-top: #5a0c1a;
+  --color-chip-on-bg-bottom: #30060e;
+  --color-chip-on-border: #c22a3e;
+  --color-chip-on-label: #ffffff;
+  --color-chip-on-glow: rgba(194, 42, 62, 0.35);
 }
 
 /* ----------------------------------------------------------------------------
@@ -498,5 +547,239 @@ body {
   /* Lightning never flashes under reduced motion (Req 3.9). */
   .lightning-flash {
     opacity: 0;
+  }
+}
+
+/* ============================================================================
+   UI polish controls (Spec 2C, Req 7.1–7.4) — bevelled iron plaques.
+   Classes bind to the iron / chip / plaque @theme token families above; no
+   hardcoded hex lives in components. Faces resolve through the scene font
+   tokens: Cinzel = --font-heading, JetBrains Mono = --font-fact.
+   Traced to docs/design-canvas/PolishGate.dc.html + PolishPlaces.dc.html
+   (.btn2 / .chip2 / .chip2.on / .plq).
+   ============================================================================ */
+
+/* Iron button: bevelled iron plaque, Cinzel uppercase label (Req 7.1). */
+.btn2 {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 3px;
+  border: 1px solid var(--color-iron-border);
+  background: linear-gradient(
+    var(--color-iron-bg-top),
+    var(--color-iron-bg-bottom)
+  );
+  color: var(--color-iron-label);
+  font-family: var(--font-heading), Georgia, serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 1px 0 var(--color-iron-inset),
+    0 4px 14px var(--color-iron-shadow);
+}
+
+/* Chip (inactive): bevelled plaque, Cinzel uppercase label (Req 7.2). */
+.chip2 {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 3px;
+  border: 1px solid var(--color-chip-border);
+  background: linear-gradient(
+    var(--color-chip-bg-top),
+    var(--color-chip-bg-bottom)
+  );
+  color: var(--color-chip-label);
+  font-family: var(--font-heading), Georgia, serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 var(--color-chip-inset);
+}
+
+/* Chip (active filter): crimson, visually distinct from inactive (Req 7.3). */
+.chip2.on {
+  border-color: var(--color-chip-on-border);
+  color: var(--color-chip-on-label);
+  background: linear-gradient(
+    var(--color-chip-on-bg-top),
+    var(--color-chip-on-bg-bottom)
+  );
+  box-shadow: 0 0 18px var(--color-chip-on-glow);
+}
+
+/* Plaque: one Cinzel name line + one mono sub-line on a bevelled slab (Req 7.4). */
+.plq {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 10px 4px;
+  border-radius: 3px;
+  background: linear-gradient(
+    var(--color-plaque-bg-top),
+    var(--color-plaque-bg-bottom)
+  );
+  border: 1px solid var(--color-plaque-border);
+  box-shadow:
+    inset 0 1px 0 var(--color-plaque-inset),
+    0 2px 8px var(--color-plaque-shadow);
+}
+.plq b {
+  font-family: var(--font-heading), Georgia, serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: var(--color-plaque-name);
+}
+.plq i {
+  font-family: var(--font-fact), ui-monospace, monospace;
+  font-style: normal;
+  font-size: 10px;
+  color: var(--color-plaque-sub);
+}
+/* ============================================================================
+   2C Polish Pass — parallax / fog / flicker keyframes (Spec 2C, task 2.2)
+   Transform- and opacity-only loops (Req 9.1). Fog drift is translateX on a
+   double-width strip, never background-position (Req 9.2). Lantern flicker
+   varies opacity by <= +/-10% at a 125-500ms loop (Req 3.3). All motion here
+   is paused under prefers-reduced-motion: reduce (Req 6.5/6.6, 2.6, 3.5).
+   Durations read from motion tokens; components apply the utility classes.
+   ============================================================================ */
+
+@theme {
+  /* --- 2C fog drift loops (double-width strips, translateX) --- */
+  --motion-fog-dense: 90s; /* Fog_Dense (fog-wisps) one direction, Req 6.2 */
+  --motion-fog-thin: 55s; /* Fog_Thin (fog-wisps-thin) opposite, Req 6.3 */
+
+  /* --- 2C lantern flicker loop (2-8 Hz -> 125-500ms; chosen 250ms = 4 Hz) --- */
+  --motion-lantern-flicker: 250ms; /* <= +/-10% opacity flicker, Req 3.3 */
+
+  /* --- 2C parallax idle drift (coarse/no-hover fallback, Req 2.7) --- */
+  --motion-scene-idle-2c: 26s; /* gentle idle transform drift */
+}
+
+/* ----------------------------------------------------------------------------
+   Fog drift (Req 6.2/6.3/9.2).
+   Each fog strip is a layer twice the visible strip width, tiled horizontally.
+   The keyframe animates translateX across exactly half the double-width strip
+   (0 -> -50% one direction, 0 -> 50% the other) so the tiling wraps with no
+   visible seam. transform only — never background-position (Req 9.2).
+   Components (Fog.tsx, task 7.1) apply .fog-wisps (dense, ~90s) and
+   .fog-wisps-thin (thin, ~55s, opposite direction).
+   ---------------------------------------------------------------------------- */
+@keyframes fog-wisps {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+@keyframes fog-wisps-thin {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(50%);
+  }
+}
+.fog-wisps {
+  animation: fog-wisps var(--motion-fog-dense) linear infinite;
+}
+.fog-wisps-thin {
+  animation: fog-wisps-thin var(--motion-fog-thin) linear infinite;
+}
+
+/* ----------------------------------------------------------------------------
+   Lantern flicker (Req 3.3).
+   Varies the lantern overlay's opacity by no more than +/-10% of steady state
+   at a 125-500ms loop (2-8 Hz). opacity only. LanternCursor (task 5.1) applies
+   .lantern-flicker only when reduced motion is inactive; under reduced motion
+   the class is omitted and/or paused here so the light holds steady (Req 3.5).
+   ---------------------------------------------------------------------------- */
+@keyframes lantern-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.93;
+  }
+  70% {
+    opacity: 0.97;
+  }
+}
+.lantern-flicker {
+  animation: lantern-flicker var(--motion-lantern-flicker) ease-in-out infinite;
+}
+
+/* ----------------------------------------------------------------------------
+   Gate fresh-zombie wander (Req 5.12/5.14, 9.1).
+   A translateX-only horizontal wander for decay-0 (fresh) zombies at the gate.
+   Each fresh zombie carries its own seeded displacement, duration, and start
+   delay as the CSS vars --wander-dx (8-24px), --wander-dur (7-12s), and
+   --wander-delay, written inline by DepthScatter (task 8.2). The keyframe swings
+   from -dx to +dx around the placed x; transform only so it stays on the
+   compositor (Req 9.1) and never moves the plaque layer (a separate sibling
+   layer). Paused entirely under reduced motion below — but DepthScatter also
+   omits the class when reducedMotion is active so fresh zombies render at x
+   with no wander (Req 5.14).
+   ---------------------------------------------------------------------------- */
+@keyframes gate-wander {
+  0%,
+  100% {
+    transform: translateX(calc(-1 * var(--wander-dx, 16px)));
+  }
+  50% {
+    transform: translateX(var(--wander-dx, 16px));
+  }
+}
+.gate-wander {
+  animation: gate-wander var(--wander-dur, 9s) ease-in-out
+    var(--wander-delay, 0s) infinite;
+}
+
+/* ----------------------------------------------------------------------------
+   Parallax idle drift (Req 2.7).
+   A gentle transform-only wander used as the idle fallback on coarse/no-hover
+   devices (where pointer parallax is disabled). Peak displacement stays small
+   so it never competes with pointer-driven parallax on fine-pointer devices.
+   ---------------------------------------------------------------------------- */
+@keyframes scene-idle-drift-2c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(3px, -3px, 0);
+  }
+}
+.scene-idle-drift-2c {
+  animation: scene-idle-drift-2c var(--motion-scene-idle-2c) ease-in-out
+    infinite;
+}
+
+/* ----------------------------------------------------------------------------
+   Reduced motion: pause every 2C polish loop at a fixed offset (Req 6.5, 3.5,
+   2.6, 9.1). Fog holds at its current drift offset; the lantern holds steady;
+   the idle drift rests at centre.
+   ---------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .fog-wisps,
+  .fog-wisps-thin {
+    animation-play-state: paused;
+  }
+  .lantern-flicker,
+  .scene-idle-drift-2c,
+  .gate-wander {
+    animation: none !important;
+    transform: none;
   }
 }

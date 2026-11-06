@@ -658,3 +658,632 @@ describe("Feature: estate-map-places, Property 4: plaqueCopy singular/plural cor
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// Feature: polish-pass-2c, Property 2: No plaque overlap at 1440 and 1280.
+//
+// This block appends to the file (one describe per property). It imports the
+// 2C polish surface it needs — `scatterLayout`, the shared `plaqueRect` pixel
+// model, `DEPTH_ROWS`, and the `PlaqueRect` type — alongside the earlier
+// estate-map-places imports above.
+//
+// Property 2 (Requirement 5.9): for 1..12 names in a single plot and any seed,
+// at a 1440px or 1280px plot width, no two plaque rectangles overlap. The test
+// drives the SAME pixel model the implementation uses — `plaqueRect`, built on
+// the `PLAQUE_W`/`PLAQUE_H` constants — so the rectangle math under test is the
+// production math, not a re-derivation that could silently diverge from it.
+// `plaqueRect` defaults its height to `plotWidthPx * 0.5` (the deliberately
+// short worst-case aspect for vertical separation), so passing width alone
+// exercises the binding case; the real place plots are taller, so no-overlap
+// here implies no-overlap for them.
+// ---------------------------------------------------------------------------
+
+import * as estateViewForOverlap from "@/lib/estate-view";
+import {
+  plaqueRect,
+  DEPTH_ROWS,
+  type PlaqueRect,
+} from "@/lib/estate-view";
+// `scatterLayout` is reached through the `estateViewForOverlap` namespace
+// import (not a second named import) so this block introduces no duplicate
+// `scatterLayout` binding that would collide with the polish-pass Property 1
+// block's own named `scatterLayout` import in this same file.
+
+/**
+ * Non-empty repo-name generator for a single plot: 1..12 distinct-ish names
+ * (PLOT_SIZE is 12). Names are drawn from the full string space (including
+ * unicode and whitespace) because the layout folds each name into its own
+ * `xmur3`/`mulberry32` stream — the exact bytes matter for the jitter draw, so
+ * the generator must span real repo-name variety, not a tidy alphabet.
+ */
+const arbPlotNames: fc.Arbitrary<string[]> = fc.array(
+  fc.string({ minLength: 1, maxLength: 40 }),
+  { minLength: 1, maxLength: 12 },
+);
+
+/**
+ * Seeds span strings and numbers, matching `scatterLayout`'s `seed` type.
+ * Named `arbOverlapSeed` (not `arbSeed`) so it does not collide with the
+ * polish-pass Property 1 block's own `arbSeed` generator in this same file.
+ */
+const arbOverlapSeed: fc.Arbitrary<number | string> = fc.oneof(
+  fc.string(),
+  fc.integer(),
+  fc.constantFrom("sky", "gate", "ground", "crypt"),
+);
+
+/** The two reference plot widths the no-overlap guarantee is pinned against. */
+const arbPlotWidth: fc.Arbitrary<number> = fc.constantFrom(1440, 1280);
+
+/**
+ * The four places plus `undefined` (the legacy full band). Every creature's `y`
+ * is mapped into the chosen place's stage band, so the no-overlap guarantee
+ * must hold for each place's band (visual fix 2C), not just the legacy band.
+ */
+const arbOverlapPlace: fc.Arbitrary<
+  "sky" | "gate" | "ground" | "crypt" | undefined
+> = fc.constantFrom("sky", "gate", "ground", "crypt", undefined);
+
+/**
+ * Two axis-aligned rectangles overlap iff they share interior area on BOTH
+ * axes. Edge-touching (a right edge exactly equal to the next left edge) counts
+ * as no shared area, matching the spec's "shares no overlapping area" — so a
+ * strict inequality is used on each axis. Written independently of the layout
+ * so the property checks the placement against the geometric definition rather
+ * than against itself.
+ */
+function rectsOverlap(a: PlaqueRect, b: PlaqueRect): boolean {
+  const xOverlap = a.left < b.right && b.left < a.right;
+  const yOverlap = a.top < b.bottom && b.top < a.bottom;
+  return xOverlap && yOverlap;
+}
+
+describe("Feature: polish-pass-2c, Property 2: No plaque overlap at 1440 and 1280", () => {
+  // Clause: no two plaque rectangles intersect (Requirement 5.9). For 1..12
+  // names in a single plot, any seed, at a 1440px or 1280px plot width, every
+  // pair of distinct plaque rectangles (PLAQUE_W × PLAQUE_H × scale, centred at
+  // the record's on-screen x/y) shares no overlapping area.
+  it("places 1..12 plaques so no axis-aligned rectangle pair intersects at 1440 or 1280 px", () => {
+    fc.assert(
+      fc.property(
+        arbPlotNames,
+        arbOverlapSeed,
+        arbPlotWidth,
+        arbOverlapPlace,
+        (names, seed, plotWidth, place) => {
+          // The production layout + the production pixel model: one rect per
+          // record, PLAQUE_W/PLAQUE_H scaled by the record's scale, centred at
+          // (x * plotWidth, y * plotHeight) with plotHeight defaulting to the
+          // short worst-case aspect. `place` maps each `y` into that place's
+          // stage band; the guarantee must hold for every band (visual fix 2C).
+          const placements = estateViewForOverlap.scatterLayout(
+            names,
+            DEPTH_ROWS,
+            seed,
+            place,
+          );
+          // Exactly one record per name (Property 1 covers this; relied on here).
+          expect(placements.length).toBe(names.length);
+
+          const rects = placements.map((p) => plaqueRect(p, plotWidth));
+
+          // Every distinct pair must be non-overlapping.
+          for (let i = 0; i < rects.length; i++) {
+            for (let j = i + 1; j < rects.length; j++) {
+              expect(rectsOverlap(rects[i], rects[j])).toBe(false);
+            }
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Feature: polish-pass-2c — property tests for the pure scatter/cover math in
+// `lib/estate-view.ts` (`scatterLayout`, `coverRect`).
+//
+// This block appends to the file. It imports `scatterLayout` under its own
+// name (the Property 2 block above aliases its import to
+// `scatterLayoutForOverlap` to leave this name free), plus the cover-math
+// surface new to it (`coverRect`, the `ScatterPlacement` type, and the
+// scale-range / tombstone-tilt constants). Two describe blocks follow: the
+// determinism/shape property for `scatterLayout` (Property 1) and a cover-math
+// property for `coverRect`. Both run ≥100 cases.
+// ---------------------------------------------------------------------------
+
+import {
+  scatterLayout,
+  coverRect,
+  type ScatterPlacement,
+  SCATTER_SCALE_MIN,
+  SCATTER_SCALE_MAX,
+  TOMBSTONE_TILT_DEG,
+} from "@/lib/estate-view";
+
+/**
+ * The shared `scatterLayout` seed generator spanning both accepted shapes
+ * (string / number). Declared here as `arbSeed` (the Property 2 block above
+ * declares its own distinctly-named `arbOverlapSeed` and references this
+ * `arbSeed` for its seed input); a single module-level `const` is initialized
+ * before any `it` callback runs, so both describe blocks see it.
+ */
+const arbSeed: fc.Arbitrary<number | string> = fc.oneof(
+  fc.constantFrom<string>("sky", "gate", "ground", "crypt"),
+  fc.string(),
+  fc.integer(),
+);
+
+/**
+ * A generator for the `names` input to `scatterLayout`: lists of 0–12 distinct
+ * repo-ish names (0 exercises the empty-input clause; up to `PLOT_SIZE` = 12
+ * spans a full plot). Names are kept distinct within a list via `uniqueArray`
+ * so the "one record per name in order" clause is checked against genuinely
+ * distinct inputs as well as the general case.
+ */
+const arbScatterNames: fc.Arbitrary<string[]> = fc.uniqueArray(
+  fc.string({ minLength: 1, maxLength: 40 }),
+  { minLength: 0, maxLength: 12 },
+);
+
+/** A generator for the depth-row count — the real `DEPTH_ROWS` is 3; span 1–4. */
+const arbRows: fc.Arbitrary<number> = fc.integer({ min: 1, max: 4 });
+
+/** A deep, order-preserving signature of a placement list for equality checks. */
+function placementSignature(placements: ScatterPlacement[]): string {
+  return placements
+    .map(
+      (p) =>
+        `${p.x}\u0000${p.y}\u0000${p.scale}\u0000${p.brightness}\u0000${String(
+          p.mirrored,
+        )}\u0000${p.row}\u0000${p.tilt}`,
+    )
+    .join("\u0001");
+}
+
+describe("Feature: polish-pass-2c, Property 1: Determinism of placement", () => {
+  // Clause: determinism (Req 5.2). Two calls with equal `(names, rows, seed)`
+  // return records that are equal field-by-field and in the same order, with no
+  // reliance on external or nondeterministic state.
+  it("returns field-by-field, order-equal records for equal inputs", () => {
+    fc.assert(
+      fc.property(arbScatterNames, arbRows, arbSeed, (names, rows, seed) => {
+        const a = scatterLayout(names, rows, seed);
+        const b = scatterLayout(names, rows, seed);
+        // Same length and the same deep signature => equal field-by-field and
+        // in the same order.
+        expect(b.length).toBe(a.length);
+        expect(placementSignature(b)).toBe(placementSignature(a));
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Clause: empty input (Req 5.3). An empty `names` yields an empty collection
+  // for any rows/seed.
+  it("returns [] for empty names, for any rows and seed", () => {
+    fc.assert(
+      fc.property(arbRows, arbSeed, (rows, seed) => {
+        expect(scatterLayout([], rows, seed)).toEqual([]);
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Clause: exactly one record per name, in input order (Req 5.1). The result
+  // has the same length as `names`, with records positionally aligned to the
+  // input — no additional, missing, or duplicated records and no reordering.
+  // (The placement fields are name-independent positionally, but the count and
+  // order are the observable contract here.)
+  it("returns exactly one record per name, in input order", () => {
+    fc.assert(
+      fc.property(arbScatterNames, arbRows, arbSeed, (names, rows, seed) => {
+        const placements = scatterLayout(names, rows, seed);
+        // One record per name, no add / omit / dup.
+        expect(placements.length).toBe(names.length);
+        // Every record is a well-formed placement with finite numeric fields
+        // and a row index within the band count.
+        const bandCount = Math.max(1, Math.trunc(rows));
+        for (const p of placements) {
+          expect(Number.isFinite(p.x)).toBe(true);
+          expect(Number.isFinite(p.y)).toBe(true);
+          expect(Number.isFinite(p.scale)).toBe(true);
+          expect(Number.isFinite(p.brightness)).toBe(true);
+          expect(Number.isFinite(p.tilt)).toBe(true);
+          expect(typeof p.mirrored).toBe("boolean");
+          expect(p.row).toBeGreaterThanOrEqual(0);
+          expect(p.row).toBeLessThanOrEqual(bandCount - 1);
+        }
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Clause: scale bounds + strict cross-row ordering (Req 5.5). Every `scale`
+  // lies in [SCATTER_SCALE_MIN, SCATTER_SCALE_MAX], and for every pair of rows
+  // the nearer (higher-index) row's MINIMUM scale strictly exceeds the farther
+  // row's MAXIMUM scale — so every front record is strictly larger than every
+  // middle record, which is strictly larger than every back record.
+  it("bounds scale to [0.7,1.15] and orders it strictly front > middle > back across every pair", () => {
+    fc.assert(
+      fc.property(arbScatterNames, arbRows, arbSeed, (names, rows, seed) => {
+        const placements = scatterLayout(names, rows, seed);
+        // Bounds hold for every record.
+        for (const p of placements) {
+          expect(p.scale).toBeGreaterThanOrEqual(SCATTER_SCALE_MIN);
+          expect(p.scale).toBeLessThanOrEqual(SCATTER_SCALE_MAX);
+        }
+        assertStrictCrossRowOrdering(placements, (p) => p.scale);
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Clause: strict cross-row brightness ordering (Req 5.6). For every pair of
+  // rows the nearer row's MINIMUM brightness strictly exceeds the farther row's
+  // MAXIMUM brightness — front > middle > back for every pair.
+  it("orders brightness strictly front > middle > back across every pair", () => {
+    fc.assert(
+      fc.property(arbScatterNames, arbRows, arbSeed, (names, rows, seed) => {
+        const placements = scatterLayout(names, rows, seed);
+        assertStrictCrossRowOrdering(placements, (p) => p.brightness);
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Clause: mirrored count (Req 5.7). Exactly round(n / 3) records carry
+  // `mirrored: true`, and `mirrored` is a boolean on every record.
+  it("marks exactly round(n/3) records mirrored", () => {
+    fc.assert(
+      fc.property(arbScatterNames, arbRows, arbSeed, (names, rows, seed) => {
+        const placements = scatterLayout(names, rows, seed);
+        const mirroredCount = placements.filter((p) => p.mirrored === true).length;
+        expect(mirroredCount).toBe(Math.round(names.length / 3));
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Clause: tilt bounds (Req 5.8). The seeded tombstone tilt is always within
+  // [-TOMBSTONE_TILT_DEG, TOMBSTONE_TILT_DEG] and finite, so the ground place's
+  // deterministic rotation stays in range for any input.
+  it("keeps the seeded tilt within [-6, 6] degrees", () => {
+    fc.assert(
+      fc.property(arbScatterNames, arbRows, arbSeed, (names, rows, seed) => {
+        const placements = scatterLayout(names, rows, seed);
+        for (const p of placements) {
+          expect(p.tilt).toBeGreaterThanOrEqual(-TOMBSTONE_TILT_DEG);
+          expect(p.tilt).toBeLessThanOrEqual(TOMBSTONE_TILT_DEG);
+        }
+      }),
+      { numRuns: 100 },
+    );
+  });
+});
+
+/**
+ * Asserts a strict cross-row ordering of a numeric placement field: grouping
+ * records by `row`, for every pair of occupied rows the nearer (higher) row's
+ * MINIMUM value strictly exceeds the farther (lower) row's MAXIMUM value. This
+ * is the "every front > every middle > every back" contract of Req 5.5/5.6 —
+ * stronger than comparing row means — and it holds vacuously when a row is
+ * empty. Shared by the scale and brightness clauses above.
+ */
+function assertStrictCrossRowOrdering(
+  placements: ScatterPlacement[],
+  field: (p: ScatterPlacement) => number,
+): void {
+  // Bucket the field values by row index.
+  const byRow = new Map<number, number[]>();
+  for (const p of placements) {
+    const bucket = byRow.get(p.row);
+    if (bucket === undefined) {
+      byRow.set(p.row, [field(p)]);
+    } else {
+      bucket.push(field(p));
+    }
+  }
+  // Occupied rows in ascending (back → front) index order.
+  const rowsAsc = [...byRow.keys()].sort((a, b) => a - b);
+  // For each adjacent occupied pair, the nearer row's min > the farther row's
+  // max. Transitivity then gives the full "every nearer > every farther".
+  for (let i = 0; i + 1 < rowsAsc.length; i++) {
+    const farther = byRow.get(rowsAsc[i])!;
+    const nearer = byRow.get(rowsAsc[i + 1])!;
+    const fartherMax = Math.max(...farther);
+    const nearerMin = Math.min(...nearer);
+    expect(nearerMin).toBeGreaterThan(fartherMax);
+  }
+}
+
+describe("Feature: polish-pass-2c, Property 1: coverRect cover-math (centre + linear diameter)", () => {
+  // A positive image size and a positive element box, with the element at least
+  // as wide (per axis) as the image's aspect so the WIDTH term binds the cover
+  // scale (`viewW / imageW >= viewH / imageH`). In that regime the on-screen
+  // diameter reduces to `diamFrac * viewW`, which is exactly linear in the
+  // element width — the clause the task pins. The constraint `viewW/imageW >=
+  // viewH/imageH` is enforced by deriving viewH from a bounded multiple.
+  const arbCoverWidthBound = fc
+    .record({
+      imageW: fc.integer({ min: 1, max: 4000 }),
+      imageH: fc.integer({ min: 1, max: 4000 }),
+      viewW: fc.double({ min: 1, max: 4000, noNaN: true }),
+      diamFrac: fc.double({ min: 0, max: 1, noNaN: true }),
+      // A fraction in [0,1] of the exact height ceiling, so viewH is derived to
+      // keep the WIDTH term binding without an integer floor rounding the
+      // ceiling down to 0 (the bug the first draft hit at tiny dimensions).
+      t: fc.double({ min: 0, max: 1, noNaN: true }),
+    })
+    .map(({ imageW, imageH, viewW, diamFrac, t }) => {
+      // maxViewH is the real value where viewH/imageH == viewW/imageW; any
+      // viewH <= maxViewH keeps the width term winning the cover `max`. Floor
+      // viewH at a tiny positive epsilon so it is always a positive dimension.
+      const maxViewH = (viewW * imageH) / imageW;
+      const viewH = Math.max(1e-6, t * maxViewH);
+      return { imageW, imageH, viewW, viewH, diamFrac };
+    });
+
+  // Clause: the image centre (fx = fy = 0.5) maps to the element-box centre,
+  // and the on-screen diameter equals `diamFrac * viewW` in the width-bound
+  // regime (so diameter scales linearly with the element width). Both are the
+  // cover-math guarantees the aligned data moon relies on (Req 4.7, 4.8).
+  it("maps the image centre to the viewport centre and scales diameter linearly with width", () => {
+    fc.assert(
+      fc.property(arbCoverWidthBound, ({ imageW, imageH, viewW, viewH, diamFrac }) => {
+        const rect = coverRect({
+          imageW,
+          imageH,
+          viewW,
+          viewH,
+          fx: 0.5,
+          fy: 0.5,
+          diamFrac,
+        });
+        // The painted image, cover-scaled and centred, puts the image's own
+        // centre exactly at the element box centre regardless of aspect.
+        expect(rect.cx).toBeCloseTo(viewW / 2, 6);
+        expect(rect.cy).toBeCloseTo(viewH / 2, 6);
+        // Width binds the cover scale here, so scale = viewW / imageW and the
+        // diameter collapses to diamFrac * viewW — linear in the element width.
+        expect(rect.diameter).toBeCloseTo(diamFrac * viewW, 6);
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  // Clause: diameter linearity in element width, stated directly. Doubling the
+  // element width (keeping the width term binding) doubles the diameter, within
+  // floating-point tolerance — the "diameter scales linearly with image width"
+  // guarantee the moon sizing depends on (Req 4.8).
+  it("doubles the diameter when the element width doubles (width-bound regime)", () => {
+    fc.assert(
+      fc.property(
+        fc.record({
+          imageW: fc.integer({ min: 1, max: 2000 }),
+          imageH: fc.integer({ min: 1, max: 2000 }),
+          viewW: fc.double({ min: 1, max: 2000, noNaN: true }),
+          diamFrac: fc.double({ min: 0.001, max: 1, noNaN: true }),
+          t: fc.double({ min: 0, max: 1, noNaN: true }),
+        }),
+        ({ imageW, imageH, viewW, diamFrac, t }) => {
+          // Pick viewH so width binds the cover scale at BOTH viewW and 2*viewW
+          // (viewH/imageH <= viewW/imageW <= 2viewW/imageW). A real-valued
+          // fraction `t` of the exact ceiling avoids the integer-floor-to-0 bug.
+          const viewH = Math.max(1e-6, (t * (viewW * imageH)) / imageW);
+          const base = coverRect({
+            imageW,
+            imageH,
+            viewW,
+            viewH,
+            fx: 0.5,
+            fy: 0.5,
+            diamFrac,
+          });
+          const wide = coverRect({
+            imageW,
+            imageH,
+            viewW: viewW * 2,
+            viewH,
+            fx: 0.5,
+            fy: 0.5,
+            diamFrac,
+          });
+          expect(wide.diameter).toBeCloseTo(base.diameter * 2, 6);
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// Feature: polish-pass-2c (visual fix) — every creature's `y` lands inside its
+// place's stage band so creatures stand on their place's ground rather than
+// floating across the whole scene. Uses the production `STAGE_BANDS` + the
+// namespace `scatterLayout` so there is no duplicate named-import collision.
+// ---------------------------------------------------------------------------
+import { STAGE_BANDS as STAGE_BANDS_FOR_Y } from "@/lib/estate-view";
+
+describe("Feature: polish-pass-2c, stage bands: every creature y is inside its place band", () => {
+  const arbBandNames = fc.array(fc.string({ minLength: 1, maxLength: 40 }), {
+    minLength: 1,
+    maxLength: 12,
+  });
+  const arbBandSeed = fc.oneof(fc.string(), fc.integer());
+  const arbPlace = fc.constantFrom("sky", "gate", "ground", "crypt") as fc.Arbitrary<
+    "sky" | "gate" | "ground" | "crypt"
+  >;
+
+  it("keeps every y within the place's [top, bottom] stage band (with jitter headroom)", () => {
+    fc.assert(
+      fc.property(arbBandNames, arbBandSeed, arbPlace, (names, seed, place) => {
+        const placements = estateViewForOverlap.scatterLayout(
+          names,
+          DEPTH_ROWS,
+          seed,
+          place,
+        );
+        const band = STAGE_BANDS_FOR_Y[place];
+        // The y-jitter is a fraction of the band height, so allow a small
+        // headroom around the band edges (the row centres sit AT top/bottom and
+        // jitter nudges them a little inward/outward but stays well inside the
+        // scene). The core guarantee: no creature escapes near its band.
+        const headroom = (band.bottom - band.top) * 0.1 + 1e-9;
+        for (const pm of placements) {
+          expect(pm.y).toBeGreaterThanOrEqual(band.top - headroom);
+          expect(pm.y).toBeLessThanOrEqual(band.bottom + headroom);
+        }
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  it("orders the depth rows back(top)->front(bottom) inside the band", () => {
+    // With >= 2 rows of names, the min y of the back row is above the max y of
+    // the front row, i.e. the band fills from its top (back) to bottom (front).
+    fc.assert(
+      fc.property(
+        fc.array(fc.string({ minLength: 1, maxLength: 20 }), {
+          minLength: 6,
+          maxLength: 12,
+        }),
+        arbBandSeed,
+        arbPlace,
+        (names, seed, place) => {
+          const placements = estateViewForOverlap.scatterLayout(
+            names,
+            DEPTH_ROWS,
+            seed,
+            place,
+          );
+          const byRow = new Map<number, number[]>();
+          for (const pm of placements) {
+            const ys = byRow.get(pm.row) ?? [];
+            ys.push(pm.y);
+            byRow.set(pm.row, ys);
+          }
+          const rows = [...byRow.keys()].sort((a, b) => a - b);
+          // Back row (index 0) sits at a smaller y (higher on screen) than the
+          // front row (highest index).
+          if (rows.length >= 2) {
+            const backMax = Math.max(...byRow.get(rows[0])!);
+            const frontMin = Math.min(...byRow.get(rows[rows.length - 1])!);
+            expect(backMax).toBeLessThanOrEqual(frontMin);
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// Feature: polish-pass-2c (visual fix r3 #2/#3) ? the RESOLVED scene geometry:
+// no plaque overlaps another plaque or the UPPER 60% (head + torso) of any
+// other creature, and every plaque + creature stays inside the 16px scene
+// margins. Driven by the production `resolvePlacement` at the two real viewport
+// sizes (1440?900, 1280?720), front rows resolved first so each is cleared
+// against nearer creatures ? exactly how `DepthScatter` consumes it.
+// ---------------------------------------------------------------------------
+import {
+  resolvePlacement as resolvePlacementR3,
+  rectsIntersect as rectsIntersectR3,
+  SCENE_EDGE_MARGIN_PX as EDGE_MARGIN_R3,
+  type SceneRect as SceneRectR3,
+} from "@/lib/estate-view";
+
+/** The upper 60% (head + torso) of a creature rect ? the part protected from
+ *  plaques; the bottom 40% (legs/feet) may overlap. */
+function upper60R3(c: SceneRectR3): SceneRectR3 {
+  return { ...c, bottom: c.top + (c.bottom - c.top) * 0.6 };
+}
+
+/** Resolves a whole plot the way `DepthScatter` does: front rows first, each
+ *  plaque cleared against already-placed plaques + upper-60% creature rects. */
+function resolvePlotR3(
+  pls: ReturnType<typeof scatterLayout>,
+  place: "sky" | "gate" | "ground" | "crypt",
+  W: number,
+  H: number,
+): { plaque: SceneRectR3; creature: SceneRectR3 }[] {
+  const order = pls
+    .map((_, i) => i)
+    .sort((a, b) => pls[b].row - pls[a].row);
+  const res: { plaque: SceneRectR3; creature: SceneRectR3 }[] = new Array(pls.length);
+  const obstacles: SceneRectR3[] = [];
+  for (const i of order) {
+    const r = resolvePlacementR3(pls[i], place, W, H, obstacles);
+    res[i] = { plaque: r.plaque, creature: r.creature };
+    obstacles.push(r.plaque, upper60R3(r.creature));
+  }
+  return res;
+}
+
+const arbPlotNamesR3: fc.Arbitrary<string[]> = fc.array(
+  fc.string({ minLength: 1, maxLength: 40 }),
+  { minLength: 1, maxLength: 12 },
+);
+const arbSeedR3: fc.Arbitrary<number | string> = fc.oneof(fc.string(), fc.integer());
+const arbPlaceR3 = fc.constantFrom("sky", "gate", "ground", "crypt") as fc.Arbitrary<
+  "sky" | "gate" | "ground" | "crypt"
+>;
+/** The two real Reference_Viewports the guarantee is pinned against. */
+const arbViewportR3 = fc.constantFrom<[number, number]>([1440, 900], [1280, 720]);
+
+describe("Feature: polish-pass-2c, Property 2 (r3): no plaque overlaps a plaque or a creature's upper 60%", () => {
+  it("for 1..12 names, every place, at 1440?900 and 1280?720, plaques clear all other plaques and the upper 60% of all other creatures", () => {
+    fc.assert(
+      fc.property(
+        arbPlotNamesR3,
+        arbSeedR3,
+        arbPlaceR3,
+        arbViewportR3,
+        (names, seed, place, [W, H]) => {
+          const pls = scatterLayout(names, DEPTH_ROWS, seed, place);
+          const res = resolvePlotR3(pls, place, W, H);
+          for (let a = 0; a < res.length; a++) {
+            for (let b = 0; b < res.length; b++) {
+              if (a === b) continue;
+              // (a) no plaque overlaps any OTHER plaque.
+              expect(rectsIntersectR3(res[a].plaque, res[b].plaque)).toBe(false);
+              // (b) no plaque overlaps the UPPER 60% of any OTHER creature
+              //     (legs/feet overlap is allowed).
+              expect(
+                rectsIntersectR3(res[a].plaque, upper60R3(res[b].creature)),
+              ).toBe(false);
+            }
+          }
+        },
+      ),
+      { numRuns: 200 },
+    );
+  });
+});
+
+describe("Feature: polish-pass-2c, margins (r3 #3): every plaque and creature stays inside the 16px scene margins", () => {
+  it("for 1..12 names, every place, at 1440?900 and 1280?720, no plaque/creature rect crosses the 16px edge margins", () => {
+    fc.assert(
+      fc.property(
+        arbPlotNamesR3,
+        arbSeedR3,
+        arbPlaceR3,
+        arbViewportR3,
+        (names, seed, place, [W, H]) => {
+          const pls = scatterLayout(names, DEPTH_ROWS, seed, place);
+          const res = resolvePlotR3(pls, place, W, H);
+          for (const { plaque, creature } of res) {
+            for (const rect of [plaque, creature]) {
+              expect(rect.left).toBeGreaterThanOrEqual(EDGE_MARGIN_R3 - 1e-6);
+              expect(rect.right).toBeLessThanOrEqual(W - EDGE_MARGIN_R3 + 1e-6);
+            }
+          }
+        },
+      ),
+      { numRuns: 200 },
+    );
+  });
+});

@@ -326,3 +326,63 @@ describe("SceneView", () => {
     });
   });
 });
+
+
+describe("SceneView \u2014 place header sits below the site header, not over the stats (visual fix 2C)", () => {
+  it("renders the site header and the place chrome as separate rows, with the place chrome offset below the site-header band", () => {
+    // Open a place so both the site header (wordmark + stats + toggles) and the
+    // place chrome (Return to the gate, title, chips) are mounted together.
+    renderScene({ at: "gate" });
+
+    const siteHeader = screen.getByTestId("site-header");
+    const placeChrome = screen.getByTestId("place-chrome");
+    const stats = screen.getByTestId("scene-header");
+    const ret = screen.getByTestId("return-to-gate");
+
+    // They are distinct elements \u2014 the place chrome is NOT the site header.
+    expect(siteHeader).not.toBe(placeChrome);
+
+    // The stats line lives inside the site-header band; the Return control lives
+    // inside the place-chrome row. Neither contains the other, so they are
+    // separate rows rather than one painted over the other.
+    expect(siteHeader.contains(stats)).toBe(true);
+    expect(placeChrome.contains(ret)).toBe(true);
+    expect(siteHeader.contains(ret)).toBe(false);
+    expect(placeChrome.contains(stats)).toBe(false);
+
+    // The site header occupies the top band (top-0); the place chrome starts
+    // BELOW it via the fixed --site-header-h token, so it never overlaps the
+    // stats line.
+    expect(siteHeader.className).toContain("top-0");
+    expect(placeChrome.className).not.toContain("top-0");
+    expect(placeChrome.style.top).toBe("var(--site-header-h)");
+  });
+});
+
+
+describe("SceneView ? Return to the gate plays the reverse 'pulled out' travel (visual fix r3 #4)", () => {
+  it("starts an outward travel transition toward the map when Return is activated", async () => {
+    const user = userEvent.setup();
+    renderScene({ at: "gate" });
+    expect(screen.queryByTestId("place-view")).not.toBeNull();
+    expect(screen.queryByTestId("travel-transition")).toBeNull();
+
+    await user.click(screen.getByTestId("return-to-gate"));
+
+    const overlay = screen.getByTestId("travel-transition");
+    expect(overlay.getAttribute("data-direction")).toBe("out");
+    expect(overlay.getAttribute("data-place")).toBe("gate");
+  });
+
+  it("plays the inward travel when a place is entered from the map", async () => {
+    const user = userEvent.setup();
+    renderScene();
+    expect(screen.queryByTestId("estate-map")).not.toBeNull();
+
+    await user.click(screen.getByTestId("estate-place-gate"));
+
+    const overlay = screen.getByTestId("travel-transition");
+    expect(overlay.getAttribute("data-direction")).toBe("in");
+    expect(overlay.getAttribute("data-place")).toBe("gate");
+  });
+});

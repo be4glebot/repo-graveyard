@@ -48,10 +48,11 @@ export default function ReturnToGate({ onReturn }: ReturnToGateProps) {
       onClick={onReturn}
       onKeyDown={handleKeyDown}
       className={[
-        "inline-flex h-11 cursor-pointer items-center gap-2 rounded",
-        "border border-scene-fg-faint bg-night-sky/80 px-4",
-        "font-ui text-sm text-scene-fg",
-        "transition-colors hover:bg-candle-400/10",
+        // Bevelled iron plaque button from the boards (.btn2): the base class
+        // owns the box, Cinzel uppercase label, border, and background (Req
+        // 7.1). The utilities below carry only interaction state (cursor,
+        // hover, focus ring, transition).
+        "btn2 cursor-pointer transition-colors hover:bg-candle-400/10",
         "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
       ].join(" ")}
     >

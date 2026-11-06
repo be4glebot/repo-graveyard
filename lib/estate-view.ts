@@ -145,6 +145,216 @@ export const TRAVEL_MS = 1200;
 /** Reduced-motion crossfade duration in milliseconds. */
 export const TRAVEL_CROSSFADE_MS = 300;
 
+// --- Scatter layout (DepthScatter) -----------------------------------------
+
+/**
+ * Minimum per-creature scale in a scatter plot — the back depth row sits at the
+ * bottom of the 0.7..1.15 band so every back record is strictly smaller than
+ * every middle record (Req 5.5). (`scatterLayout`, task 1.3.)
+ */
+export const SCATTER_SCALE_MIN = 0.7;
+
+/**
+ * Maximum per-creature scale in a scatter plot — the front depth row sits at
+ * the top of the 0.7..1.15 band so every front record is strictly larger than
+ * every middle record (Req 5.5).
+ */
+export const SCATTER_SCALE_MAX = 1.15;
+
+/**
+ * Half-range, in degrees, of a ground tombstone's seeded tilt: the rotation is
+ * drawn deterministically from the per-name stream into `[-6, 6]` degrees
+ * (Req 5.8). Only the `ground` place applies this tilt.
+ */
+export const TOMBSTONE_TILT_DEG = 6;
+
+/**
+ * Plaque bounding-box width in px at `scale` 1. Single source of truth for BOTH
+ * the `Plaque` component's fixed max render width (CHANGE 4 — long names
+ * ellipsize rather than growing wider) AND the no-overlap rectangle width used
+ * by the scatter layout / Property 2 (Req 5.9, 7.4). Because a plaque can never
+ * render wider than this, the no-overlap guarantee computed from `PLAQUE_W`
+ * holds for any repo name regardless of length. Matches the existing place
+ * plaque's compact slab (~80–150px on the boards).
+ */
+export const PLAQUE_W = 160;
+
+/** Plaque bounding-box height in px at `scale` 1 (one Cinzel name line + one
+ * mono sub-line). Used alongside `PLAQUE_W` for the no-overlap rectangle
+ * (Req 5.9). Matches the real rendered plaque (≈ 40px); the boards' plaques are
+ * compact ~80–150px slabs, so 160×40 is the single source of truth and long
+ * names ellipsize with the full name in `title`/`aria-label` (visual fix r3 #1). */
+export const PLAQUE_H = 40;
+
+/**
+ * Viewport width in px that switches a plot between the scatter layout (≥ this)
+ * and the two-column staggered mobile layout (< this) (Req 5.9, 5.10).
+ */
+export const MOBILE_BREAKPOINT = 768;
+
+/**
+ * Per-place vertical "stage" band, as fractions of the scene height, that
+ * `scatterLayout` maps every creature's `y` into so creatures stand on their
+ * place's ground instead of floating across the whole scene (visual fix 2C).
+ * `top` is the back-row baseline (higher on screen), `bottom` the front-row
+ * baseline (the ground line). Ghosts float, so the sky band starts higher and
+ * ends above the very bottom; the gate/ground/crypt bands hug the lower scene
+ * where the painted ground sits. `x` is unaffected (stays in 0.08–0.92).
+ */
+export const STAGE_BANDS: Record<PlaceId, { top: number; bottom: number }> = {
+  sky: { top: 0.2, bottom: 0.7 },
+  gate: { top: 0.46, bottom: 0.86 },
+  ground: { top: 0.42, bottom: 0.86 },
+  // Crypt widened from 0.55–0.86 to 0.45–0.88: 0.31 was too tight to stack
+  // three rows of coffins (+ their plaques) without crowding (visual fix r3 #2).
+  crypt: { top: 0.45, bottom: 0.88 },
+};
+
+/** The narrowest stage band height across all places, used to pin the y-jitter
+ *  and inter-row spacing so the no-overlap guarantee (Req 5.9, Property 2)
+ *  survives mapping into the tightest band (gate, 0.46–0.86 → 0.40 tall). */
+export const STAGE_BAND_MIN_HEIGHT = Math.min(
+  ...Object.values(STAGE_BANDS).map((b) => b.bottom - b.top),
+);
+
+/**
+ * Each place's CENTRE on the estate map, as fractions of the map box. Single
+ * source of truth shared by `EstateMap`'s `PLACE_POSITIONS` (where each place
+ * link is anchored) and the travel transition (the zoom `transform-origin` when
+ * pulling into / out of a place). Matches the board arrangement: sky top-centre,
+ * ground left, crypt right, gate bottom-centre (visual fix r3 #4).
+ */
+export const PLACE_CENTERS: Record<PlaceId, { x: number; y: number }> = {
+  sky: { x: 0.46, y: 0.2 },
+  ground: { x: 0.2, y: 0.5 },
+  crypt: { x: 0.78, y: 0.48 },
+  gate: { x: 0.46, y: 0.78 },
+};
+
+// --- Painted-moon placement + per-layer parallax maxima (CHANGE 5) ---------
+
+/**
+ * Where the moon is baked into the `place-sky` painting, in source-image
+ * fractions: `fx`/`fy` are the moon's centre (x 75%, y 14%) and `diamFrac` its
+ * diameter as a fraction of image width (≈6.5%). Fed with the measured
+ * background box to `coverRect` so the code-drawn `Moon` lands exactly over the
+ * painted moon (Req 2.5, 4.7, 4.8).
+ */
+export const PAINTED_MOON = { fx: 0.75, fy: 0.14, diamFrac: 0.065 };
+
+/**
+ * Per-layer maximum parallax offset in px at `|--px| = 1`, depth-ordered
+ * background < creatures < near fog (CHANGE 5). `PARALLAX_MAX_BG` (8 px) is
+ * strictly less than the `PlaceBackground` `-3%` inset bleed so the parallaxed
+ * painting never exposes an edge.
+ */
+export const PARALLAX_MAX_BG = 8;
+
+/** Per-layer maximum parallax offset in px for the creatures / far-fog band
+ * (`--d` 0.3) at `|--px| = 1` (CHANGE 5). */
+export const PARALLAX_MAX_CREATURES = 16;
+
+/** Per-layer maximum parallax offset in px for the near-fog band
+ * (`Fog_Thin`, `--d` 0.5) at `|--px| = 1` (CHANGE 5). */
+export const PARALLAX_MAX_NEAR_FOG = 26;
+
+// ---------------------------------------------------------------------------
+// Cover-math (coverRect) — pure value objects + helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Input to `coverRect`: an image's intrinsic size, the painted element's own
+ * box (the `PlaceBackground` element box *including* its `-3%` bleed — not the
+ * viewport), a point given in source-image fractions, and the diameter of an
+ * element sized as a fraction of the image width. Pure value object — holds no
+ * DOM references. (Req 4.7, 4.8.)
+ */
+export interface CoverInput {
+  /** Intrinsic image width (px). */
+  imageW: number;
+  /** Intrinsic image height (px). */
+  imageH: number;
+  /** Painted element box width (px), including the `-3%` bleed. */
+  viewW: number;
+  /** Painted element box height (px), including the `-3%` bleed. */
+  viewH: number;
+  /** Point x as a fraction of image width, in `[0, 1]`. */
+  fx: number;
+  /** Point y as a fraction of image height, in `[0, 1]`. */
+  fy: number;
+  /** Element diameter as a fraction of image width. */
+  diamFrac: number;
+}
+
+/**
+ * Output of `coverRect`: an on-screen centre and diameter, in pixels, in the
+ * `PlaceBackground` element's coordinate space (so a `Moon` rendered inside
+ * that element shares the painting's transform). Pure value object. (Req 4.7,
+ * 4.8.)
+ */
+export interface CoverRect {
+  /** Centre x (px) in the element's coordinate space. */
+  cx: number;
+  /** Centre y (px) in the element's coordinate space. */
+  cy: number;
+  /** On-screen diameter (px). */
+  diameter: number;
+}
+
+/**
+ * Pure cover-math: maps a point given in source-image fractions to on-screen
+ * pixels for a container painted `background-size: cover`, and returns a
+ * diameter for an element sized as a fraction of the image width (Req 4.7,
+ * 4.8).
+ *
+ * Standard `cover` fit: `scale = max(viewW / imageW, viewH / imageH)`, so the
+ * drawn image is `imageW*scale × imageH*scale`, centered in the element. The
+ * centering offsets are `offsetX = (viewW - imageW*scale) / 2` (and `offsetY`
+ * similarly), and the point maps to
+ * `cx = offsetX + fx * imageW * scale`, `cy = offsetY + fy * imageH * scale`,
+ * with `diameter = diamFrac * imageW * scale`.
+ *
+ * Pure and total: any zero/negative image or element dimension (e.g. a 0×0
+ * pre-layout container) makes the cover scale undefined, so we fall back to a
+ * centered default — the element's own centre with a zero diameter — rather
+ * than emitting `NaN`/`Infinity`. The fractional inputs (`fx`/`fy`/`diamFrac`)
+ * are used as given; only the dimensions are guarded.
+ */
+export function coverRect(input: CoverInput): CoverRect {
+  const { imageW, imageH, viewW, viewH, fx, fy, diamFrac } = input;
+
+  // Guard: a non-positive image or element dimension makes the cover scale
+  // undefined (division by zero or a negative scale), so return a centered
+  // default. `viewW`/`viewH` fall back to 0 when non-finite so `cx`/`cy` are
+  // always finite numbers and never `NaN`/`Infinity`.
+  const safeViewW = Number.isFinite(viewW) ? viewW : 0;
+  const safeViewH = Number.isFinite(viewH) ? viewH : 0;
+  if (
+    !Number.isFinite(imageW) ||
+    !Number.isFinite(imageH) ||
+    imageW <= 0 ||
+    imageH <= 0 ||
+    safeViewW <= 0 ||
+    safeViewH <= 0
+  ) {
+    return { cx: safeViewW / 2, cy: safeViewH / 2, diameter: 0 };
+  }
+
+  // Standard `cover` fit: scale so the image fully covers the element, then
+  // center the (overflowing) image and map the fractional point into it.
+  const scale = Math.max(safeViewW / imageW, safeViewH / imageH);
+  const drawnW = imageW * scale;
+  const drawnH = imageH * scale;
+  const offsetX = (safeViewW - drawnW) / 2;
+  const offsetY = (safeViewH - drawnH) / 2;
+
+  return {
+    cx: offsetX + fx * drawnW,
+    cy: offsetY + fy * drawnH,
+    diameter: diamFrac * drawnW,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Pure view-model functions (stubs — implemented in later tasks)
 // ---------------------------------------------------------------------------
@@ -353,6 +563,649 @@ export function plaqueCopy(
       return _exhaustive;
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Organic seeded creature placement: `scatterLayout` (pure, DOM-free)
+// ---------------------------------------------------------------------------
+
+/**
+ * One per-name placement record produced by {@link scatterLayout}. Every field
+ * is derived deterministically from `(names, rows, seed)` so equal inputs yield
+ * field-by-field equal records in the same order (Req 5.1, 5.2).
+ */
+export interface ScatterPlacement {
+  /** Horizontal centre, a fraction of plot width in `[0, 1]`. */
+  x: number;
+  /** Vertical centre, a fraction of plot height in `[0, 1]`. */
+  y: number;
+  /**
+   * Per-creature scale in `[SCATTER_SCALE_MIN, SCATTER_SCALE_MAX]` (0.7..1.15).
+   * Strictly ordered across rows: every front-row record is greater than every
+   * middle-row record, which is greater than every back-row record (Req 5.5).
+   */
+  scale: number;
+  /**
+   * Per-creature brightness multiplier. Strictly ordered across rows the same
+   * way as `scale`: front > middle > back for *every* pair (Req 5.6).
+   */
+  brightness: number;
+  /** Whether the creature image is horizontally mirrored (Req 5.7). */
+  mirrored: boolean;
+  /** Depth band: `0` = back … `rows - 1` = front (Req 5.4). */
+  row: number;
+  /**
+   * Seeded tilt in `[-TOMBSTONE_TILT_DEG, TOMBSTONE_TILT_DEG]` degrees, applied
+   * only by the ground place to its tombstones (Req 5.8). Present on every
+   * record so the value is deterministic and ignorable by the other places.
+   */
+  tilt: number;
+}
+
+/**
+ * `xmur3` string hash — a tiny, well-known pure 32-bit string hasher used to
+ * fold `seed + "|" + name` into a seed for `mulberry32`. No RNG library and no
+ * `Math.random`: the returned closure yields the successive 32-bit avalanche
+ * values of the classic `xmur3` construction. Only the first value is consumed
+ * here (as the PRNG seed), but the closure form matches the canonical snippet.
+ */
+function xmur3(str: string): () => number {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return () => {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    h ^= h >>> 16;
+    return h >>> 0;
+  };
+}
+
+/**
+ * `mulberry32` PRNG — a tiny, well-known pure generator seeded by a 32-bit
+ * integer. Returns a closure producing successive floats in `[0, 1)`. Pure and
+ * deterministic: a given seed always yields the same stream.
+ */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// --- Slot-grid geometry (the no-overlap guarantee, Req 5.9) -----------------
+//
+// The placement is a `DEPTH_ROWS × MAX_SCATTER_COLS` grid of slots. Two plaque
+// rectangles can only overlap if their x-intervals AND their y-intervals both
+// overlap, so the grid eliminates overlap on each axis independently:
+//
+//  * Horizontal — each column owns a cell of width `1 / MAX_SCATTER_COLS` of the
+//    plot. A plaque is centred at the cell centre plus a bounded x-jitter chosen
+//    so that `maxPlaqueHalfWidth + maxJitter <= halfCell` at the *narrowest*
+//    supported plot width. Because a plaque's px width (`PLAQUE_W * scale`) is
+//    absolute while the cell's px width (`cellFrac * plotWidth`) shrinks with the
+//    plot, the narrowest width (1280) is the binding case; satisfying it there
+//    satisfies 1440 too. Same-row plaques therefore never share x-overlap.
+//
+//  * Vertical — each row owns a y-band centre, bands evenly spaced across
+//    `[SCATTER_BAND_MIN, SCATTER_BAND_MAX]`. A plaque is centred at its band plus
+//    a bounded y-jitter chosen so that two plaques in adjacent bands (the only
+//    pairs that could collide vertically — same-row pairs are already x-disjoint)
+//    stay height-separated even at a deliberately short plot height. Different-row
+//    plaques therefore never share y-overlap unless they are also in different
+//    columns (already x-disjoint).
+//
+// Every pair of distinct records is thus x-disjoint (same row), y-disjoint
+// (same column, different row), or both-different (x-disjoint by column) — so no
+// two plaque rectangles ever intersect, for 1..PLOT_SIZE names at 1440 and 1280
+// px (Req 5.9, Property 2). `PLAQUE_W`/`PLAQUE_H` are the single source of truth
+// for the rectangle size (see the constants above).
+
+/**
+ * Columns in the scatter grid: enough to hold the fullest row of a full plot
+ * (`ceil(PLOT_SIZE / DEPTH_ROWS)` = 4). Fixed for every row so the column pitch
+ * is uniform and maximal regardless of how many names actually land in a row.
+ */
+export const MAX_SCATTER_COLS = Math.ceil(PLOT_SIZE / DEPTH_ROWS);
+
+/** Narrowest plot width (px) the no-overlap guarantee is pinned against. */
+const SCATTER_MIN_PLOT_WIDTH = 1280;
+
+/**
+ * Deliberately short plot-height-to-width ratio used as the *worst case* for
+ * vertical separation. The real place plots are taller (≈0.56–0.625 of width),
+ * so proving no-overlap at this shorter height proves it for the real plots and
+ * lets the property test derive height from width alone.
+ */
+const SCATTER_MIN_PLOT_ASPECT = 0.5;
+
+/** Upper bound on x-jitter as a fraction of plot width, kept within the cell. */
+const SCATTER_X_JITTER_FRAC = (() => {
+  // Cell pitch matches the `(cols + 0.5)` grid used in `scatterLayout` (the
+  // extra half-cell reserves the odd-row stagger headroom). Jitter is bounded to
+  // half the slack between the cell width and the widest plaque, minus a small
+  // margin, so two SAME-ROW plaques (one cell pitch apart) can never overlap
+  // even at both their jitter extremes and max scale (visual fix r3 #2).
+  const cellPx = SCATTER_MIN_PLOT_WIDTH / (MAX_SCATTER_COLS + 0.5);
+  const maxPlaquePx = PLAQUE_W * SCATTER_SCALE_MAX;
+  const roomPx = Math.max(0, (cellPx - maxPlaquePx) / 2 - 4);
+  return roomPx / SCATTER_MIN_PLOT_WIDTH;
+})();
+
+/**
+ * The default ("legacy") stage band used when `scatterLayout` is called without
+ * a `place`: the full-height band the layout used before per-place stage bands
+ * existed. Named callers (`PlaceView`/`DepthScatter`) always pass a place, so
+ * this only backs place-agnostic callers and tests.
+ */
+const LEGACY_STAGE_BAND = { top: 0.18, bottom: 0.82 };
+
+/**
+ * Upper bound on y-jitter as a fraction of the STAGE BAND height (not the whole
+ * plot). It is capped small enough that two creatures in adjacent depth rows
+ * never overlap vertically even in the narrowest stage band (crypt, 0.31 tall)
+ * at the worst-case short plot height ? preserving the no-overlap guarantee
+ * (Req 5.9) after the per-place remap. See the derivation below.
+ *
+ * Worst case: narrowest band height `STAGE_BAND_MIN_HEIGHT` (0.31), `DEPTH_ROWS`
+ * (3) rows, plot height = `plotWidth * SCATTER_MIN_PLOT_ASPECT` at the narrowest
+ * width 1280 → 640px. Adjacent row centres are `bandH / (rows - 1)` apart in
+ * fraction; the max plaque is `PLAQUE_H * SCATTER_SCALE_MAX` tall. The jitter
+ * half-range (in fraction of plot height) must leave a full plaque height of
+ * clearance between adjacent row centres, so this cap sits safely under that.
+ */
+const SCATTER_Y_JITTER_BAND_FRAC = 0.06;
+
+/**
+ * Centre (fraction of plot height) of depth `band` within a `stage` band: band
+ * 0 (back) sits at the band top, the front band at the band bottom; a single
+ * band sits at the band mid-line. Shared by `scatterLayout` and `plaqueRect` so
+ * the pixel model the no-overlap property checks is the production model.
+ */
+function stageRowCentre(
+  stage: { top: number; bottom: number },
+  band: number,
+  bandCount: number,
+): number {
+  if (bandCount <= 1) {
+    return (stage.top + stage.bottom) / 2;
+  }
+  return stage.top + (stage.bottom - stage.top) * (band / (bandCount - 1));
+}
+
+/** Brightness assigned to the front row; each row behind steps down by a band. */
+const SCATTER_FRONT_BRIGHTNESS = 1;
+const SCATTER_BRIGHTNESS_STEP = 0.18;
+
+/**
+ * Draws a float in `[min, max)` from a per-name stream, mapping a `[0, 1)` draw
+ * linearly onto the half-open interval. A `min === max` interval returns `min`.
+ */
+function drawRange(rng: () => number, min: number, max: number): number {
+  return min + rng() * (max - min);
+}
+
+/**
+ * Organic, seeded, deterministic placement for a plot of creatures — the single
+ * layout function for all four places (Req 5.1). Pure: reads no clock, no DOM,
+ * and no external state, so equal `(names, rows, seed)` always produce
+ * field-by-field equal records in the same input order (Req 5.2).
+ *
+ * Each name is folded with `seed` into a 32-bit hash via `xmur3(seed + "|" +
+ * name)` that seeds a `mulberry32` stream; all per-name randomness (jitter,
+ * tilt) is drawn from that stream so it is reproducible. The records are
+ * returned one-per-name in input order with no additions, omissions, or
+ * duplicates (Req 5.1); empty `names` yields `[]` (Req 5.3).
+ *
+ * Names are distributed across `rows` depth bands front-first (the nearest band
+ * fills first, matching the boards' "nearest holds the freshest"). Each band
+ * owns a disjoint `scale` sub-range within `[SCATTER_SCALE_MIN,
+ * SCATTER_SCALE_MAX]` and a disjoint `brightness` sub-range, so *every*
+ * front-row record is strictly greater than *every* middle-row record, which is
+ * strictly greater than *every* back-row record, for both fields (Req 5.5,
+ * 5.6). Exactly `round(n / 3)` records are marked `mirrored`, chosen
+ * deterministically by ranking the per-name hashes (Req 5.7). `x`/`y` come from
+ * the per-row jittered slot grid that guarantees no two plaque rectangles
+ * overlap at 1440 or 1280 px (Req 5.9; see the slot-grid notes above).
+ *
+ * `rows` is normalised to `max(1, trunc(rows))`; the caller passes `DEPTH_ROWS`.
+ */
+export function scatterLayout(
+  names: string[],
+  rows: number,
+  seed: number | string,
+  place?: PlaceId,
+): ScatterPlacement[] {
+  const n = names.length;
+  if (n === 0) {
+    return [];
+  }
+
+  // Normalise the band count and the seed to a stable string prefix.
+  const bandCount = Math.max(1, Number.isFinite(rows) ? Math.trunc(rows) : 1);
+  const seedPrefix = String(seed);
+
+  // Per-name PRNG stream: xmur3 folds the combined string into a 32-bit seed for
+  // mulberry32. One stream per name keeps each record independent of the others.
+  const streams = names.map((name) =>
+    mulberry32(xmur3(`${seedPrefix}|${name}`)()),
+  );
+
+  // --- Mirroring (Req 5.7): exactly round(n / 3) records marked, chosen by a
+  // deterministic ranking of per-name hashes so the count is exact and stable.
+  // We rank by a dedicated hash (independent of the placement stream) and mark
+  // the lowest-ranked `mirrorCount` indices.
+  const mirrorCount = Math.round(n / 3);
+  const mirrorKeys = names.map((name, index) => ({
+    index,
+    key: xmur3(`mirror|${seedPrefix}|${name}`)(),
+  }));
+  // Sort by hash, break ties by original index so the ranking is total/stable.
+  mirrorKeys.sort((a, b) => a.key - b.key || a.index - b.index);
+  const mirrored = new Array<boolean>(n).fill(false);
+  for (let i = 0; i < mirrorCount && i < n; i++) {
+    mirrored[mirrorKeys[i].index] = true;
+  }
+
+  // --- Row assignment (Req 5.4): distribute names across the bands front-first.
+  // Band index `0` is the back; `bandCount - 1` is the front. We assign the
+  // leading (most-relevant) names to the front band, filling backwards. Each
+  // band gets `ceil(remaining / remainingBands)` names so the front is never
+  // smaller than a band behind it.
+  const bandOfIndex = new Array<number>(n);
+  {
+    let assigned = 0;
+    for (let b = bandCount - 1; b >= 0; b--) {
+      const remainingBands = b + 1; // bands still to fill, including this one
+      const take = Math.ceil((n - assigned) / remainingBands);
+      for (let k = 0; k < take && assigned < n; k++) {
+        bandOfIndex[assigned] = b;
+        assigned++;
+      }
+    }
+  }
+
+  // Per-band disjoint sub-ranges for scale and brightness. The full scale band
+  // [SCATTER_SCALE_MIN, SCATTER_SCALE_MAX] is split into `bandCount` equal
+  // sub-intervals; jitter stays strictly inside a sub-interval so the strict
+  // cross-band ordering can never be violated (Req 5.5, 5.6). Brightness uses a
+  // fixed per-band step with a matching intra-band jitter cap.
+  const scaleSpan = (SCATTER_SCALE_MAX - SCATTER_SCALE_MIN) / bandCount;
+  // Keep jitter to 80% of a sub-interval, centred, so adjacent bands never meet.
+  const scaleJitterHalf = (scaleSpan * 0.8) / 2;
+  const brightJitterHalf = (SCATTER_BRIGHTNESS_STEP * 0.8) / 2;
+
+  // Per-row column counters so slots fill left-to-right as names land in a band.
+  const colCursor = new Array<number>(bandCount).fill(0);
+
+  // Y-row centres map into the place's stage band so creatures stand on their
+  // place's ground instead of floating across the whole scene (visual fix 2C).
+  // Back (band 0) sits at the band top, the front band at the band bottom
+  // (`stageYForBand`, shared with `plaqueRect` so the pixel model matches).
+  const stage = place ? STAGE_BANDS[place] : LEGACY_STAGE_BAND;
+
+  const placements: ScatterPlacement[] = [];
+  for (let i = 0; i < n; i++) {
+    const rng = streams[i];
+    const band = bandOfIndex[i];
+
+    // Scale: band centre is the sub-interval midpoint; jitter stays inside it.
+    const scaleCentre = SCATTER_SCALE_MIN + scaleSpan * (band + 0.5);
+    const scale = scaleCentre + drawRange(rng, -scaleJitterHalf, scaleJitterHalf);
+
+    // Brightness: front band at SCATTER_FRONT_BRIGHTNESS, stepping down per band
+    // behind it; jitter stays inside the per-band step so ordering holds.
+    const brightCentre =
+      SCATTER_FRONT_BRIGHTNESS - (bandCount - 1 - band) * SCATTER_BRIGHTNESS_STEP;
+    const brightness =
+      brightCentre + drawRange(rng, -brightJitterHalf, brightJitterHalf);
+
+    // Column slot within the band: centre of the next free cell, plus x-jitter.
+    // Adjacent depth rows are STAGGERED by half a column pitch (odd rows shift
+    // right by half a cell) so a nearer row's creatures sit in the GAPS between
+    // the farther row's, letting each plaque drop into a gap rather than over
+    // the next row's creature (visual fix r3 #2.1). The stagger is folded into
+    // the cell centre and kept inside [0,1]; the per-creature x-clamp (fix r3
+    // #3, applied at render via `clampPlacementX`) pulls any edge case that
+    // leaves the 16px scene margins back in.
+    const col = colCursor[band] % MAX_SCATTER_COLS;
+    colCursor[band]++;
+    // Cell grid with a half-cell STAGGER on odd rows, mapped into [0,1] WITHOUT
+    // a post-hoc clamp: dividing by (cols + 0.5) reserves exactly half a cell of
+    // headroom so the odd-row phase (+0.5) never pushes the last column past the
+    // right edge. Same-row cells therefore stay a full cell pitch apart (so same
+    // -row plaques never collide) while adjacent rows read as organically offset
+    // rather than a rigid grid (visual fix r3 #2.1).
+    const rowPhase = (band % 2) * 0.5;
+    const cellCentre = (col + 0.5 + rowPhase) / (MAX_SCATTER_COLS + 0.5);
+    const x =
+      cellCentre + drawRange(rng, -SCATTER_X_JITTER_FRAC, SCATTER_X_JITTER_FRAC);
+
+    // Y within the stage band, jittered inside the band's safe vertical room.
+    // The jitter is a fraction of the BAND height (capped so adjacent rows
+    // never overlap even in the narrowest band at the worst-case plot height),
+    // so the no-overlap guarantee survives the per-place remap (Req 5.9).
+    const bandHeight = stage.bottom - stage.top;
+    const yJitter =
+      drawRange(rng, -SCATTER_Y_JITTER_BAND_FRAC, SCATTER_Y_JITTER_BAND_FRAC) *
+      bandHeight;
+    const y = stageRowCentre(stage, band, bandCount) + yJitter;
+
+    // Tilt for ground tombstones, drawn from the same stream (Req 5.8).
+    const tilt = drawRange(rng, -TOMBSTONE_TILT_DEG, TOMBSTONE_TILT_DEG);
+
+    placements.push({ x, y, scale, brightness, mirrored: mirrored[i], row: band, tilt });
+  }
+
+  return placements;
+}
+
+/** An axis-aligned plaque rectangle in plot pixels (centre + half extents). */
+export interface PlaqueRect {
+  /** Centre x in px. */
+  cx: number;
+  /** Centre y in px. */
+  cy: number;
+  /** Left edge in px. */
+  left: number;
+  /** Right edge in px. */
+  right: number;
+  /** Top edge in px. */
+  top: number;
+  /** Bottom edge in px. */
+  bottom: number;
+}
+
+/**
+ * Projects a {@link ScatterPlacement} to its on-screen plaque rectangle, the
+ * shared pixel model the no-overlap property (Req 5.9, Property 2) is verified
+ * against. The rectangle is `PLAQUE_W × PLAQUE_H` scaled by the record's
+ * `scale`, centred at `(x * plotWidthPx, y * plotHeightPx)`.
+ *
+ * `plotHeightPx` defaults to `plotWidthPx * SCATTER_MIN_PLOT_ASPECT` — a
+ * deliberately short plot, the worst case for vertical separation — so a caller
+ * (and the property test) can supply width alone and still exercise the binding
+ * case. The real place plots are taller, so no-overlap at this height implies
+ * no-overlap for them.
+ */
+export function plaqueRect(
+  placement: ScatterPlacement,
+  plotWidthPx: number,
+  plotHeightPx: number = plotWidthPx * SCATTER_MIN_PLOT_ASPECT,
+): PlaqueRect {
+  const w = PLAQUE_W * placement.scale;
+  const h = PLAQUE_H * placement.scale;
+  const cx = placement.x * plotWidthPx;
+  const cy = placement.y * plotHeightPx;
+  return {
+    cx,
+    cy,
+    left: cx - w / 2,
+    right: cx + w / 2,
+    top: cy - h / 2,
+    bottom: cy + h / 2,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Feet-anchored creature + plaque geometry (visual fixes r3 #2, #3) \u2014 pure
+//
+// `DepthScatter` anchors each creature by its FEET at (x*W, y*H) via
+// `translate(-50%, -100%)` (body ABOVE the feet line) and drops the plaque just
+// BELOW the feet (`top = y*H + CREATURE_PLAQUE_GAP`, centred in x). These pure
+// helpers reproduce that exact pixel model so the component and the no-overlap
+// property share one source of truth \u2014 no DOM re-derivation that could drift.
+// ---------------------------------------------------------------------------
+
+/** Intrinsic creature art box (px), square, before `scale`. Mirrors
+ *  `CREATURE_ART_SIZE` in `components/creatures/Creature.tsx`. */
+export const CREATURE_BASE_SIZE = 140;
+
+/** Required clear margin (px) between any creature/plaque and the scene edge
+ *  (fix r3 #3). */
+export const SCENE_EDGE_MARGIN_PX = 16;
+
+/** Vertical gap (px) from the feet line down to the plaque top (matches the
+ *  `+ 6px` the plaque wrapper uses, rounded into the budget as 8px). */
+export const CREATURE_PLAQUE_GAP_PX = 8;
+
+/** Creature-height floor as a fraction of scene height when a creature must be
+ *  shrunk to clear a plaque (\u2248 96px @ 900, \u2248 77px @ 720) \u2014 fix r3 #2.3. */
+export const CREATURE_HEIGHT_FLOOR_FRAC = 0.107;
+
+/** Row pitch in px: the vertical slice one depth row owns within a place's
+ *  stage band (`stageBandHeight * sceneH / rows`). (fix r3 #2) */
+export function rowPitchPx(
+  place: PlaceId,
+  sceneHeightPx: number,
+  rows: number = DEPTH_ROWS,
+): number {
+  const band = STAGE_BANDS[place];
+  const bandCount = Math.max(1, Number.isFinite(rows) ? Math.trunc(rows) : 1);
+  return ((band.bottom - band.top) * sceneHeightPx) / bandCount;
+}
+
+/** An axis-aligned rectangle in scene px (centre + edges), shared by the
+ *  creature and plaque rect helpers. */
+export interface SceneRect {
+  cx: number;
+  cy: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+/** True iff two axis-aligned rects share interior area (edge-touch = clear). */
+export function rectsIntersect(a: SceneRect, b: SceneRect): boolean {
+  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+}
+
+/**
+ * The resolved on-screen geometry for one creature: its feet point, the creature
+ * image rectangle (body above the feet), the plaque rectangle (below the feet),
+ * the final clamped/ nudged `x`, and the rendered creature height. Produced by
+ * {@link resolvePlacement}; consumed by `DepthScatter` (to size/position the
+ * creature + plaque) and the no-overlap / margin properties.
+ */
+export interface ResolvedPlacement {
+  /** Final x fraction after the edge clamp + any plaque nudge feedback. */
+  x: number;
+  /** y fraction (the feet line), unchanged by resolution. */
+  y: number;
+  /** Rendered creature height in px (\u2264 base*scale; floored when shrunk). */
+  creatureHeightPx: number;
+  /** The creature image rect (square: width === height), body above the feet. */
+  creature: SceneRect;
+  /** The plaque rect (PLAQUE_W\u00d7scale wide, PLAQUE_H\u00d7scale tall), below the feet. */
+  plaque: SceneRect;
+}
+
+/** Builds an axis-aligned rect from a centre and half extents. */
+function rectFrom(cx: number, cy: number, halfW: number, halfH: number): SceneRect {
+  return {
+    cx,
+    cy,
+    left: cx - halfW,
+    right: cx + halfW,
+    top: cy - halfH,
+    bottom: cy + halfH,
+  };
+}
+
+/**
+ * Clamps a feet x (px) so a box of half-width `halfW` stays within the scene's
+ * [margin, sceneW - margin] safe area. Pure/total: a box wider than the safe
+ * area is centred (best effort) rather than producing a negative range.
+ */
+function clampFeetX(
+  feetXPx: number,
+  halfW: number,
+  sceneWidthPx: number,
+): number {
+  const lo = SCENE_EDGE_MARGIN_PX + halfW;
+  const hi = sceneWidthPx - SCENE_EDGE_MARGIN_PX - halfW;
+  if (hi < lo) {
+    return sceneWidthPx / 2;
+  }
+  return Math.min(hi, Math.max(lo, feetXPx));
+}
+
+/**
+ * Resolves one placement's final creature + plaque geometry at a concrete scene
+ * size, applying the resolution order (visual fixes r3 #2, #3). The column
+ * stagger (fix #2.1) is already baked into `placement.x` by `scatterLayout`, so
+ * this step only adds the size/clamp/nudge feedback that depends on scene px:
+ *
+ *   - creature height (fix #2.2/2.3): capped at `rowPitch - PLAQUE_H - gap` so a
+ *     body never reaches into the next row's plaque band, defaulting to
+ *     `CREATURE_BASE_SIZE*scale`, and floored at `CREATURE_HEIGHT_FLOOR_FRAC *
+ *     sceneH` so a tight band still renders a readable creature;
+ *   - x-clamp (fix #3): the feet x is clamped so BOTH the (possibly shrunk)
+ *     creature box and the plaque box stay inside the 16px scene margins;
+ *   - plaque nudge (fix #2.4): if the plaque still overlaps a NEARER-row
+ *     creature (passed in via `nearerCreatures`), it is slid sideways within
+ *     +/-PLAQUE_W/2 to drop into a gap.
+ *
+ * `nearerCreatures` are the already-resolved creature rects of rows IN FRONT of
+ * this one (larger `row` index) \u2014 the only ones whose bodies can hang into this
+ * plaque \u2014 so callers resolve front rows first. Pass `[]` for the frontmost row.
+ *
+ * Pure and deterministic in its inputs; reads no DOM.
+ */
+export function resolvePlacement(
+  placement: ScatterPlacement,
+  place: PlaceId,
+  sceneWidthPx: number,
+  sceneHeightPx: number,
+  obstacles: readonly SceneRect[] = [],
+): ResolvedPlacement {
+  const scale = placement.scale;
+  const plaqueW = PLAQUE_W * scale;
+  const plaqueH = PLAQUE_H * scale;
+  const baseCreatureH = CREATURE_BASE_SIZE * scale;
+  const feetYPx = placement.y * sceneHeightPx;
+
+  // Creatures render at full size by default (visual fix r3 #2: no shrinking
+  // unless a plaque genuinely cannot be placed clear). The floor is the
+  // fallback size when that happens (~96px @ 900 / ~77px @ 720).
+  const floorH = Math.min(baseCreatureH, CREATURE_HEIGHT_FLOOR_FRAC * sceneHeightPx);
+
+  // The plaque sits over the BOTTOM QUARTER of its OWN creature's body (Option
+  // A, visual fix r3 #2): body spans [feetY - cH, feetY]; the plaque's vertical
+  // centre lands at feetY - cH*0.125 (the middle of the bottom 25%), covering
+  // the feet/legs of a creature, the base of a tombstone (below the RIP text),
+  // or the lower lid of a coffin \u2014 never the head/chest. Its y therefore depends
+  // on the creature height, so both are resolved together below.
+  const plaqueRectFor = (centreX: number, creatureH: number): SceneRect =>
+    rectFrom(
+      centreX,
+      // Bottom-quarter midpoint for small/medium creatures, but clamped to a
+      // thin feet-hugging strip (<= plaqueH/2 + gap above the feet) for tall
+      // creatures so the plaque never rides up into the row above (fix r3 #2).
+      feetYPx - Math.min(creatureH * 0.125, plaqueH / 2 + CREATURE_PLAQUE_GAP_PX),
+      plaqueW / 2,
+      plaqueH / 2,
+    );
+
+  // 1. Edge clamp (fix #3): clamp the feet x so BOTH the creature box and the
+  //    plaque box stay inside the 16px margins; the wider half-width bounds it.
+  const halfWiden = Math.max(baseCreatureH, plaqueW) / 2;
+  const feetXPx = clampFeetX(placement.x * sceneWidthPx, halfWiden, sceneWidthPx);
+
+  const safeLo = SCENE_EDGE_MARGIN_PX + plaqueW / 2;
+  const safeHi = sceneWidthPx - SCENE_EDGE_MARGIN_PX - plaqueW / 2;
+  const clampCx = (cx: number): number =>
+    safeHi < safeLo ? sceneWidthPx / 2 : Math.min(safeHi, Math.max(safeLo, cx));
+
+  // A plaque for THIS creature may legitimately overlap its OWN creature body
+  // (that is where it sits), so the obstacle set a candidate plaque must clear
+  // is every ALREADY-PLACED plaque/creature in `obstacles` (other rows), never
+  // its own creature. `hits` tests exactly that.
+  const hits = (pq: SceneRect): boolean =>
+    obstacles.some((o) => rectsIntersect(pq, o));
+
+  // 4. Plaque placement (fix #2.4): prefer the plaque centred on the creature x,
+  //    then NUDGE within +/-PLAQUE_W/2, then \u2014 only if that cannot clear \u2014 widen
+  //    the search across the whole safe x-range so the plaque never lands on
+  //    ANOTHER plaque or creature. Deterministic symmetric scan.
+  const findClearCx = (creatureH: number): number => {
+    const centred = clampCx(feetXPx);
+    if (!hits(plaqueRectFor(centred, creatureH))) {
+      return centred;
+    }
+    const nudge = plaqueW / 2;
+    const span = Math.max(nudge, safeHi - safeLo);
+    const steps = 64;
+    for (let k = 1; k <= steps; k++) {
+      const delta = (span * k) / steps;
+      const right = clampCx(feetXPx + delta);
+      if (!hits(plaqueRectFor(right, creatureH))) {
+        return right;
+      }
+      const left = clampCx(feetXPx - delta);
+      if (!hits(plaqueRectFor(left, creatureH))) {
+        return left;
+      }
+    }
+    return centred; // best effort
+  };
+
+  // Full size first; if no clear plaque x exists at full size, shrink this
+  // creature to the floor (which lifts the plaque higher \u2014 feetY - floorH*0.125
+  // \u2014 away from the row ahead and shrinks the obstacle it leaves for nearer
+  // rows) and re-search (fix #2.3).
+  // Height cap (fix r3 #2.2/#2.3): keep a creature's body within about one row
+  // pitch so its UPPER 60% (head + torso, the part the property protects)
+  // cannot reach up into the plaque band of the row behind it. Prefer the
+  // base size when the band is loose; floor it so a tight band still renders a
+  // readable creature (~96px @ 900 / ~77px @ 720).
+  const pitch = rowPitchPx(place, sceneHeightPx);
+  const capH = pitch - plaqueH - CREATURE_PLAQUE_GAP_PX;
+  let creatureH = Math.max(floorH, Math.min(baseCreatureH, capH));
+  let plaqueCx = findClearCx(creatureH);
+  if (hits(plaqueRectFor(plaqueCx, creatureH)) && floorH < creatureH) {
+    creatureH = floorH;
+    plaqueCx = findClearCx(creatureH);
+  }
+
+  const creatureW = creatureH; // square art box
+  const creature = rectFrom(
+    feetXPx,
+    feetYPx - creatureH / 2,
+    creatureW / 2,
+    creatureH / 2,
+  );
+
+  return {
+    x: feetXPx / sceneWidthPx,
+    y: placement.y,
+    creatureHeightPx: creatureH,
+    creature,
+    plaque: plaqueRectFor(plaqueCx, creatureH),
+  };
+}
+
+/**
+ * Clamps a placement's `x` so its plaque and creature stay within the 16px
+ * scene margins at a concrete scene size (fix r3 #3), returning a new placement
+ * (never mutating the input). A thin wrapper over {@link resolvePlacement}'s
+ * clamp for callers that only need the corrected `x`.
+ */
+export function clampPlacementX(
+  placement: ScatterPlacement,
+  place: PlaceId,
+  sceneWidthPx: number,
+  sceneHeightPx: number,
+): ScatterPlacement {
+  const resolved = resolvePlacement(placement, place, sceneWidthPx, sceneHeightPx);
+  return { ...placement, x: resolved.x };
 }
 
 // ---------------------------------------------------------------------------

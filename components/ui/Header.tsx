@@ -108,7 +108,18 @@ export default function Header({
   const hasError = error !== null;
 
   return (
-    <header className="flex items-start justify-between gap-4 font-ui text-scene-fg">
+    <header
+      data-testid="scene-header"
+      className={[
+        "flex items-start justify-between gap-4 font-ui text-scene-fg",
+        // On short viewports (<900px tall) the chrome condenses so the controls
+        // always stay within the header's own box and never overlap the scene
+        // content beneath it, down to a 360px-wide viewport (Req 1.3). The
+        // header wraps to a column and each cluster is allowed to wrap, so the
+        // return/lights/sound controls reflow instead of spilling.
+        "[@media(max-height:899px)]:flex-col [@media(max-height:899px)]:items-stretch [@media(max-height:899px)]:gap-2",
+      ].join(" ")}
+    >
       {/* LEFT cluster: wordmark + username badge on one row, summary beneath. */}
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
@@ -139,8 +150,8 @@ export default function Header({
       {/* RIGHT cluster: a compact visit box + the two toggles on ONE row. The
           validation message sits below the row (still role="alert"), so it
           never widens the control strip. */}
-      <div className="flex flex-col items-end gap-1">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col items-end gap-1 [@media(max-height:899px)]:items-start">
+        <div className="flex flex-wrap items-center gap-2 [@media(max-height:899px)]:justify-start">
           <form
             onSubmit={handleSubmit}
             noValidate

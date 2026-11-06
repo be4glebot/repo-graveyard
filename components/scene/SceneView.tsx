@@ -79,7 +79,7 @@ import EstateMap from "@/components/scene/EstateMap";
 import Footer from "@/components/scene/Footer";
 import LightsOnTable from "@/components/scene/LightsOnTable";
 import PlaceView from "@/components/scene/PlaceView";
-import TravelTransition from "@/components/scene/TravelTransition";
+import { TravelRunner } from "@/components/scene/TravelTransition";
 import Header from "@/components/ui/Header";
 import Toggle from "@/components/ui/Toggle";
 
@@ -260,25 +260,30 @@ export default function SceneView({
 
   // --- Travel transition ---------------------------------------------------
   // `travelingTo` is the place a travel transition is currently playing toward,
-  // or `null` when no transition is running. `SceneView` owns the overlay: it
-  // is set at the moment of place entry (after the client-only `pushState` +
-  // `setView`) and cleared when the overlay reports `done`, at which point
-  // focus moves to the place heading (Req 13.1–13.5). Travel runs ONLY on
-  // map→place entry; returning to the map performs no travel (Req 13.7).
-  const [travelingTo, setTravelingTo] = useState<PlaceId | null>(null);
+  // The in-flight travel transition, or `null` when none is running. It carries
+  // the view we are leaving (`from`), the view we are entering (`to`), the
+  // `place` whose centre is the zoom origin, and the pull `direction`. CRUCIAL
+  // (visual fix r3 travel): the committed nav `view` is NOT flipped on click \u2014
+  // the source view stays mounted and zooms; the `TravelRunner` reports the CUT
+  // (under the fog) via `onCutTravel`, and only THEN is `view` switched to the
+  // destination. `onTravelDone` clears the travel and moves arrival focus. The
+  // URL is pushed immediately on click so the place stays shareable.
+  const [travel, setTravel] = useState<{
+    from: "map" | PlaceId;
+    to: "map" | PlaceId;
+    place: PlaceId;
+    direction: "in" | "out";
+  } | null>(null);
 
-  // Remembers the place link the user travelled FROM so returning to the map
-  // can move focus back to it (fallback: the map heading, Req 13.7). Each
-  // `onEnterPlace` records the originating place id; `onReturn` reads and
-  // clears it.
+  // Remembers the place link the user travelled FROM so returning to the map can
+  // move focus back to it (fallback: the map heading, Req 13.7).
   const originPlaceRef = useRef<PlaceId | null>(null);
 
   /**
-   * Enter a place from the map: push one history entry carrying `?at=place`,
-   * set the view (Req 10.5), then start the travel transition toward it (Req
-   * 13.1). `plotIndex`/`activeFilter`/`selected` are left intact so returning
-   * later restores the same place state (Req 10.7); the turning-soon "Go to it"
-   * jump (task 11.1) sets those explicitly before/after calling this.
+   * Enter a place from the map: push one history entry carrying `?at=place`
+   * (shareable immediately, Req 10.5), then start the inward "pulled in" travel.
+   * `view` is left on the map so the REAL map zooms; it is switched to the place
+   * at the cut (`onCutTravel`). Interactive state is left intact (Req 10.7).
    */
   const onEnterPlace = useCallback((place: PlaceId): void => {
     if (typeof window !== "undefined") {
@@ -286,57 +291,73 @@ export default function SceneView({
       window.history.pushState({ view: place }, "", url);
     }
     originPlaceRef.current = place;
-    setView(place);
-    // Kick off the travel overlay AFTER the navigation is committed; the
-    // overlay is purely visual and never changes application state (Req 13.1).
-    setTravelingTo(place);
+    setTravel({ from: "map", to: place, place, direction: "in" });
   }, []);
 
   /**
-   * Called by the `TravelTransition` overlay when the transition finishes (or
-   * is skipped). Clears the transitioning flag and moves focus to the place
-   * heading so keyboard/screen-reader users land on the place's name on arrival
-   * (Req 13.3/13.5). The design makes travel the single owner of arrival focus;
-   * `PlaceView`'s own mount focus covers the no-travel / deep-link paths.
+   * The CUT: fired by `TravelRunner` while the fog fully covers the screen.
+   * Commits the mounted view switch to the travel destination, so the REAL
+   * destination view mounts and animates in for the second half.
+   */
+  const onCutTravel = useCallback((): void => {
+    setTravel((current) => {
+      if (current) {
+        setView(current.to);
+      }
+      return current;
+    });
+  }, []);
+
+  /**
+   * End of travel (or a skip): clear the transition and move arrival focus \u2014 to
+   * the place heading on an INWARD travel, or back to the originating place link
+   * (fallback: the map heading) on an OUTWARD one (Req 13.3/13.5/13.7). Focus is
+   * deferred to the next frame so the destination view has rendered.
    */
   const onTravelDone = useCallback((): void => {
-    setTravelingTo(null);
-    if (typeof document !== "undefined") {
-      const heading = document.querySelector<HTMLElement>(
-        '[data-testid="place-heading"]',
-      );
-      heading?.focus();
-    }
+    setTravel((current) => {
+      const direction = current?.direction ?? "in";
+      const origin = originPlaceRef.current;
+      if (typeof window !== "undefined") {
+        window.setTimeout(() => {
+          if (direction === "in") {
+            document
+              .querySelector<HTMLElement>('[data-testid="place-heading"]')
+              ?.focus();
+          } else {
+            const target =
+              (origin &&
+                document.querySelector<HTMLElement>(
+                  `[data-testid="estate-place-${origin}"]`,
+                )) ||
+              document.querySelector<HTMLElement>('[data-testid="map-heading"]');
+            target?.focus();
+          }
+          if (direction === "out") {
+            originPlaceRef.current = null;
+          }
+        }, 0);
+      }
+      return null;
+    });
   }, []);
 
   /**
-   * Return to the map: push one history entry whose URL omits `at` and set the
-   * view to "map" (Req 10.6). Interactive state is not reset (Req 10.7). No
-   * travel plays on the return (Req 13.7); focus moves back to the originating
-   * place link if it can be found, else the map heading as a fallback.
+   * Return to the map: push one history entry whose URL omits `at` (Req 10.6),
+   * then start the REVERSE "pulled out" travel from the current place back to the
+   * map (visual fix r3 #4). `view` stays on the place so the REAL place zooms
+   * out; it switches to the map at the cut. Interactive state is not reset
+   * (Req 10.7); arrival focus is handled by `onTravelDone`.
    */
   const onReturn = useCallback((): void => {
     if (typeof window !== "undefined") {
       window.history.pushState({ view: "map" }, "", window.location.pathname);
     }
-    // No travel on return; cancel any in-flight transition defensively.
-    setTravelingTo(null);
     const origin = originPlaceRef.current;
-    originPlaceRef.current = null;
-    setView("map");
-    // Move focus back to the originating place link, falling back to the map
-    // heading (Req 13.7). Deferred to the next frame so the map has rendered.
-    if (typeof window !== "undefined") {
-      window.setTimeout(() => {
-        const target =
-          (origin &&
-            document.querySelector<HTMLElement>(
-              `[data-testid="estate-place-${origin}"]`,
-            )) ||
-          document.querySelector<HTMLElement>('[data-testid="map-heading"]');
-        target?.focus();
-      }, 0);
-    }
+    // `from` is whatever place we are currently in; prefer the recorded origin,
+    // else fall back to the gate so the overlay always has a centre.
+    const fromPlace = origin ?? "gate";
+    setTravel({ from: fromPlace, to: "map", place: fromPlace, direction: "out" });
   }, []);
 
   // Back/forward: resolve the view purely on the client from the popstate event's
@@ -472,17 +493,55 @@ export default function SceneView({
     );
   }
 
-  // --- Travel representatives ----------------------------------------------
-  // Stand-in motes in the travel overlay rise on the per-creature stagger keyed
-  // by repo name (`animationDelay`). We feed the head of the destination
-  // place's first plot (the same rows the place will show) so the raise reads
-  // as "these creatures rising" rather than arbitrary motes. Empty places yield
-  // an empty list and the overlay simply plays zoom/fog/title. These names are
-  // read only when a transition is in flight.
-  const travelNames =
-    travelingTo === null ? [] : plots[0].slice(0, PLOT_SIZE).map((row) => row.name);
-
   // --- Map / place render switch (Req 1.1, 10.1, 10.2, 11.1) ---------------
+  //
+  // `renderSceneView` builds the REAL map or place view for a view identity,
+  // threading an optional `travel` hint so a view can fade its own sub-parts
+  // during a transition (the map fades its NON-target place links; the place
+  // fades its chrome in last) and pause its pointer parallax. `SceneView`
+  // renders this directly when idle, or hands the `from`/`to` views to
+  // `TravelRunner` (which wraps the mounted one in the zoom `travel-stage`).
+  const renderSceneView = (
+    which: "map" | PlaceId,
+    travelHint?: { active: boolean; targetPlace: PlaceId },
+  ): React.ReactNode => {
+    if (which === "map") {
+      return (
+        <EstateMap
+          rows={rows}
+          username={username ?? ""}
+          mode={mode}
+          turningSoon={turningSoon}
+          whispers={whispers}
+          onEnterPlace={onEnterPlace}
+          onGoToTurningSoon={onGoToTurningSoon}
+          reducedMotion={reducedMotion}
+          lightsOn={lightsOn}
+          travel={travelHint}
+        />
+      );
+    }
+    return (
+      <PlaceView
+        place={which}
+        rows={which === view ? placeRows : rows.filter((r) => placeOf(r) === which)}
+        activeFilter={activeFilter}
+        plotIndex={clampedPlotIndex}
+        selectedName={selected}
+        onFilterChange={setActiveFilter}
+        onPlotChange={setPlotIndex}
+        onSelect={handleSelect}
+        onReturn={onReturn}
+        filterHeroes={filterHeroes}
+        reducedMotion={reducedMotion}
+        lightsOn={lightsOn}
+        travel={travelHint ? { active: travelHint.active } : undefined}
+      />
+    );
+  };
+
+  // With the lights off we render one of the two navigation levels: the estate
+  // map when `view === "map"`, else the place view for the current place. Both
   // With the lights off we render one of the two navigation levels: the estate
   // map when `view === "map"`, else the place view for the current place. Both
   // sit under the shared Header/Footer chrome so the username badge, summary,
@@ -499,8 +558,14 @@ export default function SceneView({
       className="relative min-h-dvh w-full"
     >
       {/* Header chrome (frontmost), carrying the username badge, the summary,
-          and the Lights-on / Sound toggles (Req 15 chrome; Req 10.6 toggle). */}
-      <div className="absolute inset-x-0 top-0 z-50 p-4">
+          and the Lights-on / Sound toggles (Req 15 chrome; Req 10.6 toggle).
+          Occupies the fixed `--site-header-h` band at the top; the place chrome
+          offsets itself below this band so the two never overlap (visual fix 2C). */}
+      <div
+        data-testid="site-header"
+        className="absolute inset-x-0 top-0 z-50 p-4"
+        style={{ minHeight: "var(--site-header-h)" }}
+      >
         <Header
           rows={rows}
           username={username ?? ""}
@@ -512,50 +577,33 @@ export default function SceneView({
         />
       </div>
 
-      {view === "map" ? (
-        <EstateMap
-          rows={rows}
-          username={username ?? ""}
-          mode={mode}
-          turningSoon={turningSoon}
-          whispers={whispers}
-          onEnterPlace={onEnterPlace}
-          onGoToTurningSoon={onGoToTurningSoon}
-          reducedMotion={reducedMotion}
-        />
+      {travel === null ? (
+        renderSceneView(view)
       ) : (
-        <PlaceView
-          place={view}
-          rows={placeRows}
-          activeFilter={activeFilter}
-          plotIndex={clampedPlotIndex}
-          selectedName={selected}
-          onFilterChange={setActiveFilter}
-          onPlotChange={setPlotIndex}
-          onSelect={handleSelect}
-          onReturn={onReturn}
-          filterHeroes={filterHeroes}
+        <TravelRunner
+          key={`${travel.direction}-${travel.place}`}
+          place={travel.place}
+          direction={travel.direction}
           reducedMotion={reducedMotion}
+          from={renderSceneView(travel.from, {
+            active: true,
+            targetPlace: travel.place,
+          })}
+          to={renderSceneView(travel.to, {
+            active: true,
+            targetPlace: travel.place,
+          })}
+          onCut={onCutTravel}
+          onDone={onTravelDone}
         />
       )}
 
-      {/* Footer chrome (plaque left, legend right) above the view. */}
+      {/* Footer chrome (plaque left, legend right) above the view. It sits
+          OUTSIDE the travel stage so it — like the site header / toggles — stays
+          fixed and unzoomed during a travel transition. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40">
         <Footer mode={mode} />
       </div>
-
-      {/* The travel overlay plays over the map/place view during the transition
-          window and reports completion via `onTravelDone`. It is `aria-hidden`
-          and never traps focus; arrival focus is moved by `onTravelDone`. */}
-      {travelingTo !== null ? (
-        <TravelTransition
-          key={travelingTo}
-          place={travelingTo}
-          creatureNames={travelNames}
-          reducedMotion={reducedMotion}
-          onDone={onTravelDone}
-        />
-      ) : null}
     </div>
   );
 }

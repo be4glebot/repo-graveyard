@@ -32,12 +32,15 @@ export interface PagerProps {
   onPlotChange: (index: number) => void;
 }
 
-/** Shared bordered `.btn` treatment for the two pager controls. */
+/**
+ * Shared bevelled-iron `.btn2` treatment for the two pager controls. The base
+ * class from the boards owns the box, Cinzel uppercase label, border, and
+ * background (Req 7.1); the utilities here carry only interaction and disabled
+ * state so the two controls still disable correctly at the plot ends.
+ */
 const PAGER_BUTTON = [
-  "inline-flex h-11 items-center gap-2 rounded",
-  "border border-scene-fg-faint bg-night-sky/80 px-4",
-  "font-ui text-sm text-scene-fg",
-  "transition-colors enabled:cursor-pointer enabled:hover:bg-candle-400/10",
+  "btn2 transition-colors",
+  "enabled:cursor-pointer enabled:hover:bg-candle-400/10",
   "disabled:cursor-not-allowed disabled:opacity-40",
   "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
 ].join(" ");
