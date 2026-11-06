@@ -100,6 +100,26 @@ export interface EstateMapProps {
 }
 
 /**
+ * Per-place absolute position classes, matching `EstateMap.dc.html`'s board
+ * arrangement (a ~1440x900 canvas). Each entry positions the place's root
+ * `<button>` absolutely and gives the gate a higher stacking context so it
+ * reads in front of the others. The canvas pixel coords map to % of the board:
+ *
+ *   sky    `left:44%; top:168px` → `left-[44%] top-[18%]`   (top-centre)
+ *   ground `left:14%; top:420px` → `left-[14%] top-[46%]`   (left, above fence)
+ *   crypt  `left:72%; top:400px` → `left-[72%] top-[44%]`   (right, mausoleum)
+ *   gate   `left:38%; top:610px` → `left-[38%] top-[66%]`   (bottom-centre, front)
+ *
+ * The lower band sits at z-20; the gate rides z-30 so it overlaps cleanly.
+ */
+const PLACE_POSITIONS: Record<PlaceId, string> = {
+  sky: "absolute left-[44%] top-[18%] z-20",
+  ground: "absolute left-[14%] top-[46%] z-20",
+  crypt: "absolute left-[72%] top-[44%] z-20",
+  gate: "absolute left-[38%] top-[66%] z-30",
+};
+
+/**
  * Groups rows by `placeOf` into the four place buckets. Every place key is
  * present (possibly empty) so an empty place still renders (Req 1.6), and the
  * input order is preserved within each bucket for stable per-place ordering.
@@ -140,29 +160,35 @@ export default function EstateMap({
       className="relative h-dvh w-full overflow-hidden"
       style={{ backgroundColor: "var(--color-night-sky)" }}
     >
-      {/* --- Reused painted stack, same back-to-front order as Scene. --- */}
-      <div className="absolute inset-0 z-0">
+      {/* --- Reused painted stack, same back-to-front order as Scene. These are
+          decorative full-cover layers, so each is `pointer-events-none` — only
+          the real controls (the place buttons, the chrome) take clicks. --- */}
+      <div className="pointer-events-none absolute inset-0 z-0">
         <Sky />
       </div>
-      <div className="absolute inset-0 z-0">
+      <div className="pointer-events-none absolute inset-0 z-0">
         <Backdrop />
       </div>
-      <div className="absolute inset-0 z-10">
+      <div className="pointer-events-none absolute inset-0 z-10">
         <Moon rows={rows} />
       </div>
 
       {/* --- Band: fog over the place links, matching the old scene's z-30
           intent (density encodes the estate's zombie count, Req 3.3). `Fog`
           is itself inset-0 absolute, so it rides this full-bleed z-30 wrapper
-          placed over the Moon/Backdrop stack and under the z-40 atmosphere. --- */}
-      <div className="absolute inset-0 z-30">
+          placed over the Moon/Backdrop stack and under the z-40 atmosphere.
+          Decorative, so `pointer-events-none` — otherwise it would swallow the
+          clicks meant for the place buttons beneath it. --- */}
+      <div className="pointer-events-none absolute inset-0 z-30">
         <Fog zombieCount={zombieCount} />
       </div>
 
       {/* --- Band: atmosphere + lightning, over everything but the chrome
           (lightning cadence encodes the ancient-zombie count, Req 3.4/3.5).
-          `Lightning` is inset-0 absolute and self-hides at ancient count 0. --- */}
-      <div className="absolute inset-0 z-40">
+          `Lightning` is inset-0 absolute and self-hides at ancient count 0.
+          This z-40 layer sits above the places band, so it MUST be
+          `pointer-events-none` or it swallows every click on the map. --- */}
+      <div className="pointer-events-none absolute inset-0 z-40">
         <Atmosphere />
         <Lightning ancientCount={ancientCount} />
       </div>
@@ -176,18 +202,13 @@ export default function EstateMap({
 
       {/* --- Map heading: a programmatic focus target (`tabIndex={-1}`) so
           returning from a place can move focus back to the map when the
-          originating place link cannot be found (Req 13.7). Visually
-          unobtrusive but present in the accessibility tree as the map's name. --- */}
-      <div className="pointer-events-none absolute inset-x-0 top-[6%] z-40 flex justify-center">
-        <h1
-          data-testid="map-heading"
-          tabIndex={-1}
-          className="pointer-events-auto m-0 text-center font-heading text-2xl font-bold uppercase tracking-[4px] text-scene-fg outline-none focus-visible:ring-2 focus-visible:ring-candle-400"
-          style={{ textShadow: "0 1px 6px var(--color-night-sky)" }}
-        >
-          The Estate
-        </h1>
-      </div>
+          originating place link cannot be found (Req 13.7). Rendered `sr-only`
+          so it carries the map's accessible name and stays focusable in the
+          a11y tree WITHOUT painting a visible title that overlaps the summary /
+          turning-soon chrome (the painted board has no "THE ESTATE" title). --- */}
+      <h1 data-testid="map-heading" tabIndex={-1} className="sr-only">
+        The Estate
+      </h1>
 
       {/* --- Turning-soon notice: rendered iff pickTurningSoon named a ghost
           (Req 1.3/1.4). Its "Go to it" action jumps into the sky place on the
@@ -200,10 +221,21 @@ export default function EstateMap({
       </div>
 
       {/* --- The four place links in display order sky, gate, ground, crypt
-          (Req 1.2). Each place gets only its own rows (grouped by placeOf). --- */}
+          (Req 1.2). Each place gets only its own rows (grouped by placeOf).
+
+          Layout matches `docs/design-canvas/EstateMap.dc.html` (a ~1440x900
+          board): the places are positioned ABSOLUTELY rather than flowed in a
+          row — the sky top-centre, hallowed ground to the left above the fence,
+          the crypt to the right at the mausoleum, and the gate bottom-centre in
+          front of the gate (a higher z so it reads in front). The band itself
+          is a full-cover `pointer-events-none` wrapper so it never swallows a
+          click; each `Place` gets `pointer-events-auto` so only the place
+          buttons are clickable. Canvas pixel coords are converted to % of the
+          1440x900 board: e.g. sky `left:44%; top:168px` → `left-[44%]
+          top-[18%]`. --- */}
       <div
         data-testid="estate-map-places"
-        className="absolute inset-x-0 bottom-[8%] top-[28%] z-30 flex flex-wrap items-end justify-center gap-x-10 gap-y-12 px-6"
+        className="pointer-events-none absolute inset-0 z-20"
       >
         {PLACE_ORDER.map((place) => (
           <Place
@@ -211,6 +243,7 @@ export default function EstateMap({
             place={place}
             rows={grouped[place]}
             onEnter={onEnterPlace}
+            className={`pointer-events-auto ${PLACE_POSITIONS[place]}`}
           />
         ))}
       </div>

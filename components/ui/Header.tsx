@@ -108,85 +108,92 @@ export default function Header({
   const hasError = error !== null;
 
   return (
-    <header className="flex flex-col gap-3 font-ui text-scene-fg">
-      <div className="flex flex-wrap items-baseline gap-3">
-        <h1
-          className="font-wordmark text-3xl leading-none text-crimson-400"
-          style={{ textShadow: "0 0 12px var(--color-crimson-glow)" }}
-        >
-          Repo Graveyard
-        </h1>
-        {mode === "estate" ? (
-          <span className="rounded-full border border-crimson-400 px-2 py-0.5 font-ui text-xs uppercase tracking-wide text-crimson-200">
-            Haunted Estate
-          </span>
-        ) : null}
-        {username ? (
-          <span
-            data-testid="header-username-badge"
-            className="rounded-full border border-scene-fg-faint bg-night-sky/60 px-3 py-0.5 font-heading text-xs font-bold uppercase tracking-[2px] text-scene-fg"
+    <header className="flex items-start justify-between gap-4 font-ui text-scene-fg">
+      {/* LEFT cluster: wordmark + username badge on one row, summary beneath. */}
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1
+            className="font-wordmark text-3xl leading-none text-crimson-400"
+            style={{ textShadow: "0 0 12px var(--color-crimson-glow)" }}
           >
-            {username}
-          </span>
-        ) : null}
+            Repo Graveyard
+          </h1>
+          {mode === "estate" ? (
+            <span className="rounded-full border border-crimson-400 px-2 py-0.5 font-ui text-xs uppercase tracking-wide text-crimson-200">
+              Haunted Estate
+            </span>
+          ) : null}
+          {username ? (
+            <span
+              data-testid="header-username-badge"
+              className="rounded-full border border-scene-fg-faint bg-night-sky/60 px-3 py-0.5 font-heading text-xs font-bold uppercase tracking-[2px] text-scene-fg"
+            >
+              {username}
+            </span>
+          ) : null}
+        </div>
+
+        <SummaryLine rows={rows} counts={counts} />
       </div>
 
-      <SummaryLine rows={rows} counts={counts} />
+      {/* RIGHT cluster: a compact visit box + the two toggles on ONE row. The
+          validation message sits below the row (still role="alert"), so it
+          never widens the control strip. */}
+      <div className="flex flex-col items-end gap-1">
+        <div className="flex items-center gap-2">
+          <form
+            onSubmit={handleSubmit}
+            noValidate
+            className="flex items-center gap-2"
+          >
+            <label htmlFor={inputId} className="sr-only">
+              Visit another graveyard
+            </label>
+            <input
+              id={inputId}
+              name="visit-username"
+              type="text"
+              inputMode="text"
+              autoComplete="off"
+              maxLength={USERNAME_MAX_LENGTH}
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              aria-invalid={hasError}
+              aria-describedby={hasError ? errorId : undefined}
+              placeholder="Visit another graveyard"
+              className={
+                "w-44 rounded-md border border-scene-fg-faint bg-night-sky/60 px-3 py-2 " +
+                "font-fact text-sm text-scene-fg placeholder:text-scene-fg-faint " +
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
+              }
+            />
+            <button
+              type="submit"
+              className={
+                "rounded-md border border-candle-400 px-3 py-2 font-ui text-sm text-scene-fg " +
+                "transition-colors hover:bg-candle-400/20 " +
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
+              }
+            >
+              Visit
+            </button>
+          </form>
 
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-        className="flex flex-col gap-1 sm:flex-row sm:items-end sm:gap-2"
-      >
-        <div className="flex flex-col gap-1">
-          <label htmlFor={inputId} className="font-ui text-xs text-scene-fg-muted">
-            Visit another graveyard
-          </label>
-          <input
-            id={inputId}
-            name="visit-username"
-            type="text"
-            inputMode="text"
-            autoComplete="off"
-            maxLength={USERNAME_MAX_LENGTH}
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-            aria-invalid={hasError}
-            aria-describedby={hasError ? errorId : undefined}
-            placeholder="octocat"
-            className={
-              "w-full rounded-md border border-scene-fg-faint bg-night-sky/60 px-3 py-2 " +
-              "font-fact text-scene-fg placeholder:text-scene-fg-faint sm:w-56 " +
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
-              "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
-            }
+          <Toggle
+            label="Lights on"
+            pressed={lightsOn}
+            onChange={onLightsOnChange}
           />
+          <Toggle label="Sound" pressed={soundOn} onChange={onSoundChange} />
         </div>
-        <button
-          type="submit"
-          className={
-            "rounded-md border border-candle-400 px-4 py-2 font-ui text-scene-fg " +
-            "transition-colors hover:bg-candle-400/20 " +
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
-            "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
-          }
-        >
-          Visit
-        </button>
-      </form>
-      {hasError ? (
-        <p id={errorId} role="alert" className="font-ui text-sm text-crimson-200">
-          {error}
-        </p>
-      ) : null}
 
-      <div className="flex flex-wrap items-center gap-4">
-        <Toggle
-          label="Lights on"
-          pressed={lightsOn}
-          onChange={onLightsOnChange}
-        />
-        <Toggle label="Sound" pressed={soundOn} onChange={onSoundChange} />
+        {hasError ? (
+          <p id={errorId} role="alert" className="font-ui text-sm text-crimson-200">
+            {error}
+          </p>
+        ) : null}
       </div>
     </header>
   );

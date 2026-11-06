@@ -89,9 +89,16 @@ export interface PlaceProps {
   rows: GraveyardRow[];
   /** Raised with the place id when the link is activated (click / Enter). */
   onEnter: (place: PlaceId) => void;
+  /**
+   * Extra classes appended to the root `<button>`. The map uses this to carry
+   * the per-place absolute positioning (`absolute left-[..] top-[..] z-..`) and
+   * `pointer-events-auto`, so each place button is the only clickable element
+   * within the otherwise `pointer-events-none` places band.
+   */
+  className?: string;
 }
 
-export default function Place({ place, rows, onEnter }: PlaceProps) {
+export default function Place({ place, rows, onEnter, className }: PlaceProps) {
   const meta = PLACES[place];
   const hasRows = rows.length > 0;
 
@@ -149,6 +156,7 @@ export default function Place({ place, rows, onEnter }: PlaceProps) {
         "transition-[transform,filter] duration-200 ease-out",
         "motion-safe:hover:scale-[1.02] motion-safe:focus-visible:scale-[1.02]",
         "outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-candle-400)] focus-visible:ring-offset-0",
+        className ?? "",
       ].join(" ")}
     >
       {/* Representatives: decorative inside the place link, so the group is

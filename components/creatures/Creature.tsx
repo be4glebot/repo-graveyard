@@ -32,6 +32,7 @@ import {
 } from "react";
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
+import { type LifecycleState } from "@/lib/lifecycle";
 import {
   animationDelay,
   creatureAccessibleName,
@@ -40,6 +41,17 @@ import {
 
 /** Intrinsic pixel box the creature art is drawn into before layout scaling. */
 const CREATURE_ART_SIZE = 140;
+
+/**
+ * Decorative art box (px), sized per the estate-map canvas: the "at rest"
+ * states (tombstone/coffin) read as small ~90px markers, while the active
+ * creatures (ghost/risen/zombie) read a touch larger at ~135px. Used only on
+ * the decorative path (the estate-map representatives); the interactive path
+ * keeps the full `CREATURE_ART_SIZE`.
+ */
+function decorativeArtSize(state: LifecycleState): number {
+  return state === "tombstone" || state === "coffin" ? 90 : 135;
+}
 
 export interface CreatureProps {
   /** The classified repository this creature represents. */
@@ -122,7 +134,10 @@ export default function Creature({
   );
 
   // The art + per-decay motion wrapper is identical in both modes; only the
-  // enclosing element (interactive button vs. decorative div) differs.
+  // enclosing element (interactive button vs. decorative div) differs, and the
+  // decorative path draws a smaller box so the estate-map representatives read
+  // as the small markers the canvas calls for (tombstones/coffins smallest).
+  const artSize = decorative ? decorativeArtSize(row.state) : CREATURE_ART_SIZE;
   const inner = (
     <span
       className={animationClassName}
@@ -132,8 +147,8 @@ export default function Creature({
         src={`/art/${basename}.webp`}
         alt=""
         aria-hidden
-        width={CREATURE_ART_SIZE}
-        height={CREATURE_ART_SIZE}
+        width={artSize}
+        height={artSize}
         draggable={false}
         className="pointer-events-none select-none"
       />

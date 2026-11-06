@@ -206,30 +206,37 @@ export default function PlaceView({
       className="relative h-dvh w-full overflow-hidden"
       style={{ backgroundColor: "var(--color-night-sky)" }}
     >
-      {/* --- Reused backdrop stack (same painted estate as the map). --- */}
-      <div className="absolute inset-0 z-0">
+      {/* --- Reused backdrop stack (same painted estate as the map). These are
+          decorative full-cover layers, so each is `pointer-events-none` — only
+          the real place chrome (heading/return, chips, depth rows, pager) takes
+          clicks. --- */}
+      <div className="pointer-events-none absolute inset-0 z-0">
         <Sky />
       </div>
-      <div className="absolute inset-0 z-0">
+      <div className="pointer-events-none absolute inset-0 z-0">
         <Backdrop />
       </div>
-      <div className="absolute inset-0 z-10">
+      <div className="pointer-events-none absolute inset-0 z-10">
         <Moon rows={rows} />
       </div>
 
       {/* --- Gate-only fog: density encodes the gate's zombie count (Req 3.3).
           Placed on a z-30 wrapper under the depth rows and over the backdrop,
-          matching the old scene's band order; suppressed for other places. --- */}
+          matching the old scene's band order; suppressed for other places.
+          Decorative, so `pointer-events-none` — otherwise it would swallow the
+          clicks meant for the depth-row creatures beneath it. --- */}
       {isGate ? (
-        <div className="absolute inset-0 z-30">
+        <div className="pointer-events-none absolute inset-0 z-30">
           <Fog zombieCount={zombieCount} />
         </div>
       ) : null}
 
       {/* --- Atmosphere (+ gate-only lightning) in the z-40 band. Lightning
           cadence encodes the gate's ancient-zombie count (Req 3.4/3.5) and
-          self-hides at count 0; it renders only for the gate. --- */}
-      <div className="absolute inset-0 z-40">
+          self-hides at count 0; it renders only for the gate. This z-40 layer
+          sits above the depth rows and chips, so it MUST be
+          `pointer-events-none` or it swallows every click in the place. --- */}
+      <div className="pointer-events-none absolute inset-0 z-40">
         <Atmosphere />
         {isGate ? <Lightning ancientCount={ancientCount} /> : null}
       </div>
