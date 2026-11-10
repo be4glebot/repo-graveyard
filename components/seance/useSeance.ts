@@ -46,7 +46,9 @@ export function useSeance({
 
   // Latest inputs, read by the attempt effect without re-triggering it.
   const latest = useRef({ owner, repo, fixture, isFixture, reduced });
-  latest.current = { owner, repo, fixture, isFixture, reduced };
+  useEffect(() => {
+    latest.current = { owner, repo, fixture, isFixture, reduced };
+  });
 
   const start = useCallback(
     () => dispatch({ type: "START", reduced: latest.current.reduced }),

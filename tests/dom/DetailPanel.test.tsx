@@ -244,7 +244,9 @@ describe("SceneView opens the panel (5.1-5.8)", () => {
     await user.click(creature("good-zombie"));
     const d = dialog()!;
     expect(d.textContent).toContain("no signs it was finished");
-    expect(d.querySelector("img")).toBeNull();
+    // The decorative portrait is the only image allowed (Spec 4); injected markup creates none.
+    expect(d.querySelectorAll('img:not([data-testid="detail-portrait"] img)').length).toBe(0);
+    expect(d.querySelector('[data-testid="detail-portrait"] img')).not.toBeNull();
     expect(d.querySelector("b")).toBeNull();
     expect(d.textContent).toContain("<img src=x onerror=alert(1)><b>bold</b>");
   });
@@ -445,14 +447,18 @@ describe("DetailPanel content (6.1-6.14)", () => {
     },
   );
 
-  it("renders an empty Actions landmark with no controls (6.14)", () => {
+  it("renders an Actions landmark with exactly one control, Hold a séance (6.14)", () => {
+    // Spec 3 -> Spec 4: the Actions slot now holds the séance control and nothing else.
     renderPanel();
     const actions = dialog()!.querySelector<HTMLElement>(
       'section[aria-label="Actions"][data-slot="actions"]',
     )!;
     expect(actions).not.toBeNull();
-    expect((actions.textContent ?? "").trim()).toBe("");
-    expect(actions.querySelector("button, a, input, select, textarea, [tabindex]")).toBeNull();
+    const controls = actions.querySelectorAll("button, a, input, select, textarea, [tabindex]");
+    expect(controls.length).toBe(1);
+    expect(controls[0].tagName).toBe("BUTTON");
+    expect((controls[0].textContent ?? "").replace(/\s+/g," ").trim()).toContain("Hold a séance");
+    expect((actions.textContent ?? "").replace(/\s+/g," ").trim()).toBe((controls[0].textContent ?? "").replace(/\s+/g," ").trim());
   });
 
   it("renders HTML in the description literally (9.5)", () => {

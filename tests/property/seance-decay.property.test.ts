@@ -10,6 +10,7 @@ import {
   flickerFor,
   type DecayProfileId,
 } from "../../lib/seance-decay";
+import { buildRitualPlan } from "../../lib/seance-ritual";
 
 const STATES = ["ghost", "risen", "zombie", "tombstone", "coffin"] as const;
 
@@ -103,4 +104,31 @@ describe("seance-decay properties", () => {
       { numRuns: 200 },
     );
   });
-});
+
+  // Feature: the-seance, Property 17: Ritual plan stays within bounds
+  // **Validates: Requirements 10.3**
+  it("ritual plan stays within bounds and is deterministic", () => {
+    fc.assert(
+      fc.property(fc.string(), (seed) => {
+        const plan = buildRitualPlan(seed);
+        expect(buildRitualPlan(seed)).toEqual(plan);
+
+        const { candles } = plan;
+        expect(candles.length).toBeGreaterThanOrEqual(3);
+        expect(candles.length).toBeLessThanOrEqual(6);
+
+        for (let i = 1; i < candles.length; i += 1) {
+          const gap = candles[i].igniteAtMs - candles[i - 1].igniteAtMs;
+          expect(gap).toBeGreaterThanOrEqual(200);
+          expect(gap).toBeLessThanOrEqual(600);
+        }
+        for (const c of candles) {
+          expect(c.fadeMs).toBeGreaterThanOrEqual(500);
+          expect(c.fadeMs).toBeLessThanOrEqual(1500);
+        }
+        const last = candles[candles.length - 1];
+        expect(last.igniteAtMs + last.fadeMs).toBeLessThanOrEqual(2000);
+      }),
+      { numRuns: 200 },
+    );
+  });});

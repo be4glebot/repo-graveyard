@@ -80,8 +80,17 @@ async function EstateContent({ searchParams }: EstatePageProps) {
   const { repos, overrides } = resolveEstate(result.value, renderedAt);
   const rows = buildRows(repos, overrides, renderedAt);
 
+  // Pre-written séances keyed by repo name (unvalidated; the client validates
+  // against the séance result schema at use). Estate only — live pages never
+  // receive this, so estate.json stays out of their bundle.
+  const seanceFixtures: Record<string, unknown> = {};
+  for (const repo of result.value.repos) {
+    if (repo.seanceResult !== undefined) seanceFixtures[repo.name] = repo.seanceResult;
+  }
+
   return (
     <SceneView
+      seanceFixtures={seanceFixtures}
       rows={rows}
       repos={repos}
       truncated={false}

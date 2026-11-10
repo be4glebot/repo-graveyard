@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import type { RefObject } from "react";
+import type { MutableRefObject, RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { LifecycleState } from "@/lib/lifecycle";
 import type { RepoFacts } from "@/lib/lifecycle";
@@ -11,8 +11,16 @@ import { explanationLine } from "@/lib/repoDetails/explanationLine";
 import { buildGitHubUrl } from "@/lib/repoDetails/githubUrl";
 import { homepageDomain, isValidHttpsHomepage } from "@/lib/repoDetails/homepage";
 import ExternalLink from "./ExternalLink";
+import Portrait from "./Portrait";
+import {
+  SeanceButton,
+  SeanceProvider,
+  SeanceRegion,
+} from "@/components/seance/SeanceRegion";
 
 export interface DetailPanelProps {
+  /** Pre-written séance for a Haunted Estate repo; only passed when `isFixture`. */
+  seanceFixture?: unknown;
   row: RepoRow | undefined;
   owner: string;
   classification: { state: LifecycleState; decayLevel: number | null };
@@ -80,8 +88,12 @@ function PanelModal({
   sceneRootId,
   openerRef,
   getFallbackFocus,
+  seanceFixture,
 }: DetailPanelProps & { row: RepoRow }) {
   const headingId = useId();
+  // Filled by SeanceRegion; Escape asks it first (skip ritual / settle reveal).
+  const escapeClaimRef = useRef<(() => boolean) | null>(null);
+  const [ritual, setRitual] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
@@ -125,6 +137,7 @@ function PanelModal({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
+        if (escapeClaimRef.current?.()) return;
         onCloseRef.current();
         return;
       }
@@ -208,29 +221,52 @@ function PanelModal({
             : `opacity ${duration} ease-out, transform ${duration} ease-out`,
         }}
       >
-        <div className="flex items-start justify-between gap-3 p-4">
-          <h2 id={headingId} className="font-display text-xl">
-            {row.name}
-          </h2>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Close record"
-            className="cursor-pointer rounded-md border border-candle-400 px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-candle-400"
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <PanelContent
-          row={row}
+        <SeanceProvider
+          key={`${owner}/${row.name}`}
           owner={owner}
-          classification={classification}
-          facts={facts}
-          renderedAt={renderedAt}
+          repo={row.name}
+          fixture={seanceFixture}
           isFixture={isFixture}
-          revivedAt={revivedAt}
-        />
+          reduced={reduced}
+        >
+          {/* Header sits above the ritual layer (z-10) so Close stays usable. */}
+          <div className="relative z-20 flex items-start justify-between gap-3 p-4">
+            <h2
+              id={headingId}
+              className="font-heading text-xl uppercase tracking-[2px]"
+            >
+              {row.name}
+            </h2>
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={onClose}
+              aria-label="Close record"
+              className="cursor-pointer rounded-md border border-candle-400 px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-candle-400"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <Portrait
+            name={row.name}
+            state={classification.state}
+            decayLevel={classification.decayLevel}
+            ritual={ritual}
+          />
+          <PanelContent
+            row={row}
+            owner={owner}
+            classification={classification}
+            facts={facts}
+            renderedAt={renderedAt}
+            isFixture={isFixture}
+            revivedAt={revivedAt}
+            ritual={ritual}
+            reduced={reduced}
+            onRitualChange={setRitual}
+            escapeClaimRef={escapeClaimRef}
+          />
+        </SeanceProvider>
       </div>
     </div>
   );
@@ -240,7 +276,11 @@ function PanelModal({
 const FALLBACK_LANGUAGE_COLOR = "var(--color-scene-fg-faint)";
 
 const PILL =
-  "inline-block rounded-full border border-iron-border px-2.5 py-0.5 font-mono text-[11px] lowercase tracking-wide text-moon-100";
+  "inline-block rounded-full border border-iron-border px-2.5 py-0.5 font-fact text-[11px] lowercase tracking-wide text-moon-100";
+
+/** Section heading, matching the AI region heading and Seance.dc.html. */
+const SECTION_HEADING =
+  "m-0 mb-3 font-heading text-[13px] uppercase tracking-[2px] text-moon-300";
 
 function count(n: number): number {
   return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
@@ -275,10 +315,20 @@ function PanelContent({
   renderedAt,
   isFixture,
   revivedAt,
+  ritual,
+  reduced,
+  onRitualChange,
+  escapeClaimRef,
 }: Pick<
   DetailPanelProps,
   "owner" | "classification" | "facts" | "renderedAt" | "isFixture" | "revivedAt"
-> & { row: RepoRow }) {
+> & {
+  row: RepoRow;
+  ritual: boolean;
+  reduced: boolean;
+  onRitualChange: (active: boolean) => void;
+  escapeClaimRef: MutableRefObject<(() => boolean) | null>;
+}) {
   const description =
     row.description !== null && row.description.trim() !== ""
       ? row.description
@@ -299,88 +349,114 @@ function PanelContent({
 
   return (
     <div className="px-4 pb-6">
-      <p className="font-mono text-xs text-plaque-sub">{owner}</p>
+      <div data-ritual-dim={ritual ? "" : undefined}>
+        <p className="font-fact text-xs text-plaque-sub">{owner}</p>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        <span className={PILL}>{classification.state}</span>
-        <span className={PILL}>
-          {decayWord(classification.state, classification.decayLevel)}
-        </span>
-        {row.isArchived && <span className={PILL}>Archived</span>}
-        {row.isFork && <span className={PILL}>Fork</span>}
-      </div>
-
-      <p className="mt-4 text-sm italic leading-snug">{explanation}</p>
-
-      <p className="mt-4 text-sm leading-snug">
-        {description ?? "No epitaph was written."}
-      </p>
-
-      {topics.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5">
-          {topics.map((t, i) => (
-            <li key={`${i}-${t}`} className={PILL}>
-              {t}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <dl className="mt-4 grid grid-cols-3 gap-2 font-mono text-xs">
-        <div>
-          <dt className="text-plaque-sub">Stars</dt>
-          <dd>{count(row.stargazerCount)}</dd>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className={PILL}>{classification.state}</span>
+          <span className={PILL}>
+            {decayWord(classification.state, classification.decayLevel)}
+          </span>
+          {row.isArchived && <span className={PILL}>Archived</span>}
+          {row.isFork && <span className={PILL}>Fork</span>}
         </div>
-        <div>
-          <dt className="text-plaque-sub">Forks</dt>
-          <dd>{count(row.forkCount)}</dd>
-        </div>
-        <div>
-          <dt className="text-plaque-sub">Open issues</dt>
-          <dd>{count(row.openIssueCount)}</dd>
-        </div>
-      </dl>
 
-      {language && (
-        <p className="mt-3 inline-flex items-center gap-1.5 font-mono text-xs">
-          <span
-            aria-hidden="true"
-            data-testid="language-dot"
-            className="inline-block h-2.5 w-2.5 rounded-full"
-            style={{ backgroundColor: language.color ?? FALLBACK_LANGUAGE_COLOR }}
-          />
-          {language.name}
+        <p className="mt-4 font-narrative text-sm italic leading-snug">
+          {explanation}
         </p>
-      )}
 
-      <p className="mt-3 font-mono text-xs text-plaque-sub">
-        Created {relativeDate(row.createdAt, renderedAt)}
-      </p>
-      <p className="font-mono text-xs text-plaque-sub">
-        Last push {relativeDate(row.pushedAt, renderedAt)}
-      </p>
+        <p className="mt-4 text-sm leading-snug">
+          {description ?? "No epitaph was written."}
+        </p>
 
-      <div className="mt-5 flex flex-col gap-2 text-sm">
-        {isFixture ? (
-          <p className="font-mono text-xs italic text-plaque-sub">
-            Sample repository
+        {topics.length > 0 && (
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {topics.map((t, i) => (
+              <li key={`${i}-${t}`} className={PILL}>
+                {t}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <section aria-label="From GitHub" className="mt-6">
+          <h3 className={SECTION_HEADING}>From GitHub</h3>
+
+          <dl className="grid grid-cols-3 gap-2 font-fact text-xs">
+            <div>
+              <dt className="text-plaque-sub">Stars</dt>
+              <dd>{count(row.stargazerCount)}</dd>
+            </div>
+            <div>
+              <dt className="text-plaque-sub">Forks</dt>
+              <dd>{count(row.forkCount)}</dd>
+            </div>
+            <div>
+              <dt className="text-plaque-sub">Open issues</dt>
+              <dd>{count(row.openIssueCount)}</dd>
+            </div>
+          </dl>
+
+          {language && (
+            <p className="mt-3 inline-flex items-center gap-1.5 font-fact text-xs">
+              <span
+                aria-hidden="true"
+                data-testid="language-dot"
+                className="inline-block h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: language.color ?? FALLBACK_LANGUAGE_COLOR }}
+              />
+              {language.name}
+            </p>
+          )}
+
+          <p className="mt-3 font-fact text-xs text-plaque-sub">
+            Created {relativeDate(row.createdAt, renderedAt)}
           </p>
-        ) : (
-          <ExternalLink
-            href={buildGitHubUrl(owner, row.name)}
-            className="inline-block self-start rounded-md border border-candle-400 px-3 py-1.5 text-candle-400"
-          >
-            Open on GitHub
-          </ExternalLink>
-        )}
-        {domain && row.homepageUrl && (
-          <ExternalLink href={row.homepageUrl} className="self-start">
-            {domain}
-          </ExternalLink>
-        )}
+          <p className="font-fact text-xs text-plaque-sub">
+            Last push {relativeDate(row.pushedAt, renderedAt)}
+          </p>
+
+          <div className="mt-5 flex flex-col gap-2 text-sm">
+            {isFixture ? (
+              <p className="font-fact text-xs italic text-plaque-sub">
+                Sample repository
+              </p>
+            ) : (
+              <ExternalLink
+                href={buildGitHubUrl(owner, row.name)}
+                className="inline-block self-start rounded-md border border-candle-400 px-3 py-1.5 text-candle-400"
+              >
+                Open on GitHub
+              </ExternalLink>
+            )}
+            {domain && row.homepageUrl && (
+              <ExternalLink href={row.homepageUrl} className="self-start">
+                {domain}
+              </ExternalLink>
+            )}
+          </div>
+        </section>
+
+        <section
+          aria-label="Actions"
+          data-slot="actions"
+          className="mt-6 flex flex-col gap-2"
+        >
+          <SeanceButton />
+        </section>
       </div>
 
-      <section aria-label="Actions" data-slot="actions" />
+      <div className="mt-6">
+        <SeanceRegion
+          owner={owner}
+          repo={row.name}
+          state={classification.state}
+          decayLevel={classification.decayLevel}
+          reduced={reduced}
+          onRitualChange={onRitualChange}
+          escapeClaimRef={escapeClaimRef}
+        />
+      </div>
     </div>
   );
 }

@@ -43,6 +43,8 @@ export interface SpiritTranscriptProps {
   /** Reduced motion: render settled immediately. */
   reduced: boolean;
   onSettled?: () => void;
+  /** Parent-driven settle (e.g. the Escape claim in SeanceRegion). */
+  forceSettled?: boolean;
 }
 
 interface Flicker {
@@ -147,6 +149,7 @@ export default function SpiritTranscript({
   decayLevel,
   reduced,
   onSettled,
+  forceSettled = false,
 }: SpiritTranscriptProps) {
   const profile = selectDecayProfile(state, decayLevel);
   const [settled, setSettled] = useState<boolean>(reduced);
@@ -161,11 +164,12 @@ export default function SpiritTranscript({
   const { sentences, wordCount } = useMemo(() => {
     const parts = splitSentences(voice ?? "");
     let words = 0;
-    const rendered = parts.map((s, idx) => {
-      const r = renderSentence(s, repoName, idx, words, !reduced, revealed);
+    const rendered: ReturnType<typeof renderSentence>["nodes"][] = [];
+    for (let idx = 0; idx < parts.length; idx++) {
+      const r = renderSentence(parts[idx], repoName, idx, words, !reduced, revealed);
       words += r.words;
-      return r.nodes;
-    });
+      rendered.push(r.nodes);
+    }
     return { sentences: rendered, wordCount: words };
   }, [voice, repoName, reduced, revealed]);
 
@@ -179,6 +183,15 @@ export default function SpiritTranscript({
       setRevealed(true);
     }
   }, [reduced]);
+
+  // Parent asked for the settled state.
+  useEffect(() => {
+    if (forceSettled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSettled(true);
+      setRevealed(true);
+    }
+  }, [forceSettled]);
 
   // Start the reveal on the next frame so the transition runs from hidden.
   useEffect(() => {
@@ -228,7 +241,6 @@ export default function SpiritTranscript({
       );
     });
     return () => timers.forEach(clearTimeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settled, reduced, voice, repoName]);
 
   if (sentences.length === 0) return null;

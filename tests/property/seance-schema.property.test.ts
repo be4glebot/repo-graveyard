@@ -157,3 +157,103 @@ describe("seance schema bounds and strictness", () => {
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// Property 3 helpers
+// ---------------------------------------------------------------------------
+
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June", "July", "August",
+  "September", "October", "November", "December", "Jan", "Feb", "Mar", "Apr",
+  "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+const month = fc
+  .tuple(fc.constantFrom(...MONTH_NAMES), fc.boolean())
+  .map(([m, lower]) => (lower ? m.toLowerCase() : m));
+const pad2 = (n: number) => String(n).padStart(2, "0");
+
+const dateTemplate: fc.Arbitrary<string> = fc.oneof(
+  // YYYY-MM-DD
+  fc
+    .tuple(fc.integer({ min: 1000, max: 9999 }), fc.integer({ min: 1, max: 12 }), fc.integer({ min: 1, max: 28 }))
+    .map(([y, m, d]) => `${y}-${pad2(m)}-${pad2(d)}`),
+  // M/D/YYYY
+  fc
+    .tuple(fc.integer({ min: 1, max: 12 }), fc.integer({ min: 1, max: 28 }), fc.integer({ min: 1000, max: 9999 }))
+    .map(([m, d, y]) => `${m}/${d}/${y}`),
+  // month then day, and day then month
+  fc.tuple(month, fc.integer({ min: 1, max: 31 })).map(([m, d]) => `${m} ${d}`),
+  fc.tuple(month, fc.integer({ min: 1, max: 31 })).map(([m, d]) => `${d} ${m}`),
+  // month then 4-digit year
+  fc.tuple(month, fc.integer({ min: 1000, max: 9999 })).map(([m, y]) => `${m} ${y}`),
+  // number followed by day / days
+  fc
+    .tuple(fc.nat({ max: 9999 }), fc.constantFrom("day", "days", " day", " days"))
+    .map(([n, unit]) => `${n}${unit.startsWith(" ") ? unit : ` ${unit}`}`),
+);
+
+const ordinaryWord = fc.stringMatching(/^[a-z]{1,10}$/).filter((w) => !/^(?:day|days)$/.test(w));
+const ambiguousWord = fc.constantFrom("may", "march", "august", "May", "March", "August");
+
+/** Sentence of letters-only words with an ambiguous month word in it, no digits. */
+const ambiguousSentence = fc
+  .tuple(
+    fc.array(ordinaryWord, { minLength: 0, maxLength: 3 }),
+    ambiguousWord,
+    fc.array(ordinaryWord, { minLength: 1, maxLength: 3 }),
+    fc.constantFrom(".", "!", "?"),
+  )
+  .map(([pre, amb, post, end]) => [...pre, amb, ...post].join(" ") + end);
+
+type TopKey = "voice" | "causeOfDeath" | "verdictReason";
+type ItemKey = "title" | "detail";
+const dateTargets: { label: string; max: number; get: (r: SeanceResult, i: number) => string; set: (r: SeanceResult, i: number, v: string) => SeanceResult }[] = [
+  ...(["voice", "causeOfDeath", "verdictReason"] as TopKey[]).map((k) => ({
+    label: k,
+    max: topMax[k],
+    get: (r: SeanceResult) => r[k],
+    set: (r: SeanceResult, _i: number, v: string) => ({ ...r, [k]: v }),
+  })),
+  ...(["title", "detail"] as ItemKey[]).map((k) => ({
+    label: `item ${k}`,
+    max: itemMax[k],
+    get: (r: SeanceResult, i: number) => r.unfinishedBusiness[i][k],
+    set: (r: SeanceResult, i: number, v: string) => withItem(r, i, { [k]: v }) as SeanceResult,
+  })),
+];
+
+describe("seance schema date and day-count detection", () => {
+  // Feature: the-seance, Property 3: Date and day-count detection
+  // **Validates: Requirements 5.6, 5.7**
+  it("rejects date templates in prose, accepts them in evidence, and accepts bare month words", () => {
+    fc.assert(
+      fc.property(
+        validResult,
+        dateTemplate,
+        fc.constantFrom(...dateTargets),
+        fc.nat(),
+        fc.array(ambiguousSentence, { minLength: 2, maxLength: 3 }),
+        (result, tpl, target, idxSeed, ambiguous) => {
+          const idx = idxSeed % result.unfinishedBusiness.length;
+          fc.pre(seanceResultSchema.safeParse(result).success);
+
+          // Prose carrying a date template is rejected.
+          const polluted = `${tpl} ${target.get(result, idx)}`;
+          fc.pre(polluted.length <= target.max); // reject for the date, not the length
+          const bad = target.set(result, idx, polluted);
+          expect(seanceResultSchema.safeParse(bad).success).toBe(false);
+
+          // The same template in an evidence string is fine.
+          const ev = withItem(result, idx, { evidence: `${tpl} ref` }) as SeanceResult;
+          expect(seanceResultSchema.safeParse(ev).success).toBe(true);
+
+          // Ordinary sentences using may / march / august with no number pass.
+          const voice = ambiguous.join(" ");
+          fc.pre(voice.length <= 600 && ambiguous.length >= 2);
+          expect(seanceResultSchema.safeParse({ ...result, voice }).success).toBe(true);
+        },
+      ),
+      { numRuns: 300 },
+    );
+  });
+});

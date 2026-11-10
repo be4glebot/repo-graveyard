@@ -4,9 +4,13 @@ import type { RepoFacts } from "@/lib/lifecycle";
 import {
   deriveEvidence,
   isGroundedEvidence,
+  neutralizeMarkers,
   truncateUtf8,
+  CLOSE_MARKER,
+  OPEN_MARKER,
   type EvidencePack,
 } from "@/lib/seance";
+import { buildSeancePrompt, FORMAT_LOCK_RULE, IGNORE_INSTRUCTIONS_RULE } from "@/lib/ai";
 
 // ---------------------------------------------------------------------------
 // Reusable arbitraries (module scope; later Séance evidence properties append
@@ -150,6 +154,286 @@ describe("seance evidence grounding", () => {
         },
       ),
       { numRuns: 300 },
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Property 5 helpers
+// ---------------------------------------------------------------------------
+
+const normLocal = (s: string): string => s.trim().toLowerCase().replace(/\s+/g, " ");
+
+/** True when the candidate is derivable by the documented rule (used only to discard accidental hits). */
+function derivable(candidate: string, d: ReturnType<typeof deriveEvidence>): boolean {
+  const e = normLocal(candidate);
+  if (d.factLines.some((fl) => normLocal(fl.text) === e)) return true;
+  const sources: string[] = [];
+  if (d.readmeText !== null) sources.push(normLocal(d.readmeText));
+  for (const c of d.commitTexts) sources.push(normLocal(c));
+  return sources.some((s) => s.includes(e));
+}
+
+/** Hex nonce; combined with a fixed prefix it is a token no generated text should contain. */
+const arbNonce = fc.stringMatching(/^[0-9a-f]{12}$/);
+
+describe("seance evidence rejection", () => {
+  // Feature: the-seance, Property 5: Non-derivable evidence is rejected
+  // **Validates: Requirements 6.6, 6.7, 6.8, 20.6, 20.26**
+  it("rejects evidence shorter than 8 characters after trimming", () => {
+    fc.assert(
+      fc.property(
+        arbEvidencePack,
+        fc.stringMatching(/^[A-Za-z0-9 :._-]{0,7}$/),
+        arbWhitespace,
+        arbWhitespace,
+        (pack, short, padL, padR) => {
+          fc.pre(normLocal(short).length < 8);
+          const d = deriveEvidence(pack);
+          expect(isGroundedEvidence(padL + short + padR, d)).toBe(false);
+        },
+      ),
+      { numRuns: 200 },
+    );
+  });
+
+  // Feature: the-seance, Property 5: Non-derivable evidence is rejected
+  // **Validates: Requirements 6.6, 6.7, 20.6, 20.26**
+  it("rejects long evidence that occurs nowhere in the Evidence_Text (unique token)", () => {
+    fc.assert(
+      fc.property(arbEvidencePack, arbNonce, arbNonce, (pack, n1, n2) => {
+        const d = deriveEvidence(pack);
+        const token = `zqxjv-${n1} unbacked ${n2}-vjxqz`;
+        fc.pre(!derivable(token, d));
+        fc.pre(!d.evidenceText.toLowerCase().includes(n1) && !d.evidenceText.toLowerCase().includes(n2));
+        expect(isGroundedEvidence(token, d)).toBe(false);
+      }),
+      { numRuns: 200 },
+    );
+  });
+
+  // Feature: the-seance, Property 5: Non-derivable evidence is rejected
+  // **Validates: Requirements 6.6, 6.8, 20.6, 20.26**
+  it("rejects a strict fragment of a Fact_Line that is not verbatim in the README or a commit", () => {
+    fc.assert(
+      fc.property(arbEvidencePack, fc.nat(), arbUnit, arbUnit, (pack, pick, a, b) => {
+        const d = deriveEvidence(pack);
+        const line = d.factLines[pick % d.factLines.length].text;
+        const cps = Array.from(line);
+        fc.pre(cps.length > 8);
+        // Strict, code-point-aligned fragment of at least 8 characters.
+        const len = 8 + Math.floor(a * (cps.length - 8)); // 8 .. cps.length - 1
+        const start = Math.floor(b * (cps.length - len + 1));
+        const fragment = cps.slice(start, start + len).join("");
+        fc.pre(fragment.length >= 8 && Array.from(fragment).length < cps.length);
+        // Discard fragments that happen to be derivable another way (e.g. equal to another line).
+        fc.pre(!derivable(fragment, d));
+        expect(isGroundedEvidence(fragment, d)).toBe(false);
+      }),
+      { numRuns: 200 },
+    );
+  });
+
+  // Feature: the-seance, Property 5: Non-derivable evidence is rejected
+  // **Validates: Requirements 6.6, 6.8, 20.6, 20.26**
+  it("rejects a Fact_Line with one word changed", () => {
+    fc.assert(
+      fc.property(arbEvidencePack, fc.nat(), fc.nat(), arbNonce, (pack, pick, wordPick, n) => {
+        const d = deriveEvidence(pack);
+        const line = d.factLines[pick % d.factLines.length].text;
+        const words = line.split(" ");
+        const i = wordPick % words.length;
+        const changed = words.map((w, idx) => (idx === i ? `zqxjv${n}` : w)).join(" ");
+        fc.pre(!derivable(changed, d));
+        expect(isGroundedEvidence(changed, d)).toBe(false);
+      }),
+      { numRuns: 200 },
+    );
+  });
+});
+
+describe("seance evidence text", () => {
+  // Feature: the-seance, Property 6: Evidence_Text is deterministic and well formed
+  // **Validates: Requirements 3.8, 3.9, 3.11, 20.26**
+  it("renders byte-identical text with ordered, gap-free labels and own-line Fact_Lines of 8 to 200 chars", () => {
+    fc.assert(
+      fc.property(arbEvidencePack, (pack) => {
+        const d1 = deriveEvidence(pack);
+        const d2 = deriveEvidence(pack);
+        expect(d1.evidenceText).toBe(d2.evidenceText);
+        expect(Buffer.from(d1.evidenceText, "utf8").equals(Buffer.from(d2.evidenceText, "utf8"))).toBe(true);
+
+        // [F#] numbered 1..n, then [C#] numbered 1..m, in that order.
+        const fLines = d1.factLines.filter((l) => l.label.startsWith("F"));
+        const cLines = d1.factLines.filter((l) => l.label.startsWith("C"));
+        expect(d1.factLines).toEqual([...fLines, ...cLines]);
+        fLines.forEach((l, i) => expect(l.label).toBe(`F${i + 1}`));
+        cLines.forEach((l, i) => expect(l.label).toBe(`C${i + 1}`));
+        expect(cLines.length).toBe(d1.commitTexts.length);
+
+        // Fact lines come first in the rendered text, each on its own line, then [R] when a README exists.
+        const lines = d1.evidenceText.split("\n");
+        d1.factLines.forEach((fl, i) => {
+          expect(lines[i]).toBe(`[${fl.label}] ${fl.text}`);
+          const len = Array.from(fl.text).length;
+          expect(len).toBeGreaterThanOrEqual(8);
+          expect(len).toBeLessThanOrEqual(200);
+          expect(fl.text).not.toMatch(/[\r\n]/);
+        });
+        if (d1.readmeText !== null) {
+          expect(lines[d1.factLines.length]).toBe("[R] README excerpt");
+        } else {
+          expect(lines.length).toBe(d1.factLines.length);
+        }
+      }),
+      { numRuns: 200 },
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Property 7: README truncation
+// ---------------------------------------------------------------------------
+
+/** Well-formed text from 0 to 5000 code points; often over 8192 bytes, with multi-byte and astral characters. */
+const arbLongText: fc.Arbitrary<string> = fc
+  .array(arbCodePoint, { maxLength: 5000 })
+  .map((cps) => cps.map((cp) => String.fromCodePoint(cp)).join(""));
+
+const utf8 = new TextEncoder();
+const utf8Decoder = new TextDecoder("utf-8", { fatal: true });
+
+function checkTruncation(text: string, maxBytes: number): void {
+  const out = truncateUtf8(text, maxBytes);
+  const outBytes = utf8.encode(out).length;
+
+  // Bounded.
+  expect(outBytes).toBeLessThanOrEqual(maxBytes);
+  // Well-formed prefix of the input (code-point aligned, no lone surrogates).
+  expect(text.startsWith(out)).toBe(true);
+  expect(out.isWellFormed()).toBe(true);
+  // Round-trips through UTF-8 unchanged, no replacement character introduced.
+  expect(utf8Decoder.decode(utf8.encode(out))).toBe(out);
+  // Longest such prefix.
+  if (out.length === text.length) {
+    expect(out).toBe(text);
+  } else {
+    const next = String.fromCodePoint(text.codePointAt(out.length)!);
+    expect(outBytes + utf8.encode(next).length).toBeGreaterThan(maxBytes);
+  }
+  if (utf8.encode(text).length <= maxBytes) expect(out).toBe(text);
+}
+
+describe("seance README truncation", () => {
+  // Feature: the-seance, Property 7: README truncation is bounded and boundary safe
+  // **Validates: Requirements 3.5, 20.20**
+  it("Property 7: README truncation is bounded and boundary safe", () => {
+    fc.assert(
+      fc.property(arbLongText, (text) => {
+        checkTruncation(text, 8192);
+      }),
+      { numRuns: 200 },
+    );
+    // Small limits land the cut on every multi-byte boundary.
+    fc.assert(
+      fc.property(arbLongText, fc.integer({ min: 0, max: 40 }), (text, max) => {
+        checkTruncation(text, max);
+      }),
+      { numRuns: 200 },
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Property 8: Untrusted text stays inside delimiters
+// ---------------------------------------------------------------------------
+
+const NESTED = "<<<EVID<<<EVIDENCE>>>ENCE>>>";
+const arbMarkerNoise: fc.Arbitrary<string> = fc
+  .array(fc.constantFrom(NESTED, ...MARKER_FRAGMENTS, "", " ", "\n"), { maxLength: 4 })
+  .map((a) => a.join(""));
+
+/** Unique token wrapped in marker noise; the token sits first so line clipping cannot drop it. */
+function wrapToken(token: string, before: string, after: string): string {
+  return `${token}${before}${after}`;
+}
+
+const countOf = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
+
+describe("seance prompt delimiters", () => {
+  // Feature: the-seance, Property 8: Untrusted text stays inside delimiters
+  // **Validates: Requirements 6.1, 6.2, 6.3, 6.4, 20.7**
+  it("keeps README, commits and free-text facts inside exactly three evidence blocks", () => {
+    fc.assert(
+      fc.property(
+        arbEvidencePack,
+        fc.array(fc.stringMatching(/^[0-9a-f]{12}$/), { minLength: 12, maxLength: 12 }),
+        fc.array(arbMarkerNoise, { minLength: 12, maxLength: 12 }),
+        (basePack, hex, noise) => {
+          const tok = (name: string, i: number) => `zq${name}${hex[i]}x`;
+          const tReadme = tok("readme", 0);
+          const tOwner = tok("owner", 1);
+          const tDesc = tok("desc", 2);
+          const tLang = tok("lang", 3);
+          const tLast = tok("last", 4);
+          const tCommits = [5, 6, 7].map((i) => tok(`commit${i}`, i));
+
+          const pack: EvidencePack = {
+            facts: {
+              ...basePack.facts,
+              description: wrapToken(tDesc, noise[0], noise[1]),
+              primaryLanguage: wrapToken(tLang, noise[2], noise[3]),
+              lastCommitMessage: wrapToken(tLast, noise[4], noise[5]),
+            },
+            readme: truncateUtf8(`${noise[6]}${NESTED}${tReadme}${noise[7]}${NESTED}`),
+            commits: tCommits.map((t, i) => wrapToken(t, noise[8 + i], NESTED)),
+          };
+          const owner = wrapToken(tOwner, noise[11], NESTED);
+
+          const derived = deriveEvidence(pack);
+          const { system, user } = buildSeancePrompt(owner, derived);
+
+          // Exactly one open and one close marker per block (3 blocks).
+          expect(countOf(user, OPEN_MARKER)).toBe(3);
+          expect(countOf(user, CLOSE_MARKER)).toBe(3);
+
+          // Markers alternate open, close, open, close, open, close.
+          const order = [...user.matchAll(/<<<EVIDENCE>>>|<<<END_EVIDENCE>>>/g)].map((m) => m[0]);
+          expect(order).toEqual([OPEN_MARKER, CLOSE_MARKER, OPEN_MARKER, CLOSE_MARKER, OPEN_MARKER, CLOSE_MARKER]);
+
+          // Removing block contents leaves none of the untrusted text.
+          const outside = user.replace(/<<<EVIDENCE>>>[\s\S]*?<<<END_EVIDENCE>>>/g, "");
+          for (const t of [tReadme, tOwner, tDesc, tLang, tLast, ...tCommits]) {
+            expect(outside).not.toContain(t);
+          }
+          // Marker fragments from untrusted text do not survive outside blocks either.
+          expect(outside).not.toContain(NESTED);
+
+          // The README token is present inside the README block (the third one).
+          const blocks = [...user.matchAll(/<<<EVIDENCE>>>([\s\S]*?)<<<END_EVIDENCE>>>/g)].map((m) => m[1]);
+          expect(blocks).toHaveLength(3);
+          expect(blocks[2]).toContain(tReadme);
+          expect(blocks[1]).toContain(tCommits[0]);
+
+          // Rules live in the system message.
+          expect(system).toContain(IGNORE_INSTRUCTIONS_RULE);
+          expect(system).toContain(FORMAT_LOCK_RULE);
+        },
+      ),
+      { numRuns: 200 },
+    );
+  });
+
+  // Feature: the-seance, Property 8: Untrusted text stays inside delimiters
+  // **Validates: Requirements 6.3, 20.7**
+  it("neutralizeMarkers leaves no marker, including nested ones", () => {
+    fc.assert(
+      fc.property(arbMarkerNoise, arbSeanceText, (noise, text) => {
+        const out = neutralizeMarkers(`${noise}${NESTED}${text}${noise}`);
+        expect(out).not.toContain(OPEN_MARKER);
+        expect(out).not.toContain(CLOSE_MARKER);
+      }),
+      { numRuns: 200 },
     );
   });
 });

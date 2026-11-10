@@ -157,6 +157,11 @@ export interface SceneViewProps {
    * and never read from `localStorage`.
    */
   estateOverrides?: Record<string, Override>;
+  /**
+   * Estate-only pre-written séances (repo name → unvalidated séance result).
+   * Live pages pass nothing.
+   */
+  seanceFixtures?: Record<string, unknown>;
 }
 
 export default function SceneView({
@@ -169,6 +174,7 @@ export default function SceneView({
   initialRepo,
   at,
   estateOverrides,
+  seanceFixtures,
 }: SceneViewProps) {
   // `truncated` is part of the loader contract and the props shape but is not
   // surfaced by the scene chrome yet (the scene has no 300-repo notice of its
@@ -727,6 +733,9 @@ export default function SceneView({
         facts={panelFacts}
         renderedAt={renderedAt}
         isFixture={mode === "estate"}
+        seanceFixture={
+          mode === "estate" ? seanceFixtures?.[panelRow.name] : undefined
+        }
         revivedAt={panelRevivedAt}
         onClose={handleClosePanel}
         sceneRootId="scene-root"
