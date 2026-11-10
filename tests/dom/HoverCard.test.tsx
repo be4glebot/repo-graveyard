@@ -5,6 +5,7 @@
  *
  * Requirements: 2.1-2.12, 3.1-3.8, 10.4
  */
+import { useEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 
@@ -52,7 +53,11 @@ function makeGraveyardRow(name: string): GraveyardRow {
 let actionsRef: HoverCardActions;
 
 function Probe() {
-  actionsRef = useHoverCardActions();
+  const actions = useHoverCardActions();
+  // Publish after commit (not during render) so tests can drive the actions.
+  useEffect(() => {
+    actionsRef = actions;
+  }, [actions]);
   return null;
 }
 

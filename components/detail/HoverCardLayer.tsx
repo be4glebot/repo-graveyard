@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { LifecycleState } from "@/lib/lifecycle";
 import type { RepoRow } from "@/lib/repoRow";
@@ -90,11 +90,16 @@ function OpenCard({
   const actions = useHoverCardActions();
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
-  const [reduced, setReduced] = useState(false);
+  // Client-only (rendered through a portal after hydration), so this can read
+  // the media query directly instead of setting state in an effect.
+  const [reduced] = useState(
+    () =>
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
 
   // Measure and place; returns false when the anchor is gone/off-screen.
-  const place = useRef<() => boolean>(() => true);
-  place.current = () => {
+  const place = useCallback((): boolean => {
     const el = ref.current;
     if (!el) return true;
     if (!anchor.isConnected) return false;
@@ -106,19 +111,17 @@ function OpenCard({
     el.style.left = `${Math.round(left)}px`;
     el.style.top = `${Math.round(top)}px`;
     return true;
-  };
+  }, [anchor]);
 
   useLayoutEffect(() => {
-    if (!place.current()) {
+    if (!place()) {
       actions.closeNow();
       return;
     }
-    setReduced(
-      typeof window.matchMedia === "function" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    );
+    // Measured and placed above; reveal now that the position is set.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShown(true);
-  }, [actions]);
+  }, [actions, place]);
 
   // Follow the anchor while open; Escape closes. Listeners live only while open.
   useEffect(() => {
@@ -127,7 +130,7 @@ function OpenCard({
       if (frame !== 0) return;
       frame = window.requestAnimationFrame(() => {
         frame = 0;
-        if (!place.current()) actions.closeNow();
+        if (!place()) actions.closeNow();
       });
     };
     const onKey = (e: KeyboardEvent) => {
@@ -144,7 +147,7 @@ function OpenCard({
       window.removeEventListener("keydown", onKey);
       if (frame !== 0) window.cancelAnimationFrame(frame);
     };
-  }, [actions]);
+  }, [actions, place]);
 
   const interactive = trigger === "pointer";
   const classification = classificationsByName.get(name);

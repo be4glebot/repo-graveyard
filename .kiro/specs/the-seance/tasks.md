@@ -429,7 +429,7 @@ Ground rules for every task:
     - No pixel or screenshot comparison against `Seance.dc.html`
     - _Requirements: 10.10, 10.11, 17.2, 17.3, 17.4, 17.8, 18.11, 20.31_
 
-- [-] 14. Final checkpoint - Ensure all tests pass
+- [x] 14. Final checkpoint - Ensure all tests pass
   - Run `npx vitest --run`, `npx tsc --noEmit` and `npm run lint`. Do not run `next build` or start a dev server. Confirm `.env.local` is untouched and unstaged. Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 15. Manual visual review (for the user)

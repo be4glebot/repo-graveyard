@@ -105,7 +105,7 @@ const mutation: fc.Arbitrary<Mutation> = fc
     sentences(2, 2),
     fc.constantFrom("a", "b"), // spare entropy
   )
-  .chain(([tk, ik, idx, badLen, bv, bl, extra, five, two]) =>
+  .chain(([, , idx, badLen, bv, bl, extra, five, two]) =>
     fc.constantFrom<Mutation>(
       ...topStringKeys.flatMap((k) => [
         { name: `${k} at max`, accept: true, apply: (r: SeanceResult) => ({ ...r, [k]: padTo(r[k], topMax[k]) }) },
