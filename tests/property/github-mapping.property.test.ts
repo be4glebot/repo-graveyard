@@ -37,10 +37,31 @@ const arbReadmeBlob: fc.Arbitrary<{ byteSize: number } | null> = fc.oneof(
 );
 
 /** The flattenable primary language: absent, or a `{ name }` wrapper. */
-const arbPrimaryLanguage: fc.Arbitrary<{ name: string } | null> = fc.oneof(
+const arbPrimaryLanguage: fc.Arbitrary<{
+  name: string;
+  color: string | null;
+} | null> = fc.oneof(
   fc.constant(null),
-  fc.record({ name: fc.string({ minLength: 1, maxLength: 20 }) }),
+  fc.record({
+    name: fc.string({ minLength: 1, maxLength: 20 }),
+    color: fc.oneof(
+      fc.constant(null),
+      fc
+        .integer({ min: 0, max: 0xffffff })
+        .map((n) => `#${n.toString(16).padStart(6, "0")}`),
+    ),
+  }),
 );
+
+/** Topics connection: 0..9 topics so both "absent" and ">5" are exercised. */
+const arbRepositoryTopics: fc.Arbitrary<{
+  nodes: { topic: { name: string } }[];
+}> = fc.record({
+  nodes: fc.array(
+    fc.record({ topic: fc.record({ name: fc.string({ minLength: 1, maxLength: 15 }) }) }),
+    { minLength: 0, maxLength: 9 },
+  ),
+});
 
 /**
  * The default branch ref, exercising every shape the mapper must flatten:
@@ -79,6 +100,8 @@ const arbRawRepoNode: fc.Arbitrary<RawRepoNode> = fc.record({
   homepageUrl: fc.oneof(fc.constant(null), fc.string()),
   stargazerCount: fc.integer({ min: 0, max: 1_000_000 }),
   primaryLanguage: arbPrimaryLanguage,
+  forkCount: fc.integer({ min: 0, max: 1_000_000 }),
+  repositoryTopics: arbRepositoryTopics,
   issues: fc.record({ totalCount: fc.integer({ min: 0, max: 5000 }) }),
   releases: fc.record({ totalCount: fc.integer({ min: 0, max: 5000 }) }),
   readmeUpper: arbReadmeBlob,
@@ -125,6 +148,41 @@ describe("Property 3: Node mapping prefers README.md", () => {
         expect(facts.isFork).toBe(node.isFork);
         expect(facts.homepageUrl).toBe(node.homepageUrl);
         expect(facts.stargazerCount).toBe(node.stargazerCount);
+      }),
+      { numRuns: 100 },
+    );
+  });
+});
+
+/**
+ * Feature: repo-details-hover-panel, Property 8: Node mapping maps language into two fields
+ *
+ * Language name -> `primaryLanguage` (string), `color ?? null` -> `languageColor`;
+ * missing language -> both null; topics capped at the first 5 in order;
+ * `forkCount` unchanged.
+ *
+ * **Validates: Requirements 1.4, 1.5, 1.6**
+ */
+describe("Property 8: Node mapping maps language into two fields", () => {
+  it("maps language to name + color, caps topics at 5 in order, and preserves forkCount", () => {
+    fc.assert(
+      fc.property(arbRawRepoNode, (node) => {
+        const facts = mapRepoNode(node);
+
+        if (node.primaryLanguage === null) {
+          expect(facts.primaryLanguage).toBeNull();
+          expect(facts.languageColor).toBeNull();
+        } else {
+          expect(facts.primaryLanguage).toBe(node.primaryLanguage.name);
+          expect(facts.languageColor).toBe(node.primaryLanguage.color ?? null);
+        }
+
+        const allTopics = node.repositoryTopics.nodes.map((n) => n.topic.name);
+        expect(facts.topics).toEqual(allTopics.slice(0, 5));
+        expect(facts.topics.length).toBeLessThanOrEqual(5);
+        if (allTopics.length === 0) expect(facts.topics).toEqual([]);
+
+        expect(facts.forkCount).toBe(node.forkCount);
       }),
       { numRuns: 100 },
     );

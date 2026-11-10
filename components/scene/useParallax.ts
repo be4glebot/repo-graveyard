@@ -63,6 +63,9 @@ export interface UseParallaxOptions {
  *  get the idle drift and the static vignette (Req 2.7). */
 const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
 
+/** Window event dispatched after each parallax frame writes `--px`/`--py`. */
+export const PARALLAX_FRAME_EVENT = "parallax-frame";
+
 /**
  * Clamp a value into the inclusive `[-1, 1]` range.
  */
@@ -154,6 +157,8 @@ export function useParallax(
       const py = clampUnit((event.clientY - cy) / (rect.height / 2));
       root.style.setProperty("--px", String(px));
       root.style.setProperty("--py", String(py));
+      // Per-frame signal for anchored overlays (hover card) to re-measure.
+      window.dispatchEvent(new CustomEvent(PARALLAX_FRAME_EVENT));
     };
 
     // Stash the latest event and schedule exactly one frame if none is pending.

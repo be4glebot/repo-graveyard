@@ -40,6 +40,8 @@ function makeNode(index: number): RawRepoNode {
     homepageUrl: null,
     stargazerCount: 0,
     primaryLanguage: null,
+    forkCount: 0,
+    repositoryTopics: { nodes: [] },
     issues: { totalCount: 0 },
     releases: { totalCount: 0 },
     readmeUpper: null,

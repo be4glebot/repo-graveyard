@@ -73,13 +73,28 @@
  * 10.6, 10.7, 10.8, 13.1, 13.2, 13.3
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from "react";
 
 import EstateMap from "@/components/scene/EstateMap";
 import Footer from "@/components/scene/Footer";
 import LightsOnTable from "@/components/scene/LightsOnTable";
 import PlaceView from "@/components/scene/PlaceView";
 import { TravelRunner } from "@/components/scene/TravelTransition";
+import HoverCardLayer from "@/components/detail/HoverCardLayer";
+import DetailPanel from "@/components/detail/DetailPanel";
+import { useRepoDeepLink } from "@/components/detail/useRepoDeepLink";
+import {
+  HoverCardProvider,
+  useHoverCardActions,
+  type HoverCardActions,
+} from "@/components/detail/HoverCardProvider";
 import Header from "@/components/ui/Header";
 import Toggle from "@/components/ui/Toggle";
 
@@ -96,6 +111,7 @@ import {
 import { buildRows, type GraveyardRow } from "@/lib/graveyard-view";
 import type { Override, RepoFacts } from "@/lib/lifecycle";
 import { readOverrides, type OverrideMap } from "@/lib/overrides";
+import { buildRepoRows } from "@/lib/repoRow";
 import {
   composeWhispers,
   pickFilterHeroes,
@@ -144,8 +160,8 @@ export interface SceneViewProps {
 }
 
 export default function SceneView({
-  rows: initialRows,
-  repos,
+  rows: serverRows,
+  repos: allRepos,
   truncated,
   username,
   renderedAt,
@@ -161,6 +177,28 @@ export default function SceneView({
   void truncated;
 
   const isEstate = mode === "estate";
+
+  // --- Validation precedes classification (Req 1.8) -------------------------
+  // FIRST pipeline stage: validate every record into a `RepoRow`, skipping (and
+  // warning on) invalid ones. Only repos that produced a valid row flow into
+  // classification (`buildRows`) and the other derivations, so a skipped repo
+  // has neither a creature nor a row. No threshold or classification change.
+  const repoRows = useMemo(() => buildRepoRows(allRepos), [allRepos]);
+  // `RepoRow` lookup keyed by name, shared by the hover card and detail panel.
+  const repoRowsByName = useMemo(
+    () => new Map(repoRows.map((row) => [row.name, row] as const)),
+    [repoRows],
+  );
+  const repos = useMemo(
+    () => allRepos.filter((repo) => repoRowsByName.has(repo.name)),
+    [allRepos, repoRowsByName],
+  );
+  const initialRows = useMemo(
+    () => serverRows.filter((row) => repoRowsByName.has(row.name)),
+    [serverRows, repoRowsByName],
+  );
+  // Exposed for the detail surfaces wired in later tasks (7.x/9.x/11.x).
+  void repoRowsByName;
 
   // --- Overrides -----------------------------------------------------------
   // LIVE: start with an empty override map so the client's first paint matches
@@ -217,9 +255,46 @@ export default function SceneView({
     initialView.selected,
   );
 
-  const handleSelect = (name: string): void => {
+  // Whether the detail panel is open for `selected`. Distinct from `selected`
+  // (which also drives the aria-pressed highlight and deep-link pre-selection),
+  // so a deep link highlights a creature without auto-opening the panel.
+  const [panelOpen, setPanelOpen] = useState<boolean>(false);
+  // Filled by `SceneHoverBridge` so close handlers can reach the hover actions.
+  const hoverActionsRef = useRef<HoverCardActions | null>(null);
+
+  // State-only open/close; history is handled by `useRepoDeepLink` (Req 8).
+  const openPanelState = useCallback((name: string): void => {
     setSelected(name);
+    setPanelOpen(true);
+  }, []);
+
+  const closePanelState = useCallback((): void => {
+    // Must run BEFORE the panel unmounts: its cleanup restores focus to the
+    // opener synchronously, which would otherwise reopen a hover card.
+    hoverActionsRef.current?.suppressNextFocusOpen();
+    setPanelOpen(false);
+  }, []);
+
+  const deepLink = useRepoDeepLink({
+    rows: repoRows,
+    panelOpen,
+    onOpenState: openPanelState,
+    onCloseState: closePanelState,
+  });
+  const { handlePopState: handleRepoPopState } = deepLink;
+
+  const handleSelect = (name: string): void => {
+    deepLink.open(name);
   };
+
+  const handleClosePanel = deepLink.close;
+
+  const getFallbackFocus = useCallback(
+    (): HTMLElement | null =>
+      document.querySelector<HTMLElement>('[data-testid="place-heading"]') ??
+      document.querySelector<HTMLElement>('[data-testid="map-heading"]'),
+    [],
+  );
 
   // --- Place navigation state ----------------------------------------------
   // The 0-based plot index within the current place and the active decay/risen
@@ -374,13 +449,18 @@ export default function SceneView({
       const fromUrl = parsePlaceId(
         new URLSearchParams(window.location.search).get("at") ?? undefined,
       );
+      // Back/forward also syncs the detail panel with `?repo=` (Req 8.5). A
+      // panel-only traversal leaves the place view as it is.
+      if (handleRepoPopState()) {
+        return;
+      }
       setView(fromState ?? fromUrl ?? "map");
     };
     window.addEventListener("popstate", onPopState);
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, []);
+  }, [handleRepoPopState]);
 
   /**
    * Turning-soon "Go to it": jump straight to the turning-soon ghost inside The
@@ -550,8 +630,35 @@ export default function SceneView({
   // alike). The toggles are the same `Header`-owned controls the scene used, so
   // the existing Lights-on/Sound wiring and tests carry over unchanged. The
   // travel overlay plays over whichever view is shown during a map→place entry.
+  // Classification lookup for the hover card (built from the classified rows).
+  const classificationsByName = new Map(
+    rows.map(
+      (row) =>
+        [row.name, { state: row.state, decayLevel: row.decayLevel }] as const,
+    ),
+  );
+
+  const panelRow =
+    panelOpen && selected !== null ? repoRowsByName.get(selected) : undefined;
+  const panelClassification =
+    panelRow !== undefined ? classificationsByName.get(panelRow.name) : undefined;
+  const panelFacts =
+    panelRow !== undefined
+      ? repos.find((repo) => repo.name === panelRow.name)
+      : undefined;
+  const panelOverride =
+    panelRow !== undefined ? overrides[panelRow.name] : undefined;
+  const panelRevivedAt =
+    panelOverride?.type === "revived" ? panelOverride.setAt : undefined;
+
   return (
+    <HoverCardProvider>
+    <SceneHoverBridge
+      suppressed={panelOpen || travel !== null}
+      actionsRef={hoverActionsRef}
+    />
     <div
+      id="scene-root"
       data-testid="scene-view"
       data-lights-on="false"
       data-view={view}
@@ -605,5 +712,53 @@ export default function SceneView({
         <Footer mode={mode} />
       </div>
     </div>
+    <HoverCardLayer
+      rowsByName={repoRowsByName}
+      owner={username ?? ""}
+      classificationsByName={classificationsByName}
+      renderedAt={renderedAt}
+      isFixture={mode === "estate"}
+    />
+    {panelRow && panelClassification && panelFacts && (
+      <DetailPanel
+        row={panelRow}
+        owner={username ?? ""}
+        classification={panelClassification}
+        facts={panelFacts}
+        renderedAt={renderedAt}
+        isFixture={mode === "estate"}
+        revivedAt={panelRevivedAt}
+        onClose={handleClosePanel}
+        sceneRootId="scene-root"
+        getFallbackFocus={getFallbackFocus}
+      />
+    )}
+    </HoverCardProvider>
   );
+}
+
+/**
+ * Lives inside `HoverCardProvider` so it can reach the hover actions. Keeps the
+ * hover card suppressed (and closed) while the panel is open or a travel runs,
+ * and exposes the actions to SceneView through a ref.
+ */
+function SceneHoverBridge({
+  suppressed,
+  actionsRef,
+}: {
+  suppressed: boolean;
+  actionsRef: MutableRefObject<HoverCardActions | null>;
+}) {
+  const actions = useHoverCardActions();
+  useEffect(() => {
+    actionsRef.current = actions;
+    return () => {
+      actionsRef.current = null;
+    };
+  }, [actions, actionsRef]);
+  useEffect(() => {
+    // setSuppressed(true) also calls closeNow().
+    actions.setSuppressed(suppressed);
+  }, [actions, suppressed]);
+  return null;
 }

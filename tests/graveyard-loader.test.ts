@@ -48,6 +48,8 @@ function makeRawNode(overrides: Partial<RawRepoNode> = {}): RawRepoNode {
     homepageUrl: null,
     stargazerCount: 0,
     primaryLanguage: null,
+    forkCount: 0,
+    repositoryTopics: { nodes: [] },
     issues: { totalCount: 0 },
     releases: { totalCount: 0 },
     readmeUpper: null,
@@ -74,6 +76,9 @@ function makeRepoFacts(overrides: Partial<RepoFacts> = {}): RepoFacts {
     releaseCount: 0,
     readmeBytes: null,
     lastCommitMessage: null,
+    languageColor: null,
+    forkCount: 0,
+    topics: [],
     ...overrides,
   };
 }

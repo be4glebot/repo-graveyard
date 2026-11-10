@@ -61,7 +61,9 @@ export interface RawRepoNode {
   isFork: boolean;
   homepageUrl: string | null;
   stargazerCount: number;
-  primaryLanguage: { name: string } | null;
+  primaryLanguage: { name: string; color: string | null } | null;
+  forkCount: number;
+  repositoryTopics: { nodes: { topic: { name: string } }[] };
   issues: { totalCount: number };
   releases: { totalCount: number };
   readmeUpper: { byteSize: number } | null;
@@ -163,8 +165,17 @@ export const GRAVEYARD_QUERY = /* GraphQL */ `
           isFork
           homepageUrl
           stargazerCount
+          forkCount
           primaryLanguage {
             name
+            color
+          }
+          repositoryTopics(first: 5) {
+            nodes {
+              topic {
+                name
+              }
+            }
           }
           issues(states: OPEN) {
             totalCount
@@ -228,6 +239,11 @@ export function mapRepoNode(node: RawRepoNode): RepoFacts {
     homepageUrl: node.homepageUrl,
     stargazerCount: node.stargazerCount,
     primaryLanguage: node.primaryLanguage?.name ?? null,
+    languageColor: node.primaryLanguage?.color ?? null,
+    forkCount: node.forkCount,
+    topics: (node.repositoryTopics?.nodes ?? [])
+      .map((n) => n.topic.name)
+      .slice(0, 5),
     openIssueCount: node.issues.totalCount,
     releaseCount: node.releases.totalCount,
     readmeBytes,

@@ -25,6 +25,9 @@ const estateRepoSchema = z.object({
   homepageUrl: z.string().nullable(),
   stargazerCount: z.number().int().nonnegative(),
   primaryLanguage: z.string().nullable(),
+  languageColor: z.string().nullable().optional(), // absent => null (resolver default)
+  forkCount: z.number().int().nonnegative().optional(), // absent => 0
+  topics: z.array(z.string()).max(5).optional(), // absent => []
   openIssueCount: z.number().int().nonnegative(),
   releaseCount: z.number().int().nonnegative(),
   readmeBytes: z.number().int().nonnegative().nullable(),

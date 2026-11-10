@@ -59,6 +59,12 @@ export interface RepoFacts {
   /** README size in bytes; null = no README found. */
   readmeBytes: number | null;
   lastCommitMessage: string | null;
+  /** Language color from GitHub (e.g. "#3178c6"); null when unknown. Not used by classification. */
+  languageColor: string | null;
+  /** Fork count; not used by classification. */
+  forkCount: number;
+  /** Up to 5 repository topics in original order; not used by classification. */
+  topics: string[];
 }
 
 /** The result of classifying a single repository. */

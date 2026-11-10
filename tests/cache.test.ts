@@ -39,6 +39,9 @@ function makeRepoFacts(overrides: Partial<RepoFacts> = {}): RepoFacts {
     releaseCount: 0,
     readmeBytes: null,
     lastCommitMessage: null,
+    languageColor: null,
+    forkCount: 0,
+    topics: [],
     ...overrides,
   };
 }

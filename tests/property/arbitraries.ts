@@ -228,6 +228,9 @@ export const arbRepoFacts: fc.Arbitrary<RepoFacts> = fc.record({
   releaseCount: arbReleaseCount,
   readmeBytes: arbReadmeBytes,
   lastCommitMessage: arbCommitMessage,
+  languageColor: fc.constant(null),
+  forkCount: fc.nat({ max: 1000 }),
+  topics: fc.array(fc.string(), { maxLength: 5 }),
 });
 
 import { type Override, type OverrideType } from "@/lib/lifecycle";

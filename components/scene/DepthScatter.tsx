@@ -88,6 +88,8 @@ import Zombie from "@/components/creatures/Zombie";
 import Tombstone from "@/components/creatures/Tombstone";
 import Coffin from "@/components/creatures/Coffin";
 import Plaque from "@/components/ui/Plaque";
+import { hoverCardId } from "@/components/detail/HoverCardLayer";
+import { useOptionalHoverCardActions } from "@/components/detail/HoverCardProvider";
 
 /** Shared prop shape the five concrete creature components expose. */
 interface ConcreteCreatureProps {
@@ -96,6 +98,11 @@ interface ConcreteCreatureProps {
   selected?: boolean;
   filterHero?: boolean;
   style?: CSSProperties;
+  onHoverStart?: (name: string, anchor: HTMLElement) => void;
+  onHoverEnd?: (name: string) => void;
+  onFocusStart?: (name: string, anchor: HTMLElement) => void;
+  onBlurEnd?: (name: string) => void;
+  hoverCardId?: string;
 }
 
 /** Maps a lifecycle state to the concrete creature component that renders it. */
@@ -384,6 +391,24 @@ export default function DepthScatter({
   // rendered creature/plaque sizing matches the no-overlap property exactly
   // (visual fix r3 #2/#3).
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // Stable hover-card callbacks (null outside a provider). DepthScatter does
+  // NOT subscribe to open state, so opening/closing a card never re-renders it.
+  const hover = useOptionalHoverCardActions();
+
+  // A plaque at rest maps to the same intent as its creature; the anchor is
+  // the creature's button so the card positions identically either way.
+  const creatureButton = (name: string): HTMLElement | null => {
+    const root = rootRef.current;
+    if (root === null) return null;
+    const wrappers = root.querySelectorAll<HTMLElement>(
+      '[data-testid="scatter-creature"]',
+    );
+    for (const w of Array.from(wrappers)) {
+      if (w.dataset.name === name) return w.querySelector<HTMLElement>("button");
+    }
+    return null;
+  };
   const { width: sceneW, height: sceneH } = useSceneBox(rootRef);
   const isMobile = sceneW > 0 && sceneW < MOBILE_BREAKPOINT;
 
@@ -537,6 +562,11 @@ export default function DepthScatter({
                     onSelect={onSelect}
                     selected={row.name === selectedName}
                     filterHero={filterHeroes?.has(row.name) ?? false}
+                    onHoverStart={hover?.onPointerEnter}
+                    onHoverEnd={hover?.onPointerLeave}
+                    onFocusStart={hover?.onFocus}
+                    onBlurEnd={hover?.onBlur}
+                    hoverCardId={hover ? hoverCardId(row.name) : undefined}
                   />
                 </div>
               </div>
@@ -568,12 +598,26 @@ export default function DepthScatter({
               // Centred on the resolved plaque point (its own creature's lower
               // body): `translate(-50%, -50%)` because the resolved point is the
               // plaque CENTRE, not a corner.
-              className="pointer-events-none absolute"
+              className={
+                hover ? "pointer-events-auto absolute" : "pointer-events-none absolute"
+              }
               style={{
                 left: `${r.plaqueX * 100}%`,
                 top: `${r.plaqueY * 100}%`,
                 transform: "translate(-50%, -50%)",
               }}
+              onPointerEnter={
+                hover
+                  ? () => {
+                      const el = creatureButton(row.name);
+                      if (el) hover.onPointerEnter(row.name, el);
+                    }
+                  : undefined
+              }
+              onPointerLeave={hover ? () => hover.onPointerLeave(row.name) : undefined}
+              // The plaque can overlap its creature's lower body; forward a
+              // click to the same activation so that region stays clickable.
+              onClick={hover ? () => onSelect(row.name) : undefined}
             >
               <Plaque name={row.name} sub={plaqueSub(row)} scale={placement.scale} />
             </div>

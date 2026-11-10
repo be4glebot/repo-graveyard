@@ -52,6 +52,9 @@ function noSignalRepo(pushedAt: string): RepoFacts {
     releaseCount: 0,
     readmeBytes: null,
     lastCommitMessage: "small tweak",
+    languageColor: null,
+    forkCount: 0,
+    topics: [],
   };
 }
 

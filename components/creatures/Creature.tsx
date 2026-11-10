@@ -92,6 +92,13 @@ export interface CreatureProps {
   animationClassName?: string;
   /** Layout positioning supplied by the Zone (absolute placement, scale, etc.). */
   style?: CSSProperties;
+  /** Hover-card intents (interactive path only). Anchor is the button. */
+  onHoverStart?: (name: string, anchor: HTMLElement) => void;
+  onHoverEnd?: (name: string) => void;
+  onFocusStart?: (name: string, anchor: HTMLElement) => void;
+  onBlurEnd?: (name: string) => void;
+  /** DOM id of the hover tooltip, referenced via `aria-describedby`. */
+  hoverCardId?: string;
 }
 
 /**
@@ -110,6 +117,11 @@ export default function Creature({
   children,
   animationClassName,
   style,
+  onHoverStart,
+  onHoverEnd,
+  onFocusStart,
+  onBlurEnd,
+  hoverCardId,
 }: CreatureProps) {
   const basename = creatureImage(row.state, row.decayLevel);
   const accessibleName = creatureAccessibleName(row);
@@ -185,6 +197,15 @@ export default function Creature({
       type="button"
       aria-label={accessibleName}
       aria-pressed={selected}
+      aria-describedby={hoverCardId}
+      onPointerEnter={
+        onHoverStart ? (e) => onHoverStart(row.name, e.currentTarget) : undefined
+      }
+      onPointerLeave={onHoverEnd ? () => onHoverEnd(row.name) : undefined}
+      onFocus={
+        onFocusStart ? (e) => onFocusStart(row.name, e.currentTarget) : undefined
+      }
+      onBlur={onBlurEnd ? () => onBlurEnd(row.name) : undefined}
       data-selected={selected ? "true" : undefined}
       onClick={activate}
       onKeyDown={handleKeyDown}

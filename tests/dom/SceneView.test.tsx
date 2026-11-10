@@ -76,6 +76,9 @@ function makeRepo(overrides: Partial<RepoFacts> & { name: string }): RepoFacts {
     releaseCount: 0,
     readmeBytes: null,
     lastCommitMessage: null,
+    languageColor: null,
+    forkCount: 0,
+    topics: [],
     ...overrides,
   };
 }
@@ -160,6 +163,9 @@ afterEach(() => {
   cleanup();
   push.mockReset();
   vi.unstubAllGlobals();
+  // Opening a panel pushes `?repo=` onto jsdom's shared history; reset the URL
+  // so a later test's mount does not deep-link-open a stale panel.
+  window.history.replaceState(null, "", "/");
 });
 
 describe("SceneView", () => {

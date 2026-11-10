@@ -11,9 +11,11 @@
  */
 
 import { describe, it, expect } from "vitest";
+import { LIFECYCLE_CONFIG } from "@/lib/lifecycle";
 import {
   GRAVEYARD_QUERY,
   fetchRepos,
+  mapRepoNode,
   TransportError,
   type GraphqlTransport,
   type GraveyardQueryResponse,
@@ -37,6 +39,8 @@ function makeNode(name: string): RawRepoNode {
     homepageUrl: null,
     stargazerCount: 0,
     primaryLanguage: null,
+    forkCount: 0,
+    repositoryTopics: { nodes: [] },
     issues: { totalCount: 0 },
     releases: { totalCount: 0 },
     readmeUpper: null,
@@ -112,7 +116,7 @@ describe("GRAVEYARD_QUERY shape (Req 1.3)", () => {
       expect(flat).toMatch(new RegExp(`\\b${field}\\b`));
     }
     // Nested selections for language, issues, releases, and the last commit.
-    expect(flat).toMatch(/primaryLanguage\s*\{\s*name\s*\}/);
+    expect(flat).toMatch(/primaryLanguage\s*\{\s*name\s*color\s*\}/);
     expect(flat).toMatch(/issues\([^)]*\)\s*\{\s*totalCount\s*\}/);
     expect(flat).toMatch(/releases\s*\{\s*totalCount\s*\}/);
     expect(flat).toMatch(/defaultBranchRef\s*\{\s*target/);
@@ -277,5 +281,100 @@ describe("fetchRepos 5xx retry behavior (Req 1.7)", () => {
       // No `repos` field leaks out of an error result.
       expect(result).not.toHaveProperty("value");
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 3. Hover-panel fields: query text, paging, and mapRepoNode (Req 1.1, 1.2, 1.4-1.6)
+// ---------------------------------------------------------------------------
+
+describe("GRAVEYARD_QUERY hover-panel fields (Req 1.1, 1.2)", () => {
+  const flat = GRAVEYARD_QUERY.replace(/\s+/g, " ");
+
+  it("selects forkCount, language name+color, and the first 5 topics", () => {
+    expect(flat).toMatch(/\bforkCount\b/);
+    expect(flat).toMatch(/primaryLanguage\s*\{\s*name\s*color\s*\}/);
+    expect(flat).toMatch(/repositoryTopics\(first:\s*5\)/);
+  });
+
+  it("still issues at most 6 pages of at most 50 repositories", async () => {
+    expect(LIFECYCLE_CONFIG.pageSize).toBeLessThanOrEqual(50);
+    expect(
+      Math.ceil(LIFECYCLE_CONFIG.maxRepos / LIFECYCLE_CONFIG.pageSize),
+    ).toBeLessThanOrEqual(6);
+
+    const firsts: number[] = [];
+    const transport = (async (_q: string, vars: Record<string, unknown>) => {
+      firsts.push(vars.first as number);
+      const nodes = Array.from({ length: vars.first as number }, (_, i) =>
+        makeNode(`r${firsts.length}-${i}`),
+      );
+      return {
+        data: {
+          repositoryOwner: {
+            repositories: {
+              totalCount: 10_000,
+              pageInfo: { hasNextPage: true, endCursor: "c" },
+              nodes,
+            },
+          },
+        },
+      };
+    }) as GraphqlTransport;
+
+    const result = await fetchRepos("owner", transport);
+
+    expect(result.ok).toBe(true);
+    expect(firsts.length).toBeLessThanOrEqual(6);
+    expect(Math.max(...firsts)).toBeLessThanOrEqual(50);
+  });
+});
+
+describe("mapRepoNode hover-panel fields (Req 1.4, 1.5, 1.6)", () => {
+  it("keeps primaryLanguage as the name string and puts the color on languageColor", () => {
+    const facts = mapRepoNode({
+      ...makeNode("a"),
+      primaryLanguage: { name: "TypeScript", color: "#3178c6" },
+    });
+    expect(facts.primaryLanguage).toBe("TypeScript");
+    expect(facts.languageColor).toBe("#3178c6");
+  });
+
+  it("maps an absent language to null for both fields", () => {
+    const facts = mapRepoNode({ ...makeNode("a"), primaryLanguage: null });
+    expect(facts.primaryLanguage).toBeNull();
+    expect(facts.languageColor).toBeNull();
+  });
+
+  it("maps a language with no color to a null languageColor", () => {
+    const facts = mapRepoNode({
+      ...makeNode("a"),
+      primaryLanguage: { name: "Zig", color: null },
+    });
+    expect(facts.primaryLanguage).toBe("Zig");
+    expect(facts.languageColor).toBeNull();
+  });
+
+  it("maps absent topics to an empty array", () => {
+    const withNone = mapRepoNode(makeNode("a"));
+    expect(withNone.topics).toEqual([]);
+    const missing = mapRepoNode({
+      ...makeNode("a"),
+      repositoryTopics: undefined as unknown as RawRepoNode["repositoryTopics"],
+    });
+    expect(missing.topics).toEqual([]);
+  });
+
+  it("keeps only the first 5 topics, in order", () => {
+    const names = ["a", "b", "c", "d", "e", "f", "g"];
+    const facts = mapRepoNode({
+      ...makeNode("a"),
+      repositoryTopics: { nodes: names.map((n) => ({ topic: { name: n } })) },
+    });
+    expect(facts.topics).toEqual(["a", "b", "c", "d", "e"]);
+  });
+
+  it("carries forkCount unchanged", () => {
+    expect(mapRepoNode({ ...makeNode("a"), forkCount: 42 }).forkCount).toBe(42);
   });
 });
