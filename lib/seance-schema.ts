@@ -69,7 +69,9 @@ export function containsDateOrDayCount(text: string): boolean {
 // ---------------------------------------------------------------------------
 
 const nonBlank = (s: string) => s.trim().length > 0;
-const NO_DATE = "must not contain a date or day count";
+/** Zod issue message for the date / day-count rule (used to categorise failures). */
+export const DATE_RULE_MESSAGE = "must not contain a date or day count";
+const NO_DATE = DATE_RULE_MESSAGE;
 
 const textField = (max: number, min = 1) =>
   z

@@ -53,6 +53,11 @@ export async function POST(request: Request): Promise<Response> {
         Date.now,
       ),
       log: ({ repo: r, reason }) => console.warn("[seance]", { repo: r, reason }),
+      // Dev-only: one safe line per failed attempt (never the key, prompt or text).
+      diag:
+        process.env.NODE_ENV !== "production"
+          ? (entry) => console.warn("[seance:diag]", JSON.stringify(entry))
+          : undefined,
     },
   );
 

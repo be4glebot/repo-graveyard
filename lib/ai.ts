@@ -106,3 +106,33 @@ export function buildSeancePrompt(
 
   return { system: SYSTEM_PROMPT, user };
 }
+
+/**
+ * Pulls the first balanced `{...}` object out of model text, so output wrapped
+ * in ```json fences or introduced by a line of prose still parses. Braces
+ * inside strings are ignored. Returns null when there is no complete object
+ * (for example when the reply was cut off at the token limit).
+ */
+export function extractJsonObject(text: string): string | null {
+  const start = text.indexOf("{");
+  if (start < 0) return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < text.length; i += 1) {
+    const c = text[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === "\\") escaped = true;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') inString = true;
+    else if (c === "{") depth += 1;
+    else if (c === "}") {
+      depth -= 1;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+  }
+  return null;
+}

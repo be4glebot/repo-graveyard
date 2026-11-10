@@ -11,7 +11,12 @@
  */
 import "server-only";
 
-import { LLM_TIMEOUT_MS, MAX_OUTPUT_TOKENS, buildSeancePrompt } from "./ai";
+import {
+  LLM_TIMEOUT_MS,
+  MAX_OUTPUT_TOKENS,
+  buildSeancePrompt,
+  extractJsonObject,
+} from "./ai";
 import {
   seanceCacheGet,
   seanceCacheKey,
@@ -25,6 +30,7 @@ import type { RateLimiter } from "./ratelimit";
 import { deriveEvidence, validateGrounding } from "./seance";
 import { GATHER_TIMEOUT_MS, type FetchedEvidence } from "./seance-gather";
 import {
+  DATE_RULE_MESSAGE,
   seanceResultSchema,
   type SeanceOutcome,
   type SeanceResult,
@@ -44,6 +50,31 @@ export type SeanceLogReason =
   | "veil"
   | "weak";
 
+/** Why one attempt failed; every value is safe to log. */
+export type SeanceDiagCategory =
+  | "timeout"
+  | "http"
+  | "parse"
+  | "no-text"
+  | "abort"
+  | "schema"
+  | "grounding"
+  | "date-rule";
+
+/**
+ * One line per failed attempt. Holds only a category, numbers and zod issue
+ * paths: never the key, the prompt, README/commit text or the model's text.
+ */
+export interface SeanceDiag {
+  repo: string;
+  attempt: number;
+  category: SeanceDiagCategory;
+  httpStatus?: number;
+  anthropicErrorType?: string;
+  elapsedMs: number;
+  schemaIssuePaths?: string[];
+}
+
 export interface SeanceDeps {
   loadGraveyard: (owner: string) => Promise<Result<GraveyardData, LoadError>>;
   fetchEvidence: (owner: string, repo: string) => Promise<FetchedEvidence | null>;
@@ -51,6 +82,42 @@ export interface SeanceDeps {
   cache: CacheClient | null;
   limiter: RateLimiter;
   log: (entry: { repo: string; reason: string }) => void;
+  /** Optional, dev-only diagnostic sink (the route passes it outside production). */
+  diag?: (entry: SeanceDiag) => void;
+}
+
+const LLM_CATEGORIES = new Set<SeanceDiagCategory>([
+  "timeout",
+  "http",
+  "parse",
+  "no-text",
+  "abort",
+]);
+
+/** Reads the safe fields of an LlmError without importing the class. */
+function describeLlmError(err: unknown): Partial<SeanceDiag> & {
+  category: SeanceDiagCategory;
+} {
+  if (err && typeof err === "object") {
+    const e = err as {
+      category?: unknown;
+      httpStatus?: unknown;
+      anthropicErrorType?: unknown;
+    };
+    if (
+      typeof e.category === "string" &&
+      LLM_CATEGORIES.has(e.category as SeanceDiagCategory)
+    ) {
+      return {
+        category: e.category as SeanceDiagCategory,
+        ...(typeof e.httpStatus === "number" ? { httpStatus: e.httpStatus } : {}),
+        ...(typeof e.anthropicErrorType === "string"
+          ? { anthropicErrorType: e.anthropicErrorType }
+          : {}),
+      };
+    }
+  }
+  return { category: "http" };
 }
 
 const SILENT: SeanceOutcome = { kind: "silent" };
@@ -171,6 +238,24 @@ async function inner(
       return { kind: consumed };
     }
 
+    const startedAt = Date.now();
+    const emit = (
+      category: SeanceDiagCategory,
+      extra: Partial<SeanceDiag> = {},
+    ) => {
+      try {
+        deps.diag?.({
+          repo: req.repo,
+          attempt,
+          category,
+          ...extra,
+          elapsedMs: Date.now() - startedAt,
+        });
+      } catch {
+        // diagnostics must never break a request
+      }
+    };
+
     let text: string;
     try {
       const r = await race(
@@ -185,35 +270,52 @@ async function inner(
       if (state.cancelled) return SILENT;
       if (r.timedOut) {
         failure = "llm-error";
+        emit("timeout");
         continue;
       }
       text = r.value;
-    } catch {
+    } catch (err) {
       if (state.cancelled) return SILENT;
       failure = "llm-error";
+      const d = describeLlmError(err);
+      emit(d.category, d);
       continue;
     }
 
+    // Models sometimes wrap JSON in ``` fences or add a line of prose first.
+    const json = extractJsonObject(text);
     let parsed: unknown;
     try {
-      parsed = JSON.parse(text);
+      if (json === null) throw new Error("no object");
+      parsed = JSON.parse(json);
     } catch {
       failure = "invalid-output";
+      emit("parse");
       continue;
     }
     const checkedResult = seanceResultSchema.safeParse(parsed);
     if (!checkedResult.success) {
       failure = "invalid-output";
+      const issues = checkedResult.error.issues;
+      const paths = [
+        ...new Set(issues.map((i) => i.path.join(".") || "(root)")),
+      ].slice(0, 10);
+      emit(
+        issues.some((i) => i.message === DATE_RULE_MESSAGE)
+          ? "date-rule"
+          : "schema",
+        { schemaIssuePaths: paths },
+      );
       continue;
     }
     if (!validateGrounding(checkedResult.data, derived).ok) {
       failure = "invalid-output";
+      emit("grounding");
       continue;
     }
     valid = checkedResult.data;
     break;
   }
-
   // 8. Both failed: silent, no partial fields, nothing cached.
   if (!valid) {
     log(failure);
