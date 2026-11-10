@@ -168,6 +168,35 @@ body {
   --color-chip-on-glow: rgba(194, 42, 62, 0.35);
 }
 
+/* ============================================================================
+   The Séance (Spec 4) — additive tokens. Existing tokens are not renamed.
+   ============================================================================ */
+@theme {
+  --color-night-800: #161d31;
+  --color-moon-100: #ecead9;
+  --color-moon-300: #b9b6a3;
+  --color-ghost-300: #9fe7ff;
+
+  /* Smoke_Field fills (opaque colour; alpha below). Every luminance <= 0.2. */
+  --color-smoke-ghost-steady: #070a12;
+  --color-smoke-ghost-fading: #0a0e18;
+  --color-smoke-ghost-jitter: #0a0d16;
+  --color-smoke-risen-cyan: #08111a;
+  --color-smoke-zombie-rough: #0b0a0a;
+  --color-smoke-cold-still: #1a1b1f;
+  --smoke-alpha-min: 0.3;
+  --smoke-alpha-max: 0.85;
+
+  /* Glow (text-shadow) colours, alpha 0.1 to 0.4 */
+  --color-glow-ghost: rgba(159, 231, 255, 0.3);
+  --color-glow-zombie: rgba(226, 85, 95, 0.3);
+  --color-glow-risen: rgba(159, 231, 255, 0.3);
+
+  --motion-word-stagger: 60ms;
+  --motion-word-fade: 300ms;
+  --motion-ritual-fade-reduced: 200ms;
+}
+
 /* ----------------------------------------------------------------------------
    Parallax backdrop layers.
    --px / --py are written to the Scene root by the rAF loop (roughly [-1, 1]).
@@ -781,5 +810,312 @@ body {
   .gate-wander {
     animation: none !important;
     transform: none;
+  }
+}
+
+/* ============================================================================
+   The Séance (Spec 4, task 11.1) — additive classes. Tokens only; animates
+   transform, opacity and filter only; no flicker above 3 per second.
+   ============================================================================ */
+
+/* Focus ring: candle-400, 3px (>= 2px) on every séance control (Req 18.5). */
+[data-seance-region] :focus-visible,
+.seance-focus:focus-visible {
+  outline: 3px solid var(--color-candle-400);
+  outline-offset: 2px;
+}
+
+/* Facts and Actions dim while the ritual runs (Req 10.2: 0.3 to 0.6). */
+[data-ritual-dim] {
+  opacity: 0.45;
+  transition: opacity 300ms ease;
+}
+
+/* ---- Smoke_Field (Req 11.2, 11.3) -----------------------------------------
+   No border, no radius, no tail: the field has no pseudo-element. The ragged
+   edge is a child layer masked by fog-wisps; text sits in a padded inner layer
+   above it so words stay in the solid centre. Fill/alpha come from the
+   component via --smoke-fill and --smoke-alpha (see SpiritTranscript). */
+.smoke-field {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  isolation: isolate;
+}
+.smoke-field-ragged {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--smoke-fill, var(--color-smoke-ghost-steady));
+  opacity: var(--smoke-alpha, var(--smoke-alpha-max));
+  -webkit-mask-image: url(/art/fog-wisps.webp);
+  mask-image: url(/art/fog-wisps.webp);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.smoke-field-text {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 2.25rem;
+  color: var(--color-moon-100);
+  font-size: 15px;
+  line-height: 1.7;
+  text-shadow: 0 0 12px var(--glow-color, var(--color-glow-ghost));
+}
+@media (min-width: 768px) {
+  .smoke-field-text {
+    font-size: 16px;
+  }
+}
+
+/* ---- Word reveal (Req 11.4, 11.5, 11.11) ---------------------------------
+   Words start hidden and blurred in the "revealing" state until the component
+   marks them data-revealed="true"; per-word transition-delay is inline. */
+.spirit-word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(4px);
+  transition:
+    opacity var(--motion-word-fade) ease-out,
+    filter var(--motion-word-fade) ease-out;
+}
+.spirit-word[data-revealed="true"] {
+  opacity: 1;
+  filter: blur(0);
+}
+[data-state="settled"] .spirit-word {
+  transition: none;
+  opacity: 1;
+  filter: none;
+  animation: none;
+}
+
+/* ---- Ledger and engraved cause line (Req 13.5-13.7) ----------------------- */
+.cause-engraved {
+  font-family: var(--font-heading), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-candle-tan);
+  font-size: 15px;
+  text-shadow:
+    0 1px 0 var(--color-night-cover-top),
+    0 -1px 0 var(--color-plaque-inset);
+}
+.ledger-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ledger;
+}
+.ledger-list[data-hidden="true"],
+[data-state="revealing"] .ledger-list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ledger-item {
+  counter-increment: ledger;
+  padding: 0.75rem 0 0.75rem 2.25rem;
+  position: relative;
+  border-bottom: 1px solid var(--color-plaque-border);
+}
+.ledger-item::before {
+  content: counter(ledger);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-fact), ui-monospace, monospace;
+  color: var(--color-candle-400);
+}
+.ledger-title {
+  display: block;
+  color: var(--color-plaque-name);
+  font-size: 15px;
+}
+.ledger-detail {
+  display: block;
+  color: var(--color-plaque-sub);
+  font-size: 15px;
+}
+.ledger-evidence {
+  display: block;
+  font-family: var(--font-fact), ui-monospace, monospace;
+  color: var(--color-candle-tan);
+  font-size: 13px;
+}
+@media (min-width: 768px) {
+  .ledger-title,
+  .ledger-detail {
+    font-size: 16px;
+  }
+}
+
+/* ---- Verdict card (Req 15.x via data-treatment; accent per verdict) ------- */
+.verdict-card {
+  --verdict-accent: var(--color-ghost-300);
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--verdict-accent);
+  background: linear-gradient(
+    var(--color-plaque-bg-top),
+    var(--color-plaque-bg-bottom)
+  );
+  color: var(--color-plaque-name);
+}
+.verdict-card-word {
+  font-family: var(--font-heading), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--verdict-accent);
+}
+.verdict-card-headline {
+  color: var(--color-plaque-sub);
+}
+.verdict-card[data-treatment="cold-light"] {
+  --verdict-accent: var(--color-ghost-300);
+  box-shadow: 0 0 18px var(--color-glow-ghost);
+}
+.verdict-card[data-treatment="candlelit"] {
+  --verdict-accent: var(--color-candle-400);
+  box-shadow: 0 0 18px var(--color-candle-tan);
+}
+.verdict-card[data-treatment="crimson-chains"] {
+  --verdict-accent: var(--color-crimson-200);
+  border-style: double;
+  border-width: 4px;
+  box-shadow: inset 0 0 14px var(--color-crimson-glow);
+}
+
+/* ---- Ritual (Req 10.4, 10.5, 10.7, 10.8, 10.14) --------------------------- */
+.ritual-dim {
+  opacity: 0.45;
+  transition: opacity 300ms ease;
+}
+
+/* One-shot 1.5 s surge, brightness 1.35 (inside 1.2 to 1.5). */
+@keyframes ritual-surge-ghost {
+  0% {
+    filter: brightness(1);
+    opacity: 1;
+    transform: translateY(0);
+  }
+  25% {
+    filter: brightness(1.35);
+    opacity: 0.8;
+    transform: translateY(-3px);
+  }
+  50% {
+    filter: brightness(1.35);
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+  75% {
+    filter: brightness(1.35);
+    opacity: 0.85;
+    transform: translateY(-2px);
+  }
+  100% {
+    filter: brightness(1);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes ritual-surge-zombie {
+  0%,
+  100% {
+    filter: brightness(1);
+    transform: translateX(0);
+  }
+  20% {
+    filter: brightness(1.35);
+    transform: translateX(-3px);
+  }
+  45% {
+    filter: brightness(1.35);
+    transform: translateX(3px);
+  }
+  70% {
+    filter: brightness(1.35);
+    transform: translateX(-2px);
+  }
+}
+.ritual-surge-ghost {
+  animation: ritual-surge-ghost 1.5s ease-in-out 1 both;
+}
+.ritual-surge-zombie {
+  animation: ritual-surge-zombie 1.5s ease-in-out 1 both;
+}
+
+/* Candle flame: scale only, period 1.4 s (>= 1 s). */
+@keyframes ritual-candle-flame {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+.ritual-candle-flame {
+  transform-origin: 50% 100%;
+  animation: ritual-candle-flame 1.4s ease-in-out infinite;
+}
+
+/* Smoke rising from the layer's bottom edge. */
+@keyframes ritual-smoke {
+  0% {
+    transform: translateY(20%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-40%);
+    opacity: 0;
+  }
+}
+.ritual-smoke {
+  animation: ritual-smoke 6s ease-out infinite;
+}
+
+/* ---- Reduced motion (Req 18.8, 18.9): no animation, one 200 ms fade ------- */
+@media (prefers-reduced-motion: reduce) {
+  .ritual-surge-ghost,
+  .ritual-surge-zombie,
+  .ritual-candle-flame,
+  .ritual-smoke,
+  .spirit-word {
+    animation: none;
+    transform: none;
+    filter: none;
+    transition: opacity var(--motion-ritual-fade-reduced) linear;
+  }
+  .ritual-smoke {
+    opacity: 0.4;
+  }
+  .ritual-dim,
+  [data-ritual-dim] {
+    transition: opacity var(--motion-ritual-fade-reduced) linear;
+  }
+}
+
+/* ---- Verdict card reduced motion (Req 15.11): single 200 ms opacity fade --- */
+@keyframes verdict-card-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .verdict-card {
+    animation: verdict-card-fade var(--motion-ritual-fade-reduced) linear;
   }
 }

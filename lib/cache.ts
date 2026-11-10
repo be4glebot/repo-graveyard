@@ -22,6 +22,7 @@ import "server-only";
 import { z } from "zod";
 import { normalizeUsername } from "./username";
 import type { RepoFacts } from "./lifecycle";
+import { seanceResultSchema, type SeanceResult } from "./seance-schema";
 
 /** Cache time-to-live, in seconds (10 minutes). */
 export const GRAVEYARD_TTL_SECONDS = 600;
@@ -142,6 +143,72 @@ export async function cacheSet(
   try {
     await Promise.race([
       client.set(key, data, { ex: GRAVEYARD_TTL_SECONDS }),
+      timeout(),
+    ]);
+  } catch {
+    // Best effort: a cache write failure must never break the request.
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Séance result cache (Requirements 7.1, 7.3-7.8, 7.10-7.12)          */
+/* ------------------------------------------------------------------ */
+
+/** Séance cache time-to-live, in seconds (24 hours). */
+export const SEANCE_TTL_SECONDS = 86_400;
+
+/**
+ * Builds the séance cache key. Keyed on the repo's last activity
+ * (`pushedAt`, falling back to `createdAt`) so a new push invalidates it.
+ */
+export function seanceCacheKey(
+  owner: string,
+  repo: string,
+  pushedAt: string | null,
+  createdAt: string,
+): string {
+  return `seance:v1:${owner.toLowerCase()}/${repo.toLowerCase()}:${pushedAt ?? createdAt}`;
+}
+
+/**
+ * Reads a cached séance result. Errors, timeouts, and payloads failing
+ * `seanceResultSchema` are misses (`null`). A `null` client is always a miss.
+ * Never throws.
+ */
+export async function seanceCacheGet(
+  client: CacheClient | null,
+  key: string,
+): Promise<SeanceResult | null> {
+  if (client === null) {
+    return null;
+  }
+  try {
+    const raw = await Promise.race([client.get(key), timeout()]);
+    if (raw === null || raw === undefined) {
+      return null;
+    }
+    const parsed = seanceResultSchema.safeParse(raw);
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Writes a séance result with `SEANCE_TTL_SECONDS`. Best effort: failures,
+ * timeouts, and a `null` client are swallowed. Never throws.
+ */
+export async function seanceCacheSet(
+  client: CacheClient | null,
+  key: string,
+  result: SeanceResult,
+): Promise<void> {
+  if (client === null) {
+    return;
+  }
+  try {
+    await Promise.race([
+      client.set(key, result, { ex: SEANCE_TTL_SECONDS }),
       timeout(),
     ]);
   } catch {

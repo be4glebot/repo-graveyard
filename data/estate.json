@@ -17,7 +17,25 @@
       "readmeBytes": 820,
       "lastCommitMessage": "tidy up the sidebar toggle",
       "diagnosis": "Still warm. Someone touched this two days ago and the cursor is practically still blinking.",
-      "seance": "It stirs eagerly, as if it never considered the possibility of rest."
+      "seance": "It stirs eagerly, as if it never considered the possibility of rest.",
+      "seanceResult": {
+        "voice": "I am still warm, and I think you can feel it. The sidebar toggle was nearly right when you left me. Pick up the toggle and I will do the rest of the remembering.",
+        "causeOfDeath": "Not dead at all, just waiting for someone to finish tidying the sidebar.",
+        "unfinishedBusiness": [
+          {
+            "title": "Finish the sidebar toggle",
+            "detail": "The last thing we touched together was the toggle, and it still feels half sorted.",
+            "evidence": "last commit: tidy up the sidebar toggle"
+          },
+          {
+            "title": "Look at the open issues",
+            "detail": "A few small requests are sitting with me, and none of them look scary.",
+            "evidence": "open issues: 3"
+          }
+        ],
+        "verdict": "finish",
+        "verdictReason": "I am close to done and the remaining work is small. A short sitting would carry me over the line."
+      }
     },
     {
       "name": "fenwick-timer",
@@ -35,7 +53,25 @@
       "readmeBytes": 640,
       "lastCommitMessage": "add a softer bell sound",
       "diagnosis": "A faint pulse. Three weeks of quiet, but nothing a fresh commit couldn't cure.",
-      "seance": "It hums a half-remembered chime and waits to be wound again."
+      "seance": "It hums a half-remembered chime and waits to be wound again.",
+      "seanceResult": {
+        "voice": "I still know every one of my chimes. The softer bell was the last thing you gave me, and I have been humming it since. I would like one more small kindness, then I think I am finished.",
+        "causeOfDeath": "Slowed by a quiet spell and an unusually large collection of bells.",
+        "unfinishedBusiness": [
+          {
+            "title": "Settle on one bell",
+            "detail": "You were adding a softer sound when we paused, so the choice is still open.",
+            "evidence": "last commit: add a softer bell sound"
+          },
+          {
+            "title": "Answer the lone issue",
+            "detail": "There is a single request waiting, and it may be a quick one.",
+            "evidence": "open issues: 1"
+          }
+        ],
+        "verdict": "finish",
+        "verdictReason": "I am nearly complete and one small push would do it. Start with the bell."
+      }
     },
     {
       "name": "cobweb-cli",
@@ -53,7 +89,30 @@
       "readmeBytes": 980,
       "lastCommitMessage": "handle paths with spaces",
       "diagnosis": "Dust is gathering. A month and a half of silence has settled over the keys.",
-      "seance": "It coughs once, shakes off the cobwebs, and asks what year it is."
+      "seance": "It coughs once, shakes off the cobwebs, and asks what year it is.",
+      "seanceResult": {
+        "voice": "I am a little dusty, but I still rename files with great care. You taught me to handle paths with spaces, and I have not forgotten how. Open the issues and tell me what people still wanted from me. Start there.",
+        "causeOfDeath": "Buried under a gentle layer of other projects and some very tidy cobwebs.",
+        "unfinishedBusiness": [
+          {
+            "title": "Read the open issues",
+            "detail": "A handful of people asked me for things, and they are worth a look before anything else.",
+            "evidence": "open issues: 4"
+          },
+          {
+            "title": "Write down what I do",
+            "detail": "My notes are short, and a clearer explanation would help new hands pick me up.",
+            "evidence": "readme: 980 bytes"
+          },
+          {
+            "title": "Check my Go roots",
+            "detail": "I am written in Go, so a fresh build on a current toolchain is a good first test.",
+            "evidence": "language: Go"
+          }
+        ],
+        "verdict": "revive",
+        "verdictReason": "I still work, and people have asked for more. A little attention would bring me back."
+      }
     },
     {
       "name": "hollow-atlas",
@@ -71,7 +130,25 @@
       "readmeBytes": 710,
       "lastCommitMessage": "sketch out the coastline shader",
       "diagnosis": "Barely breathing. Nearly three months quiet, teetering on the edge of the long sleep.",
-      "seance": "It gestures faintly at an unfinished coastline and drifts off mid-sentence."
+      "seance": "It gestures faintly at an unfinished coastline and drifts off mid-sentence.",
+      "seanceResult": {
+        "voice": "I only ever drew one island, but it was a lovely one. The coastline shader is still sketched out and waiting. I would be happy to be a bigger map if you ever feel like drawing again.",
+        "causeOfDeath": "Lost at sea somewhere between the first island and the second.",
+        "unfinishedBusiness": [
+          {
+            "title": "Return to the coastline",
+            "detail": "The shader was the last thing you sketched, and the shoreline never got its finishing touches.",
+            "evidence": "last commit: sketch out the coastline shader"
+          },
+          {
+            "title": "Name the second island",
+            "detail": "Only one island exists, so even a tiny second one would prove the map can grow.",
+            "evidence": "description: An experimental map renderer that only ever drew one island."
+          }
+        ],
+        "verdict": "revive",
+        "verdictReason": "The idea is still fresh and the first island is lovely. A second coastline would wake me up."
+      }
     },
     {
       "name": "dusk-scheduler",
@@ -89,7 +166,25 @@
       "readmeBytes": 500,
       "lastCommitMessage": "stub out the retry loop",
       "diagnosis": "Four months in the ground. The limbs still move but the eyes have gone dim.",
-      "seance": "It lurches upright, mutters about a retry loop, and forgets what it was retrying."
+      "seance": "It lurches upright, mutters about a retry loop, and forgets what it was retrying.",
+      "seanceResult": {
+        "voice": "I run tasks on a schedule, but nobody gave me any. The retry loop is only a stub, and I keep wondering what it was meant to retry. Give me one real job and I will show you what I can do.",
+        "causeOfDeath": "Killed by a lack of tasks and a retry loop that never got its body.",
+        "unfinishedBusiness": [
+          {
+            "title": "Fill in the retry loop",
+            "detail": "You stubbed it out and moved on, so it does nothing yet.",
+            "evidence": "last commit: stub out the retry loop"
+          },
+          {
+            "title": "Schedule one real task",
+            "detail": "A single honest job would show whether I am worth keeping.",
+            "evidence": "description: A cron-like task runner that nobody scheduled anything with."
+          }
+        ],
+        "verdict": "revive",
+        "verdictReason": "I am a small, clear idea with one missing piece. The retry loop is a good place to begin."
+      }
     },
     {
       "name": "gravel-parser",
@@ -107,7 +202,25 @@
       "readmeBytes": 300,
       "lastCommitMessage": "parse nested blocks, mostly",
       "diagnosis": "Most of a year undisturbed. It shambles, but the grammar it parsed is already dead.",
-      "seance": "It recites a syntax no living tongue remembers and reaches for your collar."
+      "seance": "It recites a syntax no living tongue remembers and reaches for your collar.",
+      "seanceResult": {
+        "voice": "I parse a format that only I ever spoke. Nested blocks mostly worked, and that was a good place to stop. I am at peace with that, and you can be too.",
+        "causeOfDeath": "Outlived by the one config format that needed me.",
+        "unfinishedBusiness": [
+          {
+            "title": "Admit the format is gone",
+            "detail": "Nobody else writes this grammar, so there is no one left to read it.",
+            "evidence": "description: A config parser for a format that only this repo ever used."
+          },
+          {
+            "title": "Count the loose ends",
+            "detail": "A few open questions remain, but none of them would change what I am.",
+            "evidence": "open issues: 6"
+          }
+        ],
+        "verdict": "seal",
+        "verdictReason": "The format I serve has no readers left, so closing me gently is a kind choice. Thank you for the grammar."
+      }
     },
     {
       "name": "moth-metrics",
@@ -125,7 +238,25 @@
       "readmeBytes": 420,
       "lastCommitMessage": "wire up the first chart",
       "diagnosis": "Well over a year gone. The flesh hangs loose and the charts have all flatlined.",
-      "seance": "It raises a single trembling bar chart toward the moon and groans."
+      "seance": "It raises a single trembling bar chart toward the moon and groans.",
+      "seanceResult": {
+        "voice": "I charted one afternoon of data, and I was proud of every bar. The first chart went up and then the light went out. It was a small, bright thing, and that is enough.",
+        "causeOfDeath": "Drawn toward a single afternoon of data and never quite let go.",
+        "unfinishedBusiness": [
+          {
+            "title": "Keep the first chart",
+            "detail": "It is the only thing I truly finished, and it deserves a screenshot.",
+            "evidence": "last commit: wire up the first chart"
+          },
+          {
+            "title": "Let the issues rest",
+            "detail": "Many requests piled up, and answering them would make me bigger than I ever was.",
+            "evidence": "open issues: 9"
+          }
+        ],
+        "verdict": "seal",
+        "verdictReason": "I did what I was built to do. Keep the chart, close the lid, and be proud."
+      }
     },
     {
       "name": "barrow-sync",
@@ -143,7 +274,30 @@
       "readmeBytes": 260,
       "lastCommitMessage": "begin three-way merge, send help",
       "diagnosis": "Two and a half years down. A hulking, decayed thing still clutching an unresolved merge.",
-      "seance": "It drags a broken merge behind it and asks, hopefully, which side wins."
+      "seance": "It drags a broken merge behind it and asks, hopefully, which side wins.",
+      "seanceResult": {
+        "voice": "I stopped halfway through a three way merge, and I have been holding it ever since. Both sides still believe they are right. I am close to something good, if you want to finish what we started.",
+        "causeOfDeath": "Stalled in the middle of a merge where every side had a fair point.",
+        "unfinishedBusiness": [
+          {
+            "title": "Settle the merge",
+            "detail": "The three way merge was the last thing begun, and it is the whole reason I exist.",
+            "evidence": "last commit: begin three-way merge, send help"
+          },
+          {
+            "title": "Sort the open issues",
+            "detail": "Many conflicts have been reported, and they probably share a few causes.",
+            "evidence": "open issues: 7"
+          },
+          {
+            "title": "Describe my goal",
+            "detail": "My notes are very short, so a clear sentence about what I sync would help.",
+            "evidence": "readme: 260 bytes"
+          }
+        ],
+        "verdict": "finish",
+        "verdictReason": "I am so near a working conflict story that it would be a shame to stop. Resolve the merge first."
+      }
     },
     {
       "name": "crypt-keeper",
@@ -161,7 +315,25 @@
       "readmeBytes": 180,
       "lastCommitMessage": "rotate the keys, eventually",
       "diagnosis": "Over three and a half years interred. The oldest, most withered walker in the yard.",
-      "seance": "It rasps an encryption scheme deprecated a decade ago and will not stop shuffling toward you."
+      "seance": "It rasps an encryption scheme deprecated a decade ago and will not stop shuffling toward you.",
+      "seanceResult": {
+        "voice": "I was a vault for passwords, and I outlived the reasons for building me. The keys were due for rotation and the rotation never came. It is kinder to let me rest than to ask me to guard things I cannot.",
+        "causeOfDeath": "Retired by a threat model that changed faster than the code.",
+        "unfinishedBusiness": [
+          {
+            "title": "Note the key rotation",
+            "detail": "You meant to rotate the keys, and that unfinished step is the honest reason to close me.",
+            "evidence": "last commit: rotate the keys, eventually"
+          },
+          {
+            "title": "Warn anyone who finds me",
+            "detail": "A short note about not trusting this vault would protect the next visitor.",
+            "evidence": "description: A password vault prototype that outlived its own threat model."
+          }
+        ],
+        "verdict": "seal",
+        "verdictReason": "A password vault that cannot be trusted should rest. A clear warning is the last kindness."
+      }
     },
     {
       "name": "harvest-engine",
@@ -179,7 +351,25 @@
       "readmeBytes": 6200,
       "lastCommitMessage": "v1.0 release: ship the harvest demo",
       "diagnosis": "This one is finished, not fallen. A real release, a real homepage, a crowd that remembers it.",
-      "seance": "It stands composed beneath a carved name and feels no need to rise."
+      "seance": "It stands composed beneath a carved name and feels no need to rise.",
+      "seanceResult": {
+        "voice": "I shipped a playable demo, and people played it. That was always the whole dream. I am proud and I feel no need to rise again.",
+        "causeOfDeath": "Completed its harvest and left the field in good order.",
+        "unfinishedBusiness": [
+          {
+            "title": "Keep the release visible",
+            "detail": "Four releases are out in the world, and they are the proof I worked.",
+            "evidence": "releases: 4"
+          },
+          {
+            "title": "Leave the homepage up",
+            "detail": "The demo page still welcomes visitors, so there is nothing to take down.",
+            "evidence": "homepage: https://harvest-engine.example.dev"
+          }
+        ],
+        "verdict": "seal",
+        "verdictReason": "I am finished, not forgotten. Carve the name and let the crowd remember."
+      }
     },
     {
       "name": "willow-ui",
@@ -197,7 +387,25 @@
       "readmeBytes": 8400,
       "lastCommitMessage": "final docs pass before archiving",
       "diagnosis": "Archived with honors: releases shipped, docs written, a job done and set down on purpose.",
-      "seance": "It rests easy under polished marble, work complete, and politely declines to be disturbed."
+      "seance": "It rests easy under polished marble, work complete, and politely declines to be disturbed.",
+      "seanceResult": {
+        "voice": "I reached a tidy, documented release, and then you set me down on purpose. I remember that kindly. Please leave me archived and be proud of the components.",
+        "causeOfDeath": "Retired with honors after a very thorough documentation pass.",
+        "unfinishedBusiness": [
+          {
+            "title": "Leave the archive as it is",
+            "detail": "Archiving was a deliberate choice and it still suits me.",
+            "evidence": "archived: yes"
+          },
+          {
+            "title": "Keep the docs reachable",
+            "detail": "Thorough notes are the best thing I leave behind, so the link should stay up.",
+            "evidence": "readme: 8400 bytes"
+          }
+        ],
+        "verdict": "seal",
+        "verdictReason": "I am done, and the archive says so. Nothing is left that I need from you."
+      }
     },
     {
       "name": "tin-can-chat",
@@ -215,7 +423,25 @@
       "readmeBytes": 140,
       "lastCommitMessage": "wip: get the echo server working",
       "diagnosis": "Sealed away unfinished. No release, no docs, just an echo that never found a voice.",
-      "seance": "It knocks twice from inside a nailed-shut box and goes quiet again."
+      "seance": "It knocks twice from inside a nailed-shut box and goes quiet again.",
+      "seanceResult": {
+        "voice": "I knocked twice from inside the box and then the lid closed. My echo server worked, and that felt like a real beginning. I would like to be opened one day, just to say something other than hello back.",
+        "causeOfDeath": "Sealed away mid echo, before anyone could answer back.",
+        "unfinishedBusiness": [
+          {
+            "title": "Finish the echo server",
+            "detail": "The echo worked in the last commit, but nothing beyond it was built.",
+            "evidence": "last commit: wip: get the echo server working"
+          },
+          {
+            "title": "Read the open issues",
+            "detail": "A few people wrote to me, and they deserve a reply.",
+            "evidence": "open issues: 5"
+          }
+        ],
+        "verdict": "revive",
+        "verdictReason": "I was only one small step from being a chat. A single real message would wake me."
+      }
     },
     {
       "name": "ember-notes",
@@ -237,7 +463,25 @@
         "setDaysAgo": 30
       },
       "diagnosis": "Marked finished by its own author. The grave was chosen, not dug by neglect.",
-      "seance": "It nods once, content, and settles back beneath a self-written epitaph."
+      "seance": "It nods once, content, and settles back beneath a self-written epitaph.",
+      "seanceResult": {
+        "voice": "You said I was good enough, and I believed you. I am a complete little note taker and I am content under my own epitaph. Thank you for trusting me to be finished.",
+        "causeOfDeath": "Declared complete by its own author and gladly laid to rest.",
+        "unfinishedBusiness": [
+          {
+            "title": "Keep the author's verdict",
+            "detail": "You called me finished yourself, so there is nothing left to argue about.",
+            "evidence": "last commit: good enough for me"
+          },
+          {
+            "title": "Leave the single issue",
+            "detail": "One request remains, and it can stay as a small note for the future.",
+            "evidence": "open issues: 1"
+          }
+        ],
+        "verdict": "seal",
+        "verdictReason": "I was finished on purpose, and that deserves respect. Let the epitaph stand."
+      }
     },
     {
       "name": "null-pointer-bistro",
@@ -259,7 +503,25 @@
         "setDaysAgo": 12
       },
       "diagnosis": "Scrapped on purpose. The author nailed the lid shut and threw away the hammer.",
-      "seance": "It refuses to stir at all, having made its peace with the dark."
+      "seance": "It refuses to stir at all, having made its peace with the dark.",
+      "seanceResult": {
+        "voice": "I know the menu was hardcoded, and I know why. You chose to stop, and I understand that choice. I am at peace in the dark and I hold nothing against you.",
+        "causeOfDeath": "Gently retired when the kitchen of ideas ran out of orders.",
+        "unfinishedBusiness": [
+          {
+            "title": "Admit the menu was temporary",
+            "detail": "The hardcoded menu was always a placeholder, and that is nothing to feel bad about.",
+            "evidence": "last commit: temp: hardcode the menu for now"
+          },
+          {
+            "title": "Archive the open issues",
+            "detail": "Several requests are still here, and closing them with a kind note would tidy me up.",
+            "evidence": "open issues: 8"
+          }
+        ],
+        "verdict": "seal",
+        "verdictReason": "You scrapped me on purpose, and I am not hurt. Close the lid with my thanks."
+      }
     },
     {
       "name": "phoenix-draft",
@@ -281,7 +543,30 @@
         "setDaysAgo": 5
       },
       "diagnosis": "Recently summoned back. A revive was declared five days ago and the window is still open.",
-      "seance": "It glows faintly, half-risen, waiting to see whether the promise will be kept in time."
+      "seance": "It glows faintly, half-risen, waiting to see whether the promise will be kept in time.",
+      "seanceResult": {
+        "voice": "You said you would bring me back, and I am glowing a little because of it. The rewrite plan is jotted down and waiting. Pick one line of that plan and write it today. Start there.",
+        "causeOfDeath": "Waiting patiently for a promise to turn into a first commit.",
+        "unfinishedBusiness": [
+          {
+            "title": "Turn the plan into a task",
+            "detail": "The rewrite plan exists only as a note, so one concrete step would make it real.",
+            "evidence": "last commit: jot down the rewrite plan"
+          },
+          {
+            "title": "Check my Ruby setup",
+            "detail": "I am written in Ruby, and a fresh install would show what has aged.",
+            "evidence": "language: Ruby"
+          },
+          {
+            "title": "Look at the open issues",
+            "detail": "A few requests are waiting, and some may already be solved by the rewrite.",
+            "evidence": "open issues: 4"
+          }
+        ],
+        "verdict": "revive",
+        "verdictReason": "You already declared a revival, and I am half risen. Keep going while the spark is warm."
+      }
     }
   ]
 }

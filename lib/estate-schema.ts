@@ -40,6 +40,9 @@ const estateRepoSchema = z.object({
     .optional(),
   diagnosis: z.string().min(1), // Req 12.4
   seance: z.string().min(1), // Req 12.4
+  // Loose on purpose: one bad fixture should only silence that repo's séance,
+  // not fail the whole estate load. Validated against seanceResultSchema at use.
+  seanceResult: z.unknown().optional(),
 });
 
 /** The top-level estate fixture: a username plus a non-empty list of repos. */
