@@ -146,7 +146,7 @@ export default function FilterChips({
               // (Req 7.2, 7.3). The base class owns the box, font, border, and
               // background; the utilities below carry only interaction state
               // (focus ring, hover, disabled) and the inner count gap.
-              "chip2 gap-2 transition-colors",
+              "chip2 pointer-events-auto gap-2 transition-colors",
               "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
               active ? "on" : null,
               disabled

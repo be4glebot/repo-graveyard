@@ -670,7 +670,7 @@ export default function SceneView({
           offsets itself below this band so the two never overlap (visual fix 2C). */}
       <div
         data-testid="site-header"
-        className="absolute inset-x-0 top-0 z-50 p-4"
+        className="pointer-events-none absolute inset-x-0 top-0 z-50 p-4"
         style={{ minHeight: "var(--site-header-h)" }}
       >
         <Header

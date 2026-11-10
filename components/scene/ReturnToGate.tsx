@@ -52,7 +52,7 @@ export default function ReturnToGate({ onReturn }: ReturnToGateProps) {
         // owns the box, Cinzel uppercase label, border, and background (Req
         // 7.1). The utilities below carry only interaction state (cursor,
         // hover, focus ring, transition).
-        "btn2 cursor-pointer transition-colors hover:bg-candle-400/10",
+        "btn2 pointer-events-auto cursor-pointer transition-colors hover:bg-candle-400/10",
         "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
       ].join(" ")}
     >

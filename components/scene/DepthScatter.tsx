@@ -260,6 +260,13 @@ export interface DepthScatterProps {
    * creatures underneath keep animating in. Defaults to no extra style.
    */
   plaqueStyle?: CSSProperties;
+  /**
+   * Minimum top edge (px, in the scatter box's coordinates) for every creature
+   * and plaque rect on the desktop branch: `max(sceneH / 3, chromeBottomPx)`
+   * from `PlaceView`. Defaults to `sceneH / 3` when omitted. Passed to
+   * `resolvePlacement`; the mobile two-column branch ignores it.
+   */
+  topLimitPx?: number;
 }
 
 /**
@@ -377,6 +384,7 @@ export default function DepthScatter({
   filterHeroes,
   reducedMotion,
   plaqueStyle,
+  topLimitPx,
 }: DepthScatterProps) {
   // Compute the scatter layout once per (plot, place). The seed is the place id
   // so each place scatters deterministically and differently; the names are the
@@ -476,6 +484,7 @@ export default function DepthScatter({
         sceneW,
         sceneH,
         obstacles,
+        Math.max(sceneH / 3, topLimitPx ?? 0),
       );
       obstacles.push(r.plaque, upper60(r.creature));
       // The resolved creature box is square with side = creatureHeightPx; the
@@ -491,7 +500,7 @@ export default function DepthScatter({
       };
     }
     return out;
-  }, [plot, placements, place, sceneW, sceneH, isMobile]);
+  }, [plot, placements, place, sceneW, sceneH, isMobile, topLimitPx]);
 
   return (
     <div

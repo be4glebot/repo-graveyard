@@ -1,0 +1,158 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration test": {
+      "status": "passed",
+      "failingExample": "Expected failures confirm bug. (a) sky 1440x900 [\"aa0\",\"a--\"]: creature top 286.8 < 300. (c) sky [\"a-0\",\"aa-\"]: spread 158px < 544px. (b) hit test: \"blog @ (155,150) -> place-chrome\", \"gamma @ (216,137) -> place-title-block\", \"c-repo @ (166,114) -> place-title-block\"",
+      "lastRunTimestamp": 1794277973230
+    },
+    "3.4 Verify bug condition exploration test now passes": {
+      "status": "passed",
+      "lastRunTimestamp": 1794278507773
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration test": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277746630
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277749287
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277984272
+      }
+    ],
+    "2. Write preservation property tests (BEFORE implementing fix)": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277746691
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277749844
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277984720
+      }
+    ],
+    "3.1 Make full-width chrome wrappers click-through": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277746789
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277989077
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278137258
+      }
+    ],
+    "3.2 Move stage bands down and add a top limit": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277746865
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278139253
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278396583
+      }
+    ],
+    "3.3 Spread small plots across the full width": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277746903
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278399081
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278482093
+      }
+    ],
+    "3.4 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277746959
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278484859
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278587941
+      }
+    ],
+    "3.5 Verify preservation tests still pass": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277747002
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278485458
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278588581
+      }
+    ],
+    "4. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794277747037
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278593121
+      },
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278643184
+      }
+    ],
+    "3. Fix for unclickable creatures, creatures above the top third, and left-packed small plots": [
+      {
+        "executionId": "2650f020-774d-4de7-8367-cfa8b95b003c",
+        "chatSessionId": "sess_92d84d09-3f03-4951-8ed1-3bb03705968e",
+        "timestamp": 1794278588962
+      }
+    ]
+  }
+}

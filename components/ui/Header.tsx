@@ -151,7 +151,7 @@ export default function Header({
           validation message sits below the row (still role="alert"), so it
           never widens the control strip. */}
       <div className="flex flex-col items-end gap-1 [@media(max-height:899px)]:items-start">
-        <div className="flex flex-wrap items-center gap-2 [@media(max-height:899px)]:justify-start">
+        <div className="pointer-events-auto flex flex-wrap items-center gap-2 [@media(max-height:899px)]:justify-start">
           <form
             onSubmit={handleSubmit}
             noValidate

@@ -39,7 +39,7 @@ export interface PagerProps {
  * state so the two controls still disable correctly at the plot ends.
  */
 const PAGER_BUTTON = [
-  "btn2 transition-colors",
+  "btn2 pointer-events-auto transition-colors",
   "enabled:cursor-pointer enabled:hover:bg-candle-400/10",
   "disabled:cursor-not-allowed disabled:opacity-40",
   "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",

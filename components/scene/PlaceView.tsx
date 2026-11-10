@@ -66,7 +66,7 @@
  * Requirements: 2.1, 2.5, 3.1, 3.7, 4.1, 4.2, 4.3, 4.4, 4.9, 5.1, 6.1, 8.2, 8.3
  */
 
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import Atmosphere from "@/components/scene/Atmosphere";
 import DepthScatter from "@/components/scene/DepthScatter";
@@ -114,6 +114,13 @@ const NEAR_FOG_PARALLAX: CSSProperties = {
   transform:
     "translate3d(calc(var(--px,0) * 26px), calc(var(--py,0) * 26px), 0)",
 };
+
+/**
+ * Fallback chrome bottom (px from the scene top) used until the chrome rect is
+ * measured: `--site-header-h` (7rem = 112px, see globals.css) plus a typical
+ * title block (heading + subtitle + chips, ~150px).
+ */
+const CHROME_BOTTOM_FALLBACK_PX = 112 + 150;
 
 export interface PlaceViewProps {
   /** Which place this view shows. */
@@ -271,6 +278,45 @@ export default function PlaceView({
     headingRef.current?.focus();
   }, [place]);
 
+  // Measure the chrome rect (union of `place-chrome` and `place-title-block`)
+  // so creatures and plaques can be kept below it. `chromeBottomPx` is relative
+  // to the scene root's top; it starts at a fallback derived from
+  // `--site-header-h` (7rem) plus the typical title block height and is
+  // replaced by the measured value once layout is available.
+  const chromeRef = useRef<HTMLDivElement>(null);
+  const titleBlockRef = useRef<HTMLDivElement>(null);
+  const [chromeBottomPx, setChromeBottomPx] = useState(CHROME_BOTTOM_FALLBACK_PX);
+  useEffect(() => {
+    const root = rootRef.current;
+    const els = [chromeRef.current, titleBlockRef.current].filter(
+      (el): el is HTMLDivElement => el !== null,
+    );
+    if (root === null || els.length === 0) {
+      return;
+    }
+    const measure = (): void => {
+      const rootTop = root.getBoundingClientRect().top;
+      let bottom = 0;
+      for (const el of els) {
+        bottom = Math.max(bottom, el.getBoundingClientRect().bottom - rootTop);
+      }
+      // jsdom (no layout) reports 0: keep the fallback rather than collapsing.
+      if (bottom > 0) {
+        setChromeBottomPx((prev) => (prev === bottom ? prev : bottom));
+      }
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const observer = new ResizeObserver(measure);
+    for (const el of els) {
+      observer.observe(el);
+    }
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [place]);
+
   return (
     <div
       ref={rootRef}
@@ -318,6 +364,9 @@ export default function PlaceView({
             onSelect={onSelect}
             filterHeroes={filterHeroes}
             reducedMotion={reducedMotion}
+            // Scatter box top == scene top, so the chrome bottom is directly
+            // comparable. DepthScatter folds in sceneH / 3 via max().
+            topLimitPx={chromeBottomPx}
             // The plaque layer fades in with the rest of the chrome during a
             // travel transition; creatures underneath keep animating in.
             plaqueStyle={travel?.active ? chromeFadeStyle : undefined}
@@ -354,8 +403,9 @@ export default function PlaceView({
       {/* --- Return control: pinned top-left, in its own row below the site
           header band (never over the stats line, visual fix 2C). --- */}
       <div
+        ref={chromeRef}
         data-testid="place-chrome"
-        className="absolute left-0 z-50 p-6"
+        className="pointer-events-none absolute left-0 z-50 p-6"
         style={{ top: "var(--site-header-h)", ...chromeFadeStyle }}
       >
         <ReturnToGate onReturn={onReturn} />
@@ -368,8 +418,9 @@ export default function PlaceView({
           below the site header; `PlaceHeading` renders the title + subtitle and
           the chips follow it in the same column. --- */}
       <div
+        ref={titleBlockRef}
         data-testid="place-title-block"
-        className="absolute inset-x-0 z-40 flex flex-col items-center gap-4 px-6"
+        className="pointer-events-none absolute inset-x-0 z-40 flex flex-col items-center gap-4 px-6"
         style={{ top: "var(--site-header-h)", ...chromeFadeStyle }}
       >
         <PlaceHeading ref={headingRef} name={meta.name} copy={copy} />
@@ -383,7 +434,7 @@ export default function PlaceView({
 
       {/* --- Pager (bottom band). --- */}
       <div
-        className="absolute inset-x-0 bottom-16 z-40 flex justify-center px-6"
+        className="pointer-events-none absolute inset-x-0 bottom-16 z-40 flex justify-center px-6"
         style={chromeFadeStyle}
       >
         <Pager

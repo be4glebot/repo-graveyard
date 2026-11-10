@@ -200,19 +200,25 @@ export const MOBILE_BREAKPOINT = 768;
  * baseline (the ground line). Ghosts float, so the sky band starts higher and
  * ends above the very bottom; the gate/ground/crypt bands hug the lower scene
  * where the painted ground sits. `x` is unaffected (stays in 0.08–0.92).
+ *
+ * Every `top` is >= 0.36 (keeps feet out of the title area; the resolved
+ * creature/plaque tops are additionally held under `resolvePlacement`'s
+ * `topLimitPx`), and every `bottom` is <= 0.85 so feet stay above the pager
+ * (pager top is ~0.856 of a 720px scene).
  */
 export const STAGE_BANDS: Record<PlaceId, { top: number; bottom: number }> = {
-  sky: { top: 0.2, bottom: 0.7 },
-  gate: { top: 0.46, bottom: 0.86 },
-  ground: { top: 0.42, bottom: 0.86 },
-  // Crypt widened from 0.55–0.86 to 0.45–0.88: 0.31 was too tight to stack
-  // three rows of coffins (+ their plaques) without crowding (visual fix r3 #2).
-  crypt: { top: 0.45, bottom: 0.88 },
+  sky: { top: 0.38, bottom: 0.85 },
+  gate: { top: 0.46, bottom: 0.85 },
+  ground: { top: 0.42, bottom: 0.85 },
+  // Crypt was widened to 0.45 in visual fix r3 #2: a narrow band is too tight
+  // to stack three rows of coffins (+ their plaques) without crowding. The
+  // bottom moved 0.88 → 0.85 to clear the pager.
+  crypt: { top: 0.45, bottom: 0.85 },
 };
 
 /** The narrowest stage band height across all places, used to pin the y-jitter
  *  and inter-row spacing so the no-overlap guarantee (Req 5.9, Property 2)
- *  survives mapping into the tightest band (gate, 0.46–0.86 → 0.40 tall). */
+ *  survives mapping into the tightest band (gate, 0.46–0.85 → 0.39 tall). */
 export const STAGE_BAND_MIN_HEIGHT = Math.min(
   ...Object.values(STAGE_BANDS).map((b) => b.bottom - b.top),
 );
@@ -709,7 +715,7 @@ const LEGACY_STAGE_BAND = { top: 0.18, bottom: 0.82 };
 /**
  * Upper bound on y-jitter as a fraction of the STAGE BAND height (not the whole
  * plot). It is capped small enough that two creatures in adjacent depth rows
- * never overlap vertically even in the narrowest stage band (crypt, 0.31 tall)
+ * never overlap vertically even in the narrowest stage band (gate, 0.39 tall)
  * at the worst-case short plot height ? preserving the no-overlap guarantee
  * (Req 5.9) after the per-place remap. See the derivation below.
  *
@@ -844,6 +850,26 @@ export function scatterLayout(
   // Per-row column counters so slots fill left-to-right as names land in a band.
   const colCursor = new Array<number>(bandCount).fill(0);
 
+  // Plot-level lanes for rows that are NOT full: `L = min(n, MAX_SCATTER_COLS)`
+  // evenly spaced lanes with centres `(j + 0.5) / L`. A row holding `k` names
+  // takes `k` distinct lanes spaced as evenly as possible across the `L`, then
+  // rotated by the row's front-rank so single-creature rows land in different
+  // lanes (3 names -> lanes 0, 1, 2). Lanes are sorted so names fill left to
+  // right. Full rows (k === MAX_SCATTER_COLS) keep the staggered grid below.
+  const laneCount = Math.min(n, MAX_SCATTER_COLS);
+  const rowSize = new Array<number>(bandCount).fill(0);
+  for (let i = 0; i < n; i++) rowSize[bandOfIndex[i]]++;
+  const rowLanes: number[][] = rowSize.map((k, band) => {
+    if (k === 0 || k >= MAX_SCATTER_COLS) return [];
+    const rotation = bandCount - 1 - band;
+    const lanes: number[] = [];
+    for (let s = 0; s < k; s++) {
+      const base = Math.floor(((s + 0.5) * laneCount) / k);
+      lanes.push((base + rotation) % laneCount);
+    }
+    return lanes.sort((a, b) => a - b);
+  });
+
   // Y-row centres map into the place's stage band so creatures stand on their
   // place's ground instead of floating across the whole scene (visual fix 2C).
   // Back (band 0) sits at the band top, the front band at the band bottom
@@ -875,6 +901,7 @@ export function scatterLayout(
     // #3, applied at render via `clampPlacementX`) pulls any edge case that
     // leaves the 16px scene margins back in.
     const col = colCursor[band] % MAX_SCATTER_COLS;
+    const lane = rowLanes[band][colCursor[band]];
     colCursor[band]++;
     // Cell grid with a half-cell STAGGER on odd rows, mapped into [0,1] WITHOUT
     // a post-hoc clamp: dividing by (cols + 0.5) reserves exactly half a cell of
@@ -883,7 +910,10 @@ export function scatterLayout(
     // -row plaques never collide) while adjacent rows read as organically offset
     // rather than a rigid grid (visual fix r3 #2.1).
     const rowPhase = (band % 2) * 0.5;
-    const cellCentre = (col + 0.5 + rowPhase) / (MAX_SCATTER_COLS + 0.5);
+    const cellCentre =
+      lane !== undefined
+        ? (lane + 0.5) / laneCount
+        : (col + 0.5 + rowPhase) / (MAX_SCATTER_COLS + 0.5);
     const x =
       cellCentre + drawRange(rng, -SCATTER_X_JITTER_FRAC, SCATTER_X_JITTER_FRAC);
 
@@ -1017,7 +1047,8 @@ export function rectsIntersect(a: SceneRect, b: SceneRect): boolean {
 export interface ResolvedPlacement {
   /** Final x fraction after the edge clamp + any plaque nudge feedback. */
   x: number;
-  /** y fraction (the feet line), unchanged by resolution. */
+  /** y fraction (the feet line); equals the input `y` unless the top limit
+   *  lowered it. */
   y: number;
   /** Rendered creature height in px (\u2264 base*scale; floored when shrunk). */
   creatureHeightPx: number;
@@ -1077,6 +1108,10 @@ function clampFeetX(
  * this one (larger `row` index) \u2014 the only ones whose bodies can hang into this
  * plaque \u2014 so callers resolve front rows first. Pass `[]` for the frontmost row.
  *
+ *   - top limit: when `topLimitPx > 0` (default 0 = off), the creature and
+ *     plaque rect tops are kept >= `topLimitPx` by lowering the feet line, and
+ *     shrinking toward the height floor if the band's ground line is reached.
+ *
  * Pure and deterministic in its inputs; reads no DOM.
  */
 export function resolvePlacement(
@@ -1085,12 +1120,14 @@ export function resolvePlacement(
   sceneWidthPx: number,
   sceneHeightPx: number,
   obstacles: readonly SceneRect[] = [],
+  topLimitPx: number = 0,
 ): ResolvedPlacement {
   const scale = placement.scale;
   const plaqueW = PLAQUE_W * scale;
   const plaqueH = PLAQUE_H * scale;
   const baseCreatureH = CREATURE_BASE_SIZE * scale;
-  const feetYPx = placement.y * sceneHeightPx;
+  // Mutable: the top-limit step below may lower the feet line.
+  let feetYPx = placement.y * sceneHeightPx;
 
   // Creatures render at full size by default (visual fix r3 #2: no shrinking
   // unless a plaque genuinely cannot be placed clear). The floor is the
@@ -1169,6 +1206,29 @@ export function resolvePlacement(
   const pitch = rowPitchPx(place, sceneHeightPx);
   const capH = pitch - plaqueH - CREATURE_PLAQUE_GAP_PX;
   let creatureH = Math.max(floorH, Math.min(baseCreatureH, capH));
+
+  // 2. Top limit: no creature or plaque rect may rise above `topLimitPx`. The
+  //    creature top is `feet - creatureH`; the plaque top is
+  //    `feet - plaqueLift(creatureH) - plaqueH/2`. So the lowest acceptable feet
+  //    line for a given height is `limit + max(creatureH, plaqueLift + plaqueH/2)`.
+  //    First lower the feet toward that line (down to the band's ground line);
+  //    if that line lies below the band bottom, shrink the creature toward the
+  //    height floor before moving it any further. The limit is always honoured.
+  const limitPx = Number.isFinite(topLimitPx) ? Math.max(0, topLimitPx) : 0;
+  const plaqueLift = (h: number): number =>
+    Math.min(h * 0.125, plaqueH / 2 + CREATURE_PLAQUE_GAP_PX);
+  // The tiny epsilon keeps floating-point rounding in the rect math (centre
+  // +/- half extent) from landing a hair above the limit.
+  const lowestFeet = (h: number): number =>
+    limitPx + 1e-6 + Math.max(h, plaqueLift(h) + plaqueH / 2);
+  if (limitPx > 0 && feetYPx < lowestFeet(creatureH)) {
+    const groundLinePx = STAGE_BANDS[place].bottom * sceneHeightPx;
+    if (lowestFeet(creatureH) > groundLinePx) {
+      creatureH = Math.min(creatureH, Math.max(floorH, groundLinePx - limitPx));
+    }
+    feetYPx = lowestFeet(creatureH);
+  }
+
   let plaqueCx = findClearCx(creatureH);
   if (hits(plaqueRectFor(plaqueCx, creatureH)) && floorH < creatureH) {
     creatureH = floorH;
@@ -1185,7 +1245,7 @@ export function resolvePlacement(
 
   return {
     x: feetXPx / sceneWidthPx,
-    y: placement.y,
+    y: feetYPx / sceneHeightPx,
     creatureHeightPx: creatureH,
     creature,
     plaque: plaqueRectFor(plaqueCx, creatureH),
