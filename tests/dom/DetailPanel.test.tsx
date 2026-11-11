@@ -89,6 +89,7 @@ function stubMedia({ width = 1280, reduced = false, fine = true }: MediaOpts = {
   vi.stubGlobal("matchMedia", (query: string) => {
     let matches = false;
     if (query.includes("min-width: 768px")) matches = width >= 768;
+    else if (query.includes("max-width: 767px")) matches = width <= 767;
     else if (query.includes("prefers-reduced-motion")) matches = reduced;
     else if (query.includes("hover: hover")) matches = fine;
     return {
@@ -340,13 +341,57 @@ describe("DetailPanel layout (5.5-5.7)", () => {
     expect(dialog()!.className).toContain("right-0");
   });
 
-  it("is a bottom sheet at < 768px (5.6)", () => {
+  it.each([375, 700])("is a full-height sheet at %ipx (6.1, 6.3)", (width) => {
+    stubMedia({ width });
+    renderPanel();
+    const cls = dialog()!.className;
+    for (const c of [
+      "max-[767px]:inset-0",
+      "max-[767px]:h-dvh",
+      "max-[767px]:w-full",
+      "max-[767px]:rounded-none",
+      "max-[767px]:overscroll-contain",
+    ]) {
+      expect(cls).toContain(c);
+    }
+    expect(cls).not.toContain("max-h-[85vh]");
+    expect(cls).toContain("overflow-y-auto");
+  });
+
+  it("keeps the 420px right panel classes at 768px (6.1)", () => {
+    stubMedia({ width: 768 });
+    renderPanel();
+    const cls = dialog()!.className;
+    expect(cls).toContain("min-[768px]:w-[420px]");
+    expect(cls).toContain("min-[768px]:right-0");
+    expect(dialog()!.style.transform).toContain("translateX");
+  });
+
+  it("slides up from the bottom in compact mode", () => {
     stubMedia({ width: 375 });
     renderPanel();
-    expect(dialog()!.className).toContain("max-h-[85vh]");
-    expect(dialog()!.className).toContain("bottom-0");
-    expect(dialog()!.className).not.toContain("w-[420px]");
-    expect(dialog()!.className).toContain("overflow-y-auto");
+    expect(dialog()!.style.transform).toContain("translateY");
+  });
+
+  it("has a sticky opaque header and a 44px close target (6.3, 6.6)", () => {
+    stubMedia({ width: 375 });
+    renderPanel();
+    const close = screen.getByRole("button", { name: "Close record" });
+    const header = close.parentElement!;
+    expect(header.className).toContain("max-[767px]:sticky");
+    expect(header.className).toContain("max-[767px]:top-0");
+    expect(header.className).toContain("max-[767px]:bg-night-800");
+    expect(close.className).toContain("max-[767px]:min-h-11");
+    expect(close.className).toContain("max-[767px]:min-w-11");
+  });
+
+  it("closing with a removed opener does not throw (6.7)", () => {
+    const root = mountRoot();
+    const opener = root.querySelector("button")!;
+    opener.focus();
+    const { unmount } = render(<DetailPanel {...panelProps()} />);
+    opener.remove();
+    expect(() => unmount()).not.toThrow();
   });
 
   it("dims the scene with a 35-50% overlay and closes on overlay click (5.7)", async () => {

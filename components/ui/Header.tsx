@@ -35,19 +35,29 @@
  */
 
 import { useRouter } from "next/navigation";
-import { useId, useState, type FormEvent } from "react";
+import {
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from "react";
 
+import { useHeaderHeightVar } from "@/components/scene/useHeaderHeightVar";
 import SummaryLine from "@/components/ui/SummaryLine";
 import Toggle from "@/components/ui/Toggle";
+import { useMedia } from "@/components/ui/useMedia";
+import { COMPACT_MAX_WIDTH_PX } from "@/lib/estate-view";
 import type { GraveyardRow } from "@/lib/graveyard-view";
 import type { SummaryCounts } from "@/lib/scene-view";
-import { isValidUsername, USERNAME_MAX_LENGTH } from "@/lib/username";
+import { USERNAME_MAX_LENGTH, validateUsernameInput } from "@/lib/username";
 
 /** Which scene the header sits above; drives the "Haunted Estate" badge. */
 export type HeaderMode = "live" | "estate";
 
-const EMPTY_MESSAGE = "A username is required";
-const INVALID_MESSAGE = "That doesn't look like a valid GitHub username";
+/** Compact (Mobile_Viewport) query, derived from the shared constant. */
+const COMPACT_QUERY = `(max-width: ${COMPACT_MAX_WIDTH_PX}px)`;
 
 export interface HeaderProps {
   /** Rows to summarize; ignored when `counts` is provided. */
@@ -81,37 +91,72 @@ export default function Header({
   const router = useRouter();
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const inputId = useId();
   const errorId = useId();
+  const panelId = useId();
+
+  const compact = useMedia(COMPACT_QUERY, false);
+
+  // Widening from compact to desktop closes the menu (Req 4.10). Tracked as a
+  // transition (not the raw value) so environments without matchMedia still
+  // allow the menu to open.
+  const [prevCompact, setPrevCompact] = useState(compact);
+  if (prevCompact !== compact) {
+    setPrevCompact(compact);
+    if (!compact) setMenuOpen(false);
+  }
+
+  // Measure the site-header wrapper (the header's parent) and publish its
+  // height as `--site-header-h` on the scene root while compact (Req 4.12).
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const headerElRef = useRef<HTMLElement>(null);
+  const wrapperRef = useRef<HTMLElement | null>(null);
+  const rootRef = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    const el = headerElRef.current;
+    wrapperRef.current = el?.parentElement ?? el;
+    rootRef.current = el?.closest<HTMLElement>("#scene-root") ?? null;
+  }, []);
+  useHeaderHeightVar(wrapperRef, compact, rootRef);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const next = value.trim();
 
-    // Empty or whitespace-only submit stays on the current scene and shows the
-    // "required" validation message (Req 7.6).
-    if (next.length === 0) {
-      setError(EMPTY_MESSAGE);
-      return;
-    }
-    if (!isValidUsername(next)) {
-      setError(INVALID_MESSAGE);
+    // Empty/invalid submits stay on the current scene, keep the typed text and
+    // keep the menu open (Req 7.6, 4.9).
+    const check = validateUsernameInput(value);
+    if (!check.ok) {
+      setError(check.message);
       return;
     }
 
-    // Non-empty, valid submit navigates to that username's scene (Req 7.5).
+    // Valid submit navigates to that username's scene (Req 7.5) and closes the
+    // menu (Req 4.8).
     setError(null);
-    router.push(`/g/${encodeURIComponent(next)}`);
+    setMenuOpen(false);
+    router.push(`/g/${encodeURIComponent(check.username)}`);
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape" && menuOpen) {
+      setMenuOpen(false);
+      menuButtonRef.current?.focus();
+    }
   }
 
   const hasError = error !== null;
 
   return (
     <header
+      ref={headerElRef}
       data-testid="scene-header"
+      onKeyDown={handleKeyDown}
       className={[
         "flex items-start justify-between gap-4 font-ui text-scene-fg",
+        // Below 768px: one column (row + menu panel), never wrapping the row.
+        "max-[767px]:flex-col max-[767px]:items-stretch max-[767px]:gap-2",
         // On short viewports (<900px tall) the chrome condenses so the controls
         // always stay within the header's own box and never overlap the scene
         // content beneath it, down to a 360px-wide viewport (Req 1.3). The
@@ -120,37 +165,66 @@ export default function Header({
         "[@media(max-height:899px)]:flex-col [@media(max-height:899px)]:items-stretch [@media(max-height:899px)]:gap-2",
       ].join(" ")}
     >
-      {/* LEFT cluster: wordmark + username badge on one row, summary beneath. */}
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1
-            className="font-wordmark text-3xl leading-none text-crimson-400"
-            style={{ textShadow: "0 0 12px var(--color-crimson-glow)" }}
-          >
-            Repo Graveyard
-          </h1>
-          {mode === "estate" ? (
-            <span className="rounded-full border border-crimson-400 px-2 py-0.5 font-ui text-xs uppercase tracking-wide text-crimson-200">
-              Haunted Estate
-            </span>
-          ) : null}
-          {username ? (
-            <span
-              data-testid="header-username-badge"
-              className="rounded-full border border-scene-fg-faint bg-night-sky/60 px-3 py-0.5 font-heading text-xs font-bold uppercase tracking-[2px] text-scene-fg"
+      {/* Row wrapper: below 768px a single non-wrapping row (left cluster +
+          Menu button); at 768px and up it is `contents`, so the desktop flex
+          layout is exactly as before. */}
+      <div className="flex min-w-0 items-start gap-2 max-[767px]:w-full max-[767px]:flex-nowrap min-[768px]:contents">
+        {/* LEFT cluster: wordmark + username badge on one row, summary beneath. */}
+        <div className="flex min-w-0 flex-col gap-2 max-[767px]:flex-1">
+          <div className="flex flex-wrap items-center gap-3 max-[767px]:flex-nowrap max-[767px]:gap-2">
+            <h1
+              className="shrink-0 whitespace-nowrap font-wordmark text-3xl leading-none text-crimson-400"
+              style={{ textShadow: "0 0 12px var(--color-crimson-glow)" }}
             >
-              {username}
-            </span>
-          ) : null}
+              Repo Graveyard
+            </h1>
+            {mode === "estate" ? (
+              <span className="shrink-0 whitespace-nowrap rounded-full border border-crimson-400 px-2 py-0.5 font-ui text-xs uppercase tracking-wide text-crimson-200">
+                Haunted Estate
+              </span>
+            ) : null}
+            {username ? (
+              <span
+                data-testid="header-username-badge"
+                className="min-w-0 truncate rounded-full border border-scene-fg-faint bg-night-sky/60 px-3 py-0.5 font-heading text-xs font-bold uppercase tracking-[2px] text-scene-fg"
+              >
+                {username}
+              </span>
+            ) : null}
+          </div>
+
+          <SummaryLine rows={rows} counts={counts} />
         </div>
 
-        <SummaryLine rows={rows} counts={counts} />
+        <button
+          ref={menuButtonRef}
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls={panelId}
+          onClick={() => setMenuOpen((open) => !open)}
+          className={
+            "pointer-events-auto min-h-11 min-w-11 shrink-0 rounded-md border border-candle-400 px-3 " +
+            "font-ui text-sm text-scene-fg transition-colors hover:bg-candle-400/20 min-[768px]:hidden " +
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
+            "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
+          }
+        >
+          Menu
+        </button>
       </div>
 
-      {/* RIGHT cluster: a compact visit box + the two toggles on ONE row. The
-          validation message sits below the row (still role="alert"), so it
-          never widens the control strip. */}
-      <div className="flex flex-col items-end gap-1 [@media(max-height:899px)]:items-start">
+      {/* RIGHT cluster / Menu panel: a compact visit box + the two toggles on
+          ONE row. Below 768px it is hidden until the Menu opens (CSS-driven, so
+          no hydration flash); at 768px and up it is always shown inline. The
+          validation message sits below the row (still role="alert"). */}
+      <div
+        id={panelId}
+        className={[
+          "flex-col items-end gap-1 [@media(max-height:899px)]:items-start",
+          "max-[767px]:items-stretch max-[767px]:rounded-md max-[767px]:bg-night-sky/90 max-[767px]:p-3",
+          menuOpen ? "flex" : "max-[767px]:hidden min-[768px]:flex",
+        ].join(" ")}
+      >
         <div className="pointer-events-auto flex flex-wrap items-center gap-2 [@media(max-height:899px)]:justify-start">
           <form
             onSubmit={handleSubmit}

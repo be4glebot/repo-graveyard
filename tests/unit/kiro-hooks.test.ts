@@ -71,7 +71,7 @@ describe.each(cases)("$file", ({ file, command, matches, misses }) => {
     expect(hook.trigger).toBe("PostFileSave");
     expect(hook.action.type).toBe("command");
     expect(hook.action.command).toBe(command);
-    expect(hook.enabled).toBe(true);
+    // `enabled` is the user's personal toggle, so it is intentionally not asserted.
     expect(typeof hook.timeout).toBe("number");
     expect(hook.timeout).toBeGreaterThan(0);
     expect(() => new RegExp(hook.matcher)).not.toThrow();

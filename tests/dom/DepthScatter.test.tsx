@@ -446,6 +446,7 @@ describe("DepthScatter — width branch (Req 5.9, 5.10)", () => {
         selectedName={null}
         onSelect={noop}
         reducedMotion={false}
+        compactBand={{ top: 120, bottom: 500 }}
       />,
     );
 

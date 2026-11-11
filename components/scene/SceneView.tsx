@@ -676,8 +676,7 @@ export default function SceneView({
           offsets itself below this band so the two never overlap (visual fix 2C). */}
       <div
         data-testid="site-header"
-        className="pointer-events-none absolute inset-x-0 top-0 z-50 p-4"
-        style={{ minHeight: "var(--site-header-h)" }}
+        className="pointer-events-none absolute inset-x-0 top-0 z-50 min-h-[var(--site-header-h)] p-4 max-[767px]:min-h-0"
       >
         <Header
           rows={rows}

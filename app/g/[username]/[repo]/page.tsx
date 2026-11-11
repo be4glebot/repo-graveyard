@@ -32,6 +32,7 @@ import SceneView from "@/components/scene/SceneView";
 import SceneErrorState from "@/components/scene/SceneErrorState";
 import { loadGraveyard } from "@/lib/graveyard-loader";
 import { buildRows } from "@/lib/graveyard-view";
+import { resetInMinutes } from "@/lib/edge-states";
 
 import type { Metadata } from "next";
 
@@ -50,26 +51,6 @@ export async function generateMetadata({
 interface GraveyardRepoPageProps {
   params: Promise<{ username: string; repo: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-/**
- * Whole minutes from `renderedAt` to the rate-limit reset instant, or
- * `undefined` when the reset time is unknown or already in the past. Mirrors
- * the base route's derivation so both scene routes render the countdown
- * identically.
- */
-function resetInMinutesFrom(
-  renderedAt: string,
-  resetAt: string | null,
-): number | undefined {
-  if (resetAt === null) {
-    return undefined;
-  }
-  const deltaMs = new Date(resetAt).getTime() - new Date(renderedAt).getTime();
-  if (!Number.isFinite(deltaMs) || deltaMs <= 0) {
-    return undefined;
-  }
-  return Math.floor(deltaMs / 60_000);
 }
 
 /**
@@ -103,11 +84,11 @@ async function GraveyardRepoContent({
 
   if (!result.ok) {
     const { error } = result;
-    const resetInMinutes =
+    const resetMinutes =
       error.kind === "rate-limited"
-        ? resetInMinutesFrom(renderedAt, error.resetAt)
+        ? resetInMinutes(error.resetAt, renderedAt)
         : undefined;
-    return <SceneErrorState kind={error.kind} resetInMinutes={resetInMinutes} />;
+    return <SceneErrorState kind={error.kind} resetInMinutes={resetMinutes} />;
   }
 
   const { repos, truncated } = result.value;

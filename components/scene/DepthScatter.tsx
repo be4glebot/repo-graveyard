@@ -71,15 +71,17 @@ import { type LifecycleState } from "@/lib/lifecycle";
 import {
   CREATURE_BASE_SIZE,
   DEPTH_ROWS,
+  COMPACT_MAX_WIDTH_PX,
   GHOST_DECAY_WORDS,
-  MOBILE_BREAKPOINT,
   ZOMBIE_DECAY_WORDS,
+  compactStackLayout,
   resolvePlacement,
   scatterLayout,
   type PlaceId,
   type ResolvedPlacement,
   type ScatterPlacement,
   type SceneRect,
+  type StageBandPx,
 } from "@/lib/estate-view";
 
 import Ghost from "@/components/creatures/Ghost";
@@ -116,42 +118,6 @@ const CREATURE_BY_STATE: Record<
   tombstone: Tombstone,
   coffin: Coffin,
 };
-
-// --- Two-column mobile layout geometry (Req 5.10) --------------------------
-//
-// Below 768px the seeded scatter is replaced by a staggered two-column stack.
-// The two column centres sit at these x fractions; every creature also gets its
-// OWN vertical slot (no two share a y-band within a plaque height), so no two
-// plaque rectangles ever share both an x-band and a y-band regardless of the
-// narrow viewport width — the same "disjoint on at least one axis" guarantee
-// the scatter grid gives on wide viewports. The vertical slots span
-// [MOBILE_Y_MIN, MOBILE_Y_MAX] so the top/bottom plaques clear the plot edges.
-
-/** Left/right column centres as fractions of plot width. */
-const MOBILE_COL_X = [0.28, 0.72] as const;
-
-/** First and last vertical slot centres as fractions of plot height. */
-const MOBILE_Y_MIN = 0.08;
-const MOBILE_Y_MAX = 0.92;
-
-/**
- * Computes the two-column staggered mobile placement for index `i` of `n`
- * creatures. Returns the `x`/`y` fractions only; scale/brightness/mirrored/tilt
- * continue to come from the seeded `scatterLayout` record. Columns alternate
- * (even indices left, odd indices right) and every creature owns a distinct
- * vertical slot evenly spaced across [MOBILE_Y_MIN, MOBILE_Y_MAX], so same-column
- * creatures are y-disjoint and cross-column creatures are x-disjoint (Req 5.10).
- */
-function mobilePosition(i: number, n: number): { x: number; y: number } {
-  const x = MOBILE_COL_X[i % MOBILE_COL_X.length];
-  // One vertical slot per creature so no two plaques share a y-band. A single
-  // creature sits at the vertical centre.
-  const y =
-    n <= 1
-      ? (MOBILE_Y_MIN + MOBILE_Y_MAX) / 2
-      : MOBILE_Y_MIN + ((MOBILE_Y_MAX - MOBILE_Y_MIN) * i) / (n - 1);
-  return { x, y };
-}
 
 // --- Seeded wander parameters for fresh gate zombies (Req 5.12) ------------
 //
@@ -264,9 +230,15 @@ export interface DepthScatterProps {
    * Minimum top edge (px, in the scatter box's coordinates) for every creature
    * and plaque rect on the desktop branch: `max(sceneH / 3, chromeBottomPx)`
    * from `PlaceView`. Defaults to `sceneH / 3` when omitted. Passed to
-   * `resolvePlacement`; the mobile two-column branch ignores it.
+   * `resolvePlacement`; the compact branch ignores it (it uses `compactBand`).
    */
   topLimitPx?: number;
+  /**
+   * Stage band (px, scene coordinates) for the compact layout. When set and the
+   * scene is at most `COMPACT_MAX_WIDTH_PX` wide, positions come from
+   * `compactStackLayout`; otherwise the desktop branches run unchanged.
+   */
+  compactBand?: StageBandPx;
 }
 
 /**
@@ -385,6 +357,7 @@ export default function DepthScatter({
   reducedMotion,
   plaqueStyle,
   topLimitPx,
+  compactBand,
 }: DepthScatterProps) {
   // Compute the scatter layout once per (plot, place). The seed is the place id
   // so each place scatters deterministically and differently; the names are the
@@ -418,7 +391,13 @@ export default function DepthScatter({
     return null;
   };
   const { width: sceneW, height: sceneH } = useSceneBox(rootRef);
-  const isMobile = sceneW > 0 && sceneW < MOBILE_BREAKPOINT;
+  const bandTop = compactBand?.top;
+  const bandBottom = compactBand?.bottom;
+  const isMobile =
+    sceneW > 0 &&
+    sceneW <= COMPACT_MAX_WIDTH_PX &&
+    bandTop !== undefined &&
+    bandBottom !== undefined;
 
   const isGround = place === "ground";
   const isGate = place === "gate";
@@ -455,10 +434,23 @@ export default function DepthScatter({
   const resolved = useMemo<Resolved[]>(() => {
     const out: Resolved[] = new Array(plot.length);
 
-    if (isMobile) {
+    if (isMobile && bandTop !== undefined && bandBottom !== undefined) {
+      const stacked = compactStackLayout(
+        placements,
+        sceneW,
+        { top: bandTop, bottom: bandBottom },
+        sceneH > 0 ? sceneH : undefined,
+      );
+      const H = sceneH > 0 ? sceneH : Math.max(1, bandBottom);
       for (let i = 0; i < plot.length; i++) {
-        const { x, y } = mobilePosition(i, plot.length);
-        out[i] = { feetX: x, feetY: y, plaqueX: x, plaqueY: y, effectiveScale: placements[i].scale };
+        const r = stacked[i];
+        out[i] = {
+          feetX: r.x,
+          feetY: r.y,
+          plaqueX: r.plaque.cx / sceneW,
+          plaqueY: r.plaque.cy / H,
+          effectiveScale: r.creatureHeightPx / CREATURE_BASE_SIZE,
+        };
       }
       return out;
     }
@@ -500,7 +492,7 @@ export default function DepthScatter({
       };
     }
     return out;
-  }, [plot, placements, place, sceneW, sceneH, isMobile, topLimitPx]);
+  }, [plot, placements, place, sceneW, sceneH, isMobile, topLimitPx, bandTop, bandBottom]);
 
   return (
     <div

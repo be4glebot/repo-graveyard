@@ -68,6 +68,8 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
+import { useMedia } from "@/components/ui/useMedia";
+
 import Atmosphere from "@/components/scene/Atmosphere";
 import DepthScatter from "@/components/scene/DepthScatter";
 import Fog from "@/components/scene/Fog";
@@ -86,6 +88,10 @@ import {
   ZOMBIE_DECAY_WORDS,
   PLACES,
   PLOT_SIZE,
+  COMPACT_CHROME_FALLBACK_PX,
+  COMPACT_MAX_WIDTH_PX,
+  compactPlotSize,
+  stageBand,
   orderForPlace,
   paginate,
   plaqueCopy,
@@ -121,6 +127,16 @@ const NEAR_FOG_PARALLAX: CSSProperties = {
  * title block (heading + subtitle + chips, ~150px).
  */
 const CHROME_BOTTOM_FALLBACK_PX = 112 + 150;
+
+/** Compact (< 768px) media query, derived from the shared constant. */
+const COMPACT_QUERY = `(max-width: ${COMPACT_MAX_WIDTH_PX}px)`;
+
+/** Fallback top-chrome bottom (px) for the compact layout before measuring. */
+const COMPACT_TOP_FALLBACK_PX =
+  COMPACT_CHROME_FALLBACK_PX.header +
+  COMPACT_CHROME_FALLBACK_PX.returnLink +
+  COMPACT_CHROME_FALLBACK_PX.titleBlock +
+  COMPACT_CHROME_FALLBACK_PX.chips;
 
 export interface PlaceViewProps {
   /** Which place this view shows. */
@@ -221,13 +237,24 @@ export default function PlaceView({
 }: PlaceViewProps) {
   const meta = PLACES[place];
 
+  // Compact (< 768px) layout. The media query is authoritative; where
+  // `matchMedia` is unavailable (jsdom) the measured root width decides.
+  const mediaCompact = useMedia(COMPACT_QUERY, false);
+  const hasMatchMedia =
+    typeof window !== "undefined" && typeof window.matchMedia === "function";
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  const compact = hasMatchMedia
+    ? mediaCompact
+    : box.w > 0 && box.w <= COMPACT_MAX_WIDTH_PX;
+  const pageSize = compact ? compactPlotSize(box.w) : PLOT_SIZE;
+
   // Derivation pipeline: filter → order → paginate. Memoized on the inputs so
   // the plots are recomputed only when the rows/filter actually change.
   const plots = useMemo(() => {
     const filtered = applyFilter(place, rows, activeFilter);
     const ordered = orderForPlace(place, filtered);
-    return paginate(ordered, PLOT_SIZE);
-  }, [place, rows, activeFilter]);
+    return paginate(ordered, pageSize);
+  }, [place, rows, activeFilter, pageSize]);
 
   // Clamp the incoming plot index into range so a stale/out-of-range value can
   // never index past the plots (Req 8.3). `paginate` always returns ≥ 1 plot.
@@ -285,7 +312,9 @@ export default function PlaceView({
   // replaced by the measured value once layout is available.
   const chromeRef = useRef<HTMLDivElement>(null);
   const titleBlockRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
   const [chromeBottomPx, setChromeBottomPx] = useState(CHROME_BOTTOM_FALLBACK_PX);
+  const [barTopPx, setBarTopPx] = useState<number | null>(null);
   useEffect(() => {
     const root = rootRef.current;
     const els = [chromeRef.current, titleBlockRef.current].filter(
@@ -295,6 +324,17 @@ export default function PlaceView({
       return;
     }
     const measure = (): void => {
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      setBox((prev) => (prev.w === w && prev.h === h ? prev : { w, h }));
+      const barEl = barRef.current;
+      if (barEl !== null) {
+        const barTop =
+          barEl.getBoundingClientRect().top - root.getBoundingClientRect().top;
+        if (barTop > 0) {
+          setBarTopPx((prev) => (prev === barTop ? prev : barTop));
+        }
+      }
       const rootTop = root.getBoundingClientRect().top;
       let bottom = 0;
       for (const el of els) {
@@ -314,8 +354,23 @@ export default function PlaceView({
       observer.observe(el);
     }
     observer.observe(root);
+    if (barRef.current !== null) {
+      observer.observe(barRef.current);
+    }
     return () => observer.disconnect();
-  }, [place]);
+  }, [place, compact]);
+
+  // Compact stage band from the measured chrome column bottom and bar top,
+  // using the fallback heights until a measurement lands.
+  const compactBand = useMemo(() => {
+    if (!compact) return undefined;
+    const sceneH =
+      box.h > 0 ? box.h : typeof window !== "undefined" ? window.innerHeight : 0;
+    const measured = chromeBottomPx !== CHROME_BOTTOM_FALLBACK_PX;
+    const top = measured ? chromeBottomPx : COMPACT_TOP_FALLBACK_PX;
+    const barTop = barTopPx ?? sceneH - COMPACT_CHROME_FALLBACK_PX.bottomBar;
+    return stageBand(sceneH, top, barTop);
+  }, [compact, box.h, chromeBottomPx, barTopPx]);
 
   return (
     <div
@@ -367,6 +422,7 @@ export default function PlaceView({
             // Scatter box top == scene top, so the chrome bottom is directly
             // comparable. DepthScatter folds in sceneH / 3 via max().
             topLimitPx={chromeBottomPx}
+            compactBand={compactBand}
             // The plaque layer fades in with the rest of the chrome during a
             // travel transition; creatures underneath keep animating in.
             plaqueStyle={travel?.active ? chromeFadeStyle : undefined}
@@ -400,7 +456,59 @@ export default function PlaceView({
         {isGate ? <Lightning ancientCount={ancientCount} /> : null}
       </div>
 
-      {/* --- Return control: pinned top-left, in its own row below the site
+      {compact ? (
+        <>
+          {/* --- Compact chrome: ONE flow column (return link, heading, chips
+              in a single horizontally scrolling row) below the site header. --- */}
+          <div
+            ref={chromeRef}
+            data-testid="place-chrome"
+            className="pointer-events-none absolute inset-x-0 z-50 flex flex-col items-stretch gap-2 px-4 py-2"
+            style={{ top: "var(--site-header-h)", ...chromeFadeStyle }}
+          >
+            <div className="flex justify-start">
+              <ReturnToGate onReturn={onReturn} />
+            </div>
+            <div
+              ref={titleBlockRef}
+              data-testid="place-title-block"
+              className="flex flex-col items-center gap-2"
+            >
+              <PlaceHeading ref={headingRef} name={meta.name} copy={copy} />
+            </div>
+            <div
+              data-testid="place-chips-row"
+              className="pointer-events-auto overflow-x-auto [&>div]:w-max [&>div]:flex-nowrap [&>div]:justify-start"
+            >
+              <FilterChips
+                place={place}
+                rows={rows}
+                activeFilter={activeFilter}
+                onFilterChange={onFilterChange}
+              />
+            </div>
+          </div>
+
+          {/* --- Bottom bar: the pager, fixed to the bottom with safe-area
+              padding. --- */}
+          <div
+            ref={barRef}
+            data-testid="place-bottom-bar"
+            className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pt-2"
+            style={{
+              paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom, 0px))",
+              ...chromeFadeStyle,
+            }}
+          >
+            <Pager
+              plotIndex={clampedIndex}
+              plotCount={plotCount}
+              onPlotChange={onPlotChange}
+            />
+          </div>
+        </>
+      ) : (
+        <>      {/* --- Return control: pinned top-left, in its own row below the site
           header band (never over the stats line, visual fix 2C). --- */}
       <div
         ref={chromeRef}
@@ -443,6 +551,8 @@ export default function PlaceView({
           onPlotChange={onPlotChange}
         />
       </div>
+        </>
+      )}
     </div>
   );
 }

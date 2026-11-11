@@ -41,7 +41,10 @@ import { connection } from "next/server";
 import SceneView from "@/components/scene/SceneView";
 import SceneErrorState from "@/components/scene/SceneErrorState";
 import { loadGraveyard } from "@/lib/graveyard-loader";
+import GraveyardLoading from "@/components/scene/GraveyardLoading";
+import EmptyGraveyard from "@/components/scene/EmptyGraveyard";
 import { buildRows } from "@/lib/graveyard-view";
+import { resetInMinutes } from "@/lib/edge-states";
 
 import type { Metadata } from "next";
 
@@ -54,33 +57,12 @@ export async function generateMetadata({
   params,
 }: GraveyardPageProps): Promise<Metadata> {
   const { username } = await params;
-  return { title: `Repo Graveyard — ${username}` };
+  return { title: { absolute: `Repo Graveyard — ${username}` } };
 }
 
 interface GraveyardPageProps {
   params: Promise<{ username: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-/**
- * Derives whole minutes until a rate-limit reset relative to the render instant.
- * Returns `undefined` when the reset time is unknown or unparseable, so the
- * caller omits `resetInMinutes` entirely. Never returns a negative number: a
- * reset already in the past floors to 0.
- */
-function resetInMinutesFrom(
-  resetAt: string | null,
-  renderedAt: string,
-): number | undefined {
-  if (resetAt === null) {
-    return undefined;
-  }
-  const resetMs = Date.parse(resetAt);
-  const nowMs = Date.parse(renderedAt);
-  if (Number.isNaN(resetMs) || Number.isNaN(nowMs)) {
-    return undefined;
-  }
-  return Math.max(0, Math.floor((resetMs - nowMs) / 60_000));
 }
 
 /**
@@ -108,14 +90,18 @@ async function GraveyardContent({ params, searchParams }: GraveyardPageProps) {
 
   if (!result.ok) {
     const { error } = result;
-    const resetInMinutes =
+    const resetMinutes =
       error.kind === "rate-limited"
-        ? resetInMinutesFrom(error.resetAt, renderedAt)
+        ? resetInMinutes(error.resetAt, renderedAt)
         : undefined;
-    return <SceneErrorState kind={error.kind} resetInMinutes={resetInMinutes} />;
+    return <SceneErrorState kind={error.kind} resetInMinutes={resetMinutes} />;
   }
 
   const { repos, truncated } = result.value;
+
+  if (repos.length === 0) {
+    return <EmptyGraveyard username={username} />;
+  }
 
   // Initial, no-override rows classified against the single server clock; these
   // satisfy SceneViewProps.rows and make the first paint hydration-stable.
@@ -137,13 +123,7 @@ async function GraveyardContent({ params, searchParams }: GraveyardPageProps) {
 
 export default function GraveyardPage({ params, searchParams }: GraveyardPageProps) {
   return (
-    <Suspense
-      fallback={
-        <main className="flex min-h-dvh flex-col items-center justify-center bg-background text-foreground">
-          <p className="text-base text-foreground/60">Loading the graveyard…</p>
-        </main>
-      }
-    >
+    <Suspense fallback={<GraveyardLoading />}>
       <GraveyardContent params={params} searchParams={searchParams} />
     </Suspense>
   );

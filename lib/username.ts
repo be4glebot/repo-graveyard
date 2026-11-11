@@ -35,3 +35,31 @@ export function isValidUsername(input: string): boolean {
 export function normalizeUsername(input: string): string {
   return input.toLowerCase();
 }
+
+/** Message shown when the landing/visit form is submitted empty. */
+export const USERNAME_EMPTY_MESSAGE = "A username is required";
+
+/** Message shown when the trimmed input is not a valid GitHub username. */
+export const USERNAME_INVALID_MESSAGE =
+  "That doesn't look like a valid GitHub username";
+
+export type UsernameCheck =
+  | { ok: true; username: string }
+  | { ok: false; message: string };
+
+/**
+ * Validates raw form input: trims first, then checks emptiness, then
+ * `isValidUsername`. On success returns the trimmed username.
+ *
+ * Requirements: 2.2, 2.3, 2.4
+ */
+export function validateUsernameInput(raw: string): UsernameCheck {
+  const username = raw.trim();
+  if (username.length === 0) {
+    return { ok: false, message: USERNAME_EMPTY_MESSAGE };
+  }
+  if (!isValidUsername(username)) {
+    return { ok: false, message: USERNAME_INVALID_MESSAGE };
+  }
+  return { ok: true, username };
+}

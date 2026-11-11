@@ -22,7 +22,7 @@ describe(".env.example", () => {
     expect(existsSync(path)).toBe(true);
   });
 
-  it("has exactly the four expected lines", () => {
+  it("has exactly the expected lines", () => {
     const lines = readFileSync(path, "utf8")
       .split(/\r?\n/)
       .map((l) => l.trim())
@@ -32,6 +32,7 @@ describe(".env.example", () => {
       "LLM_MODEL=claude-haiku-5-5",
       "LLM_API_KEY=",
       "LLM_DAILY_LIMIT=150",
+      "NEXT_PUBLIC_SITE_URL=https://your-deployment.example.com",
     ]);
   });
 

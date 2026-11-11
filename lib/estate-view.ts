@@ -1005,6 +1005,272 @@ export const SCENE_EDGE_MARGIN_PX = 16;
  *  `+ 6px` the plaque wrapper uses, rounded into the budget as 8px). */
 export const CREATURE_PLAQUE_GAP_PX = 8;
 
+/**
+ * Shared plaque lift rule: how many px the plaque's vertical centre sits above
+ * its creature's feet line. The bottom-quarter midpoint (`creatureH * 0.125`)
+ * for small creatures, clamped to a thin feet-hugging strip
+ * (`plaqueH / 2 + CREATURE_PLAQUE_GAP_PX`) for tall ones. Used by
+ * `resolvePlacement` and the compact layout so the two paths cannot drift.
+ */
+export function plaqueLiftPx(creatureH: number, plaqueH: number): number {
+  return Math.min(creatureH * 0.125, plaqueH / 2 + CREATURE_PLAQUE_GAP_PX);
+}
+
+// --- Compact (< MOBILE_BREAKPOINT) layout constants -------------------------
+
+/** Widest viewport (px) that uses the compact layout; derived from the
+ *  breakpoint so the two cannot drift. */
+export const COMPACT_MAX_WIDTH_PX = MOBILE_BREAKPOINT - 1;
+
+/** Slot rows per compact page (plaque rows need ~50px each). */
+export const COMPACT_SLOT_ROWS = 4;
+
+/** Minimum column width (px) before another compact column is added. */
+export const COMPACT_COLUMN_MIN_PX = 160;
+
+/** Maximum number of compact columns. */
+export const COMPACT_MAX_COLUMNS = 4;
+
+/** Gap (px) between compact slots. */
+export const COMPACT_SLOT_GAP_PX = 4;
+
+/** Smallest creature height (px) the compact layout will render. */
+export const COMPACT_CREATURE_MIN_PX = 64;
+
+/** Max px a plaque rect extends below its creature's feet: half the tallest
+ *  plaque (`PLAQUE_H * SCATTER_SCALE_MAX / 2`), reached when the lift is 0. */
+export const PLAQUE_BELOW_FEET_MAX_PX = (PLAQUE_H * SCATTER_SCALE_MAX) / 2;
+
+/**
+ * Fallback chrome heights (px) used before anything is measured (first paint,
+ * jsdom). Each is at least the real rendered height so no creature sits under
+ * chrome on first paint.
+ */
+export const COMPACT_CHROME_FALLBACK_PX = {
+  header: 64,
+  returnLink: 44,
+  titleBlock: 120,
+  chips: 56,
+  bottomBar: 80,
+};
+
+/** A vertical stage band in scene px. */
+export interface StageBandPx {
+  top: number;
+  bottom: number;
+}
+
+/**
+ * Compact stage band from measured chrome. Non-finite inputs coerce to 0 and
+ * the scene height to `max(0, finite)`; `top` is clamped into `[0, H]` and
+ * `bottom` into `[top, H]`, so the band is never negative and stays inside the
+ * scene. `bottom` is the bar top minus the max plaque overhang below the feet.
+ */
+export function stageBand(
+  sceneHeightPx: number,
+  topChromeBottomPx: number,
+  bottomBarTopPx: number,
+): StageBandPx {
+  const fin = (n: number): number => (Number.isFinite(n) ? n : 0);
+  const h = Math.max(0, fin(sceneHeightPx));
+  const top = Math.min(h, Math.max(0, fin(topChromeBottomPx)));
+  const rawBottom = fin(bottomBarTopPx) - PLAQUE_BELOW_FEET_MAX_PX;
+  const bottom = Math.min(h, Math.max(top, rawBottom));
+  return { top, bottom };
+}
+
+// --- Compact columns, plot size, chrome boxes and stack layout (Decision D) --
+
+/** Coerces a non-finite number to 0. */
+function finiteOrZero(n: number): number {
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * Number of compact columns for a scene width: as many `COMPACT_COLUMN_MIN_PX`
+ * wide columns as fit between the edge margins, clamped to `2..4`. Total: a
+ * non-finite or tiny width yields 2.
+ */
+export function compactColumns(sceneWidthPx: number): number {
+  const usable = finiteOrZero(sceneWidthPx) - 2 * SCENE_EDGE_MARGIN_PX;
+  const fit = Math.floor(
+    (usable + COMPACT_SLOT_GAP_PX) / (COMPACT_COLUMN_MIN_PX + COMPACT_SLOT_GAP_PX),
+  );
+  return Math.min(COMPACT_MAX_COLUMNS, Math.max(2, fit));
+}
+
+/** Creatures per compact page: `min(columns * COMPACT_SLOT_ROWS, PLOT_SIZE)`. */
+export function compactPlotSize(sceneWidthPx: number): number {
+  return Math.min(compactColumns(sceneWidthPx) * COMPACT_SLOT_ROWS, PLOT_SIZE);
+}
+
+/** Heights (px) of the compact chrome pieces. */
+export type CompactChromeHeights = typeof COMPACT_CHROME_FALLBACK_PX;
+
+/** The compact chrome boxes in top-to-bottom order. */
+export interface CompactChromeBoxes {
+  header: SceneRect;
+  returnLink: SceneRect;
+  titleBlock: SceneRect;
+  chips: SceneRect;
+  bottomBar: SceneRect;
+}
+
+/**
+ * Pure model of the compact chrome: header, return link, title block and chips
+ * stacked full width from y = 0 in that order, and the bottom bar anchored to
+ * the viewport bottom. Non-finite or negative inputs coerce to 0. Boxes are
+ * returned in order even when the stack is taller than the viewport.
+ */
+export function layoutCompactChrome(
+  viewportW: number,
+  viewportH: number,
+  heights: CompactChromeHeights,
+): CompactChromeBoxes {
+  const w = Math.max(0, finiteOrZero(viewportW));
+  const vh = Math.max(0, finiteOrZero(viewportH));
+  const hOf = (n: number): number => Math.max(0, finiteOrZero(n));
+  const box = (top: number, height: number): SceneRect => ({
+    cx: w / 2,
+    cy: top + height / 2,
+    left: 0,
+    right: w,
+    top,
+    bottom: top + height,
+  });
+  const header = box(0, hOf(heights.header));
+  const returnLink = box(header.bottom, hOf(heights.returnLink));
+  const titleBlock = box(returnLink.bottom, hOf(heights.titleBlock));
+  const chips = box(titleBlock.bottom, hOf(heights.chips));
+  const barH = hOf(heights.bottomBar);
+  const bottomBar = box(Math.max(0, vh - barH), barH);
+  return { header, returnLink, titleBlock, chips, bottomBar };
+}
+
+/**
+ * Compact (< `MOBILE_BREAKPOINT`) layout: a column grid of creatures stacked in
+ * slot rows inside the stage `band`. Returns one {@link ResolvedPlacement} per
+ * input, in order, and never throws (non-finite inputs are coerced).
+ *
+ * Only each placement's `scale` is used. Columns are equal cells between the
+ * edge margins; a plaque is as wide as `PLAQUE_W * scale` capped to its cell,
+ * so same-row plaques never overlap. Creature heights are capped so the rows
+ * fit the band, and row feet lines are spaced so creature tops and plaque rects
+ * stay inside `[band.top, band.bottom]` and plaques of adjacent rows stay
+ * `COMPACT_SLOT_GAP_PX` apart, whenever the band is tall enough to allow it.
+ *
+ * `y` is a fraction of `sceneHeightPx`, which defaults to `band.bottom`.
+ */
+export function compactStackLayout(
+  placements: readonly ScatterPlacement[],
+  sceneWidthPx: number,
+  band: StageBandPx,
+  sceneHeightPx?: number,
+): ResolvedPlacement[] {
+  const n = placements.length;
+  if (n === 0) {
+    return [];
+  }
+  const W = Math.max(0, finiteOrZero(sceneWidthPx));
+  const top = Math.max(0, finiteOrZero(band.top));
+  const bottom = Math.max(top, finiteOrZero(band.bottom));
+  const H = Math.max(
+    1,
+    sceneHeightPx === undefined ? bottom : finiteOrZero(sceneHeightPx),
+  );
+
+  const cols = compactColumns(W);
+  const rows = Math.ceil(n / cols);
+  const gap = COMPACT_SLOT_GAP_PX;
+  const cellW = Math.max(
+    0,
+    (W - 2 * SCENE_EDGE_MARGIN_PX - (cols - 1) * gap) / cols,
+  );
+
+  const scales = placements.map((p) => {
+    const s = finiteOrZero(p.scale) || 1;
+    return Math.min(SCATTER_SCALE_MAX, Math.max(SCATTER_SCALE_MIN, s));
+  });
+
+  // Worst-case plaque extents relative to the feet line.
+  const maxPlaqueH = PLAQUE_H * SCATTER_SCALE_MAX;
+  const worstLift = plaqueLiftPx(CREATURE_BASE_SIZE * SCATTER_SCALE_MAX, maxPlaqueH);
+  const bestLift = plaqueLiftPx(
+    COMPACT_CREATURE_MIN_PX,
+    PLAQUE_H * SCATTER_SCALE_MIN,
+  );
+  const overhang = Math.max(0, maxPlaqueH / 2 - bestLift);
+  const minPitch = maxPlaqueH + gap + Math.max(0, worstLift - bestLift);
+
+  // Creature height cap so all rows fit the band.
+  const usable = bottom - overhang - top;
+  const maxH = Math.max(
+    COMPACT_CREATURE_MIN_PX,
+    usable - (rows - 1) * minPitch,
+  );
+  const heights = scales.map((s) => Math.min(CREATURE_BASE_SIZE * s, maxH));
+
+  // Per-row extents: how far plaques reach above (up) and below (down) the feet,
+  // and the tallest creature.
+  const up = new Array<number>(rows).fill(0);
+  const down = new Array<number>(rows).fill(0);
+  const tall = new Array<number>(rows).fill(0);
+  for (let i = 0; i < n; i++) {
+    const j = Math.floor(i / cols);
+    const ph = PLAQUE_H * scales[i];
+    const lift = plaqueLiftPx(heights[i], ph);
+    up[j] = Math.max(up[j], lift + ph / 2);
+    down[j] = Math.max(down[j], ph / 2 - lift);
+    tall[j] = Math.max(tall[j], heights[i]);
+  }
+
+  // Minimal feet lines, top to bottom, then spread any slack evenly.
+  const feet = new Array<number>(rows).fill(0);
+  feet[0] = top + Math.max(tall[0], up[0]);
+  for (let j = 1; j < rows; j++) {
+    feet[j] = Math.max(
+      feet[j - 1] + Math.max(0, down[j - 1]) + gap + up[j],
+      top + Math.max(tall[j], up[j]),
+    );
+  }
+  if (rows > 1) {
+    const lastLimit = bottom - Math.max(0, down[rows - 1]);
+    const slack = lastLimit - feet[rows - 1];
+    if (slack > 0) {
+      for (let j = 1; j < rows; j++) {
+        feet[j] += (slack * j) / (rows - 1);
+      }
+    }
+  } else {
+    feet[0] = Math.max(feet[0], bottom - Math.max(0, down[0]));
+  }
+
+  return placements.map((_, i) => {
+    const j = Math.floor(i / cols);
+    const col = i % cols;
+    const scale = scales[i];
+    const h = heights[i];
+    const plaqueW = Math.min(PLAQUE_W * scale, cellW);
+    const plaqueH = PLAQUE_H * scale;
+    const cellCx = SCENE_EDGE_MARGIN_PX + cellW / 2 + col * (cellW + gap);
+    const plaqueCx = W > 0 && cellW > 0 ? cellCx : W / 2;
+    const feetX = clampFeetX(cellCx, h / 2, W);
+    const feetY = feet[j];
+    return {
+      x: W > 0 ? feetX / W : 0.5,
+      y: feetY / H,
+      creatureHeightPx: h,
+      creature: rectFrom(feetX, feetY - h / 2, h / 2, h / 2),
+      plaque: rectFrom(
+        plaqueCx,
+        feetY - plaqueLiftPx(h, plaqueH),
+        plaqueW / 2,
+        plaqueH / 2,
+      ),
+    };
+  });
+}
+
 /** Creature-height floor as a fraction of scene height when a creature must be
  *  shrunk to clear a plaque (\u2248 96px @ 900, \u2248 77px @ 720) \u2014 fix r3 #2.3. */
 export const CREATURE_HEIGHT_FLOOR_FRAC = 0.107;
@@ -1146,7 +1412,7 @@ export function resolvePlacement(
       // Bottom-quarter midpoint for small/medium creatures, but clamped to a
       // thin feet-hugging strip (<= plaqueH/2 + gap above the feet) for tall
       // creatures so the plaque never rides up into the row above (fix r3 #2).
-      feetYPx - Math.min(creatureH * 0.125, plaqueH / 2 + CREATURE_PLAQUE_GAP_PX),
+      feetYPx - plaqueLiftPx(creatureH, plaqueH),
       plaqueW / 2,
       plaqueH / 2,
     );
@@ -1215,8 +1481,7 @@ export function resolvePlacement(
   //    if that line lies below the band bottom, shrink the creature toward the
   //    height floor before moving it any further. The limit is always honoured.
   const limitPx = Number.isFinite(topLimitPx) ? Math.max(0, topLimitPx) : 0;
-  const plaqueLift = (h: number): number =>
-    Math.min(h * 0.125, plaqueH / 2 + CREATURE_PLAQUE_GAP_PX);
+  const plaqueLift = (h: number): number => plaqueLiftPx(h, plaqueH);
   // The tiny epsilon keeps floating-point rounding in the rect math (centre
   // +/- half extent) from landing a hair above the limit.
   const lowestFeet = (h: number): number =>

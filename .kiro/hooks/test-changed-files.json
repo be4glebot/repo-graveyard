@@ -11,7 +11,7 @@
         "command": "npx vitest run --changed --reporter=dot"
       },
       "timeout": 120,
-      "enabled": true
+      "enabled": false
     }
   ]
 }

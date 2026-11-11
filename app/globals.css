@@ -1603,3 +1603,18 @@ body {
     animation: ritual-text-fade var(--motion-ritual-fade-reduced) linear both;
   }
 }
+
+/* ---- Landing text scrim and wordmark glow (landing-mobile-states 4.3) ------ */
+.landing-scrim {
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--color-night-sky) 78%, transparent) 0%,
+    color-mix(in srgb, var(--color-night-sky) 55%, transparent) 60%,
+    transparent 100%
+  );
+}
+.wordmark-glow {
+  text-shadow:
+    0 0 12px var(--color-crimson-glow),
+    0 0 32px var(--color-crimson-glow);
+}

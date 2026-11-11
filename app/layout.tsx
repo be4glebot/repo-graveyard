@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { buildRootMetadata, resolveSiteUrl } from "@/lib/site-meta";
 import { sceneFontVariables } from "./fonts";
 import "./globals.css";
 
@@ -13,11 +14,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Repo Graveyard",
-  description:
-    "See a GitHub user's public repositories as a haunted graveyard of ghosts, zombies, tombstones, and more.",
-};
+export const metadata: Metadata = buildRootMetadata(
+  resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL),
+);
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

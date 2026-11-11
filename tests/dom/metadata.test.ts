@@ -17,6 +17,7 @@ vi.mock("next/server", () => ({ connection: async () => {} }));
 vi.mock("@/lib/graveyard-loader", () => ({ loadGraveyard: vi.fn() }));
 vi.mock("@/lib/estate-loader", () => ({ loadEstate: vi.fn() }));
 
+import { buildRootMetadata } from "@/lib/site-meta";
 import { generateMetadata as userMetadata } from "@/app/g/[username]/page";
 import { generateMetadata as repoMetadata } from "@/app/g/[username]/[repo]/page";
 import { metadata as estateMetadata } from "@/app/estate/page";
@@ -30,7 +31,12 @@ describe("page metadata titles (visual fix 2C)", () => {
     );
     const src = readFileSync(layoutPath, "utf-8");
     expect(src).not.toContain("Create Next App");
-    expect(src).toContain('title: "Repo Graveyard"');
+    expect(src).toContain("buildRootMetadata");
+    const root = buildRootMetadata(new URL("http://localhost:3000"));
+    expect(root.title).toEqual({
+      default: "Repo Graveyard",
+      template: "%s \u00b7 Repo Graveyard",
+    });
   });
 
   it("the /g/[username] route titles as 'Repo Graveyard \u2014 {user}'", async () => {
@@ -38,7 +44,9 @@ describe("page metadata titles (visual fix 2C)", () => {
       params: Promise.resolve({ username: "octocat" }),
       searchParams: Promise.resolve({}),
     });
-    expect(meta.title).toBe("Repo Graveyard \u2014 octocat");
+    expect(meta.title).toEqual({
+      absolute: "Repo Graveyard \u2014 octocat",
+    });
   });
 
   it("the deep-link /g/[username]/[repo] route keeps the owner in the title", async () => {

@@ -10,6 +10,7 @@ import { decayWord } from "@/lib/repoDetails/decayWord";
 import { explanationLine } from "@/lib/repoDetails/explanationLine";
 import { buildGitHubUrl } from "@/lib/repoDetails/githubUrl";
 import { homepageDomain, isValidHttpsHomepage } from "@/lib/repoDetails/homepage";
+import { COMPACT_MAX_WIDTH_PX } from "@/lib/estate-view";
 import ExternalLink from "./ExternalLink";
 import Portrait from "./Portrait";
 import {
@@ -98,7 +99,9 @@ function PanelModal({
   const closeRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
   const [shown, setShown] = useState(false);
-  const desktop = useMedia("(min-width: 768px)", true);
+  // Compact (< MOBILE_BREAKPOINT): full-height sheet. Layout classes below use
+  // max-[767px]/min-[768px]; this query only picks the slide direction.
+  const compact = useMedia(`(max-width: ${COMPACT_MAX_WIDTH_PX}px)`, false);
   const reduced = useMedia("(prefers-reduced-motion: reduce)", true);
   const openerRefHolder = useRef<HTMLElement | null>(null);
 
@@ -178,7 +181,11 @@ function PanelModal({
       const opener = openerRefHolder.current;
       const dest =
         opener && opener.isConnected ? opener : (getFallbackFocus?.() ?? null);
-      dest?.focus({ preventScroll: true });
+      try {
+        (dest ?? document.body).focus({ preventScroll: true });
+      } catch {
+        // Focus restore is best effort; never throw during cleanup.
+      }
     };
     // Open lifetime only: props captured at open are intentional.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -187,9 +194,9 @@ function PanelModal({
   const duration = reduced ? "200ms" : "220ms";
   const hidden = reduced
     ? "none"
-    : desktop
-      ? "translateX(100%)"
-      : "translateY(100%)";
+    : compact
+      ? "translateY(100%)"
+      : "translateX(100%)";
 
   return (
     <div className="fixed inset-0 z-[70]">
@@ -207,12 +214,7 @@ function PanelModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
-        className={[
-          "absolute overflow-y-auto bg-night-800 text-moon-100",
-          desktop
-            ? "right-0 top-0 h-full w-[420px] max-w-full"
-            : "bottom-0 left-0 w-full max-h-[85vh] rounded-t-lg",
-        ].join(" ")}
+        className="absolute overflow-y-auto bg-night-800 text-moon-100 max-[767px]:inset-0 max-[767px]:h-dvh max-[767px]:w-full max-[767px]:overscroll-contain max-[767px]:rounded-none min-[768px]:right-0 min-[768px]:top-0 min-[768px]:h-full min-[768px]:w-[420px] min-[768px]:max-w-full"
         style={{
           opacity: shown ? 1 : 0,
           transform: shown ? "none" : hidden,
@@ -230,7 +232,7 @@ function PanelModal({
           reduced={reduced}
         >
           {/* Header sits above the ritual layer (z-10) so Close stays usable. */}
-          <div className="relative z-20 flex items-start justify-between gap-3 p-4">
+          <div className="relative z-20 flex items-start justify-between gap-3 p-4 max-[767px]:sticky max-[767px]:top-0 max-[767px]:items-center max-[767px]:bg-night-800">
             <h2
               id={headingId}
               className="font-heading text-xl uppercase tracking-[2px]"
@@ -242,7 +244,7 @@ function PanelModal({
               type="button"
               onClick={onClose}
               aria-label="Close record"
-              className="cursor-pointer rounded-md border border-candle-400 px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-candle-400"
+              className="cursor-pointer rounded-md max-[767px]:inline-flex max-[767px]:min-h-11 max-[767px]:min-w-11 max-[767px]:items-center max-[767px]:justify-center border border-candle-400 px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-candle-400"
             >
               <span aria-hidden="true">×</span>
             </button>

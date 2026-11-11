@@ -21,6 +21,8 @@ export default defineConfig({
   },
   test: {
     passWithNoTests: true,
+    // Root option; every project below uses `extends: true`, so it inherits.
+    maxWorkers: 2,
     projects: [
       {
         extends: true,

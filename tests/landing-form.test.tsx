@@ -33,7 +33,7 @@ function getInput(): HTMLInputElement {
 }
 
 function getButton(): HTMLButtonElement {
-  return screen.getByRole("button", { name: "Visit graveyard" }) as HTMLButtonElement;
+  return screen.getByRole("button", { name: "Open the gate" }) as HTMLButtonElement;
 }
 
 describe("UsernameForm", () => {
@@ -105,6 +105,40 @@ describe("UsernameForm", () => {
     await user.click(getButton());
 
     expect(push).toHaveBeenCalledWith("/g/a-b-c");
+  });
+
+  it("focuses the input and keeps its value when a submit is rejected", async () => {
+    const user = userEvent.setup();
+    render(<UsernameForm />);
+
+    await user.type(getInput(), "has space");
+    await user.click(getButton());
+
+    expect(screen.getByRole("alert").textContent).toBe(INVALID_MESSAGE);
+    expect(document.activeElement).toBe(getInput());
+    expect(getInput().value).toBe("has space");
+  });
+
+  it("focuses the input after an empty submit", async () => {
+    const user = userEvent.setup();
+    render(<UsernameForm />);
+
+    await user.click(getButton());
+
+    expect(document.activeElement).toBe(getInput());
+    expect(getInput().value).toBe("");
+  });
+
+  it("clears the message as soon as the input changes", async () => {
+    const user = userEvent.setup();
+    render(<UsernameForm />);
+
+    await user.type(getInput(), "-bad");
+    await user.click(getButton());
+    expect(screen.getByRole("alert")).toBeTruthy();
+
+    await user.type(getInput(), "x");
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("places the input before the button in tab order (input -> button)", async () => {
