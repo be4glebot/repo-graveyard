@@ -91,43 +91,63 @@ export default function Footer({ mode = "live" }: FooterProps) {
       {/* Legend / key (right): the five states grouped under their four places
           (Req 15.8). Each place heads a group; the gate lists both of its
           states ("zombie" and "risen"), the other three list one each. */}
-      <ul
-        data-testid="scene-footer-legend"
-        aria-label="Lifecycle legend"
-        className={[
-          "flex flex-wrap items-start gap-x-4 gap-y-1",
-          "font-[family-name:var(--font-ui)] text-xs",
-        ].join(" ")}
-      >
-        {PLACE_ORDER.map((placeId) => {
-          const place = PLACES[placeId];
-          return (
-            <li
-              key={placeId}
-              data-legend-place={placeId}
-              className="flex flex-col gap-0.5"
-            >
-              <span
-                className="font-[family-name:var(--font-heading)] uppercase tracking-[1.5px]"
-                style={{ color: "var(--color-candle-tan)" }}
-              >
-                {place.name}
-              </span>
-              <ul className="flex flex-wrap items-center gap-x-2">
-                {place.states.map((state) => (
-                  <li
-                    key={state}
-                    data-legend-state={state}
-                    className="whitespace-nowrap"
-                  >
-                    {STATE_LABEL[state]}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          );
-        })}
-      </ul>
+      {/* Hidden below 768px: the legend lives in the header Menu panel there,
+          so the compact Bottom_Bar holds only the Pager. */}
+      <SceneLegend
+        testId="scene-footer-legend"
+        className="max-[767px]:hidden"
+      />
     </footer>
+  );
+}
+
+export interface SceneLegendProps {
+  /** `data-testid` for the legend list. */
+  testId: string;
+  /** Extra classes (e.g. responsive visibility). */
+  className?: string;
+}
+
+/** The lifecycle legend list, shared by the desktop footer and the compact menu. */
+export function SceneLegend({ testId, className }: SceneLegendProps) {
+  return (
+    <ul
+      data-testid={testId}
+      aria-label="Lifecycle legend"
+      className={[
+        "flex flex-wrap items-start gap-x-4 gap-y-1",
+        "font-[family-name:var(--font-ui)] text-xs",
+        className ?? "",
+      ].join(" ")}
+    >
+      {PLACE_ORDER.map((placeId) => {
+        const place = PLACES[placeId];
+        return (
+          <li
+            key={placeId}
+            data-legend-place={placeId}
+            className="flex flex-col gap-0.5"
+          >
+            <span
+              className="font-[family-name:var(--font-heading)] uppercase tracking-[1.5px]"
+              style={{ color: "var(--color-candle-tan)" }}
+            >
+              {place.name}
+            </span>
+            <ul className="flex flex-wrap items-center gap-x-2">
+              {place.states.map((state) => (
+                <li
+                  key={state}
+                  data-legend-state={state}
+                  className="whitespace-nowrap"
+                >
+                  {STATE_LABEL[state]}
+                </li>
+              ))}
+            </ul>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

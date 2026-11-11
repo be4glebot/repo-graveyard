@@ -45,19 +45,16 @@ import {
 } from "react";
 
 import { useHeaderHeightVar } from "@/components/scene/useHeaderHeightVar";
+import { SceneLegend } from "@/components/scene/Footer";
 import SummaryLine from "@/components/ui/SummaryLine";
 import Toggle from "@/components/ui/Toggle";
-import { useMedia } from "@/components/ui/useMedia";
-import { COMPACT_MAX_WIDTH_PX } from "@/lib/estate-view";
+import { useIsCompact } from "@/components/ui/useIsCompact";
 import type { GraveyardRow } from "@/lib/graveyard-view";
 import type { SummaryCounts } from "@/lib/scene-view";
 import { USERNAME_MAX_LENGTH, validateUsernameInput } from "@/lib/username";
 
 /** Which scene the header sits above; drives the "Haunted Estate" badge. */
 export type HeaderMode = "live" | "estate";
-
-/** Compact (Mobile_Viewport) query, derived from the shared constant. */
-const COMPACT_QUERY = `(max-width: ${COMPACT_MAX_WIDTH_PX}px)`;
 
 export interface HeaderProps {
   /** Rows to summarize; ignored when `counts` is provided. */
@@ -97,7 +94,7 @@ export default function Header({
   const errorId = useId();
   const panelId = useId();
 
-  const compact = useMedia(COMPACT_QUERY, false);
+  const compact = useIsCompact();
 
   // Widening from compact to desktop closes the menu (Req 4.10). Tracked as a
   // transition (not the raw value) so environments without matchMedia still
@@ -279,6 +276,13 @@ export default function Header({
             {error}
           </p>
         ) : null}
+
+        {/* Compact only: the lifecycle legend moves here from the footer so
+            the bottom bar holds just the pager. */}
+        <SceneLegend
+          testId="menu-legend"
+          className="pointer-events-auto mt-1 min-[768px]:hidden"
+        />
       </div>
     </header>
   );

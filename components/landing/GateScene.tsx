@@ -16,9 +16,25 @@ import ShellFog from "@/components/scene/ShellFog";
 import Moon from "@/components/scene/Moon";
 import useParallax from "@/components/scene/useParallax";
 import { useMedia } from "@/components/ui/useMedia";
+import {
+  MOON_TOP_PX,
+  moonRightCss,
+  moonSizeCss,
+  textClearanceCss,
+} from "@/lib/landing-moon";
 
 /** Max displacement (px) per layer band: backdrop, fog, moon. */
 export const PARALLAX_BANDS_PX = { back: 8, mid: 16, front: 24 } as const;
+
+/** Soft glow for the small landing moon (the default glow suits a 130px disc). */
+const MOON_GLOW_SCALE = 0.4;
+
+/** CSS variables shared by the moon wrapper and the landing `main` spacer. */
+const MOON_VARS = {
+  "--gate-moon-size": moonSizeCss(),
+  "--gate-moon-right": moonRightCss(),
+  "--gate-text-clearance": textClearanceCss(),
+} as CSSProperties;
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -45,6 +61,7 @@ export default function GateScene({ children }: GateSceneProps) {
       data-testid="gate-scene"
       data-reduced-motion={reducedMotion ? "true" : "false"}
       className="relative flex min-h-dvh flex-col overflow-hidden bg-night-sky text-scene-fg"
+      style={MOON_VARS}
     >
       {/* Layers extend past the root by their band so edges never show. */}
       <div
@@ -69,7 +86,20 @@ export default function GateScene({ children }: GateSceneProps) {
         className="pointer-events-none absolute inset-0"
         style={bandStyle(PARALLAX_BANDS_PX.front, live)}
       >
-        <Moon rows={[]} />
+        {/* Upper-right corner; size and inset come from lib/landing-moon so
+            the geometry test checks exactly what renders. */}
+        <div
+          data-testid="gate-moon"
+          className="absolute"
+          style={{
+            top: `${MOON_TOP_PX}px`,
+            right: "var(--gate-moon-right)",
+            width: "var(--gate-moon-size)",
+            height: "var(--gate-moon-size)",
+          }}
+        >
+          <Moon rows={[]} fillParent glowScale={MOON_GLOW_SCALE} />
+        </div>
       </div>
       <div className="relative z-10 flex flex-1 flex-col">{children}</div>
     </div>

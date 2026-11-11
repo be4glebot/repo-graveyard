@@ -68,7 +68,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
-import { useMedia } from "@/components/ui/useMedia";
+import { useIsCompact } from "@/components/ui/useIsCompact";
 
 import Atmosphere from "@/components/scene/Atmosphere";
 import DepthScatter from "@/components/scene/DepthScatter";
@@ -89,7 +89,6 @@ import {
   PLACES,
   PLOT_SIZE,
   COMPACT_CHROME_FALLBACK_PX,
-  COMPACT_MAX_WIDTH_PX,
   compactPlotSize,
   stageBand,
   orderForPlace,
@@ -127,9 +126,6 @@ const NEAR_FOG_PARALLAX: CSSProperties = {
  * title block (heading + subtitle + chips, ~150px).
  */
 const CHROME_BOTTOM_FALLBACK_PX = 112 + 150;
-
-/** Compact (< 768px) media query, derived from the shared constant. */
-const COMPACT_QUERY = `(max-width: ${COMPACT_MAX_WIDTH_PX}px)`;
 
 /** Fallback top-chrome bottom (px) for the compact layout before measuring. */
 const COMPACT_TOP_FALLBACK_PX =
@@ -237,16 +233,17 @@ export default function PlaceView({
 }: PlaceViewProps) {
   const meta = PLACES[place];
 
-  // Compact (< 768px) layout. The media query is authoritative; where
-  // `matchMedia` is unavailable (jsdom) the measured root width decides.
-  const mediaCompact = useMedia(COMPACT_QUERY, false);
-  const hasMatchMedia =
-    typeof window !== "undefined" && typeof window.matchMedia === "function";
+  // Compact (< 768px) layout. `useIsCompact` (the CSS breakpoint's media
+  // query) is the ONLY decider; measured sizes are used for layout math only.
+  const compact = useIsCompact();
   const [box, setBox] = useState({ w: 0, h: 0 });
-  const compact = hasMatchMedia
-    ? mediaCompact
-    : box.w > 0 && box.w <= COMPACT_MAX_WIDTH_PX;
-  const pageSize = compact ? compactPlotSize(box.w) : PLOT_SIZE;
+  const layoutW =
+    box.w > 0
+      ? box.w
+      : typeof window !== "undefined" && window.innerWidth > 0
+        ? window.innerWidth
+        : 375;
+  const pageSize = compact ? compactPlotSize(layoutW) : PLOT_SIZE;
 
   // Derivation pipeline: filter → order → paginate. Memoized on the inputs so
   // the plots are recomputed only when the rows/filter actually change.
@@ -422,6 +419,7 @@ export default function PlaceView({
             // Scatter box top == scene top, so the chrome bottom is directly
             // comparable. DepthScatter folds in sceneH / 3 via max().
             topLimitPx={chromeBottomPx}
+            compact={compact}
             compactBand={compactBand}
             // The plaque layer fades in with the rest of the chrome during a
             // travel transition; creatures underneath keep animating in.
@@ -470,8 +468,7 @@ export default function PlaceView({
               <ReturnToGate onReturn={onReturn} />
             </div>
             <div
-              ref={titleBlockRef}
-              data-testid="place-title-block"
+              data-testid="place-compact-heading"
               className="flex flex-col items-center gap-2"
             >
               <PlaceHeading ref={headingRef} name={meta.name} copy={copy} />
@@ -528,7 +525,7 @@ export default function PlaceView({
       <div
         ref={titleBlockRef}
         data-testid="place-title-block"
-        className="pointer-events-none absolute inset-x-0 z-40 flex flex-col items-center gap-4 px-6"
+        className="place-title-clear pointer-events-none absolute inset-x-0 z-40 flex flex-col items-center gap-4 px-6"
         style={{ top: "var(--site-header-h)", ...chromeFadeStyle }}
       >
         <PlaceHeading ref={headingRef} name={meta.name} copy={copy} />

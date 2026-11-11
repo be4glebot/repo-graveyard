@@ -174,6 +174,7 @@ describe("DepthScatter compact path at 700 px", () => {
         selectedName={null}
         onSelect={() => {}}
         reducedMotion
+        compact
         compactBand={compactBand}
       />,
     );

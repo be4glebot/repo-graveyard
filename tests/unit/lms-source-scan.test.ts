@@ -101,12 +101,14 @@ describe("lms breakpoint thresholds", () => {
   });
 
   it("compact media queries are derived from COMPACT_MAX_WIDTH_PX", () => {
+    expect(load("components/ui/useIsCompact.ts")).toContain("COMPACT_MAX_WIDTH_PX");
+    // Every other decider goes through the one shared hook.
     for (const file of [
       "components/ui/Header.tsx",
       "components/detail/DetailPanel.tsx",
       "components/scene/PlaceView.tsx",
     ]) {
-      expect(load(file), file).toContain("COMPACT_MAX_WIDTH_PX");
+      expect(load(file), file).toContain("useIsCompact");
     }
   });
 

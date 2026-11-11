@@ -34,9 +34,15 @@ export interface PlaqueProps {
   sub: string;
   /** Optional render scale; multiplies size and the fixed max width. Default 1. */
   scale?: number;
+  /**
+   * Optional exact width (px) from the compact layout. When set it overrides
+   * the scaled max width: width = max-width = this, min-width 0, border-box,
+   * so the name ellipsizes within the computed cell.
+   */
+  widthPx?: number;
 }
 
-export default function Plaque({ name, sub, scale = 1 }: PlaqueProps) {
+export default function Plaque({ name, sub, scale = 1, widthPx }: PlaqueProps) {
   // A non-finite or non-positive scale collapses to 1 so the plaque is always
   // laid out at a sensible, well-defined size.
   const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
@@ -49,7 +55,17 @@ export default function Plaque({ name, sub, scale = 1 }: PlaqueProps) {
     <span
       className="plq"
       data-testid="plaque"
-      style={{ maxWidth: `${maxWidth}px` }}
+      style={
+        widthPx !== undefined
+          ? {
+              width: `${widthPx}px`,
+              maxWidth: `${widthPx}px`,
+              minWidth: 0,
+              boxSizing: "border-box",
+              overflow: "hidden",
+            }
+          : { maxWidth: `${maxWidth}px` }
+      }
     >
       {/* Exactly one Cinzel name line. It ellipsizes rather than widening the
           slab; the full name stays available via title + aria-label so it is

@@ -40,6 +40,11 @@ import { cleanup, render, within } from "@testing-library/react";
 
 import DepthScatter from "@/components/scene/DepthScatter";
 import type { GraveyardRow } from "@/lib/graveyard-view";
+import {
+  DEPTH_ROWS,
+  compactStackLayout,
+  scatterLayout,
+} from "@/lib/estate-view";
 import type { LifecycleState } from "@/lib/lifecycle";
 
 const noop = () => {};
@@ -446,6 +451,7 @@ describe("DepthScatter — width branch (Req 5.9, 5.10)", () => {
         selectedName={null}
         onSelect={noop}
         reducedMotion={false}
+        compact
         compactBand={{ top: 120, bottom: 500 }}
       />,
     );
@@ -464,6 +470,42 @@ describe("DepthScatter — width branch (Req 5.9, 5.10)", () => {
     // One plaque per creature is still rendered in the two-column layout.
     const plaques = getAllByTestId("scatter-plaque");
     expect(plaques).toHaveLength(plot.length);
+  });
+
+  it("at 375px sizes every plaque to the layout rect width with min-width 0 (compact)", () => {
+    installResizeObserver(375);
+    const band = { top: 120, bottom: 500 };
+    const plot = makeRows(4, "ghost");
+    const { getAllByTestId } = render(
+      <DepthScatter
+        place="sky"
+        plot={plot}
+        selectedName={null}
+        onSelect={noop}
+        reducedMotion={false}
+        compact
+        compactBand={band}
+      />,
+    );
+
+    // Same inputs the component feeds the layout (fake RO reports h === w).
+    const expected = compactStackLayout(
+      scatterLayout(plot.map((r) => r.name), DEPTH_ROWS, "sky", "sky"),
+      375,
+      band,
+      375,
+    );
+    const wrappers = getAllByTestId("scatter-plaque");
+    const slabs = getAllByTestId("plaque");
+    expect(wrappers).toHaveLength(plot.length);
+    wrappers.forEach((el, i) => {
+      const w = expected[i].plaque.right - expected[i].plaque.left;
+      for (const node of [el, slabs[i]]) {
+        expect(parseFloat(node.style.width)).toBeCloseTo(w, 6);
+        expect(parseFloat(node.style.maxWidth)).toBeCloseTo(w, 6);
+        expect(["0", "0px", "none"]).toContain(node.style.minWidth);
+      }
+    });
   });
 
   it("stays on the scatter layout when the container measures >=768px", () => {

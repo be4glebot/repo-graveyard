@@ -45,7 +45,7 @@ export default function UsernameForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-2">
-      <label htmlFor={inputId} className="text-sm font-medium text-scene-fg">
+      <label htmlFor={inputId} className="font-ui text-sm font-medium text-scene-fg">
         GitHub username
       </label>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
@@ -63,14 +63,14 @@ export default function UsernameForm() {
           aria-invalid={hasError}
           aria-describedby={hasError ? errorId : undefined}
           placeholder="octocat"
-          className="w-full rounded-md border border-iron-border bg-night-sky px-3 py-2 text-scene-fg placeholder:text-scene-fg-muted focus:outline-none focus:ring-2 focus:ring-candle-400 focus:ring-offset-2 focus:ring-offset-night-sky sm:w-64"
+          className="w-full rounded-md border border-iron-border bg-night-sky px-3 font-ui py-2 text-scene-fg placeholder:text-scene-fg-muted focus:outline-none focus:ring-2 focus:ring-candle-400 focus:ring-offset-2 focus:ring-offset-night-sky sm:w-64"
         />
         <ThemedButton type="submit" variant="crimson">
           Open the gate
         </ThemedButton>
       </div>
       {hasError ? (
-        <p id={errorId} role="alert" className="text-sm text-crimson-200">
+        <p id={errorId} role="alert" className="font-ui text-sm text-crimson-200">
           {error}
         </p>
       ) : null}

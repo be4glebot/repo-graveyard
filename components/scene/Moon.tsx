@@ -52,6 +52,14 @@ export interface MoonProps {
    * when absent, the moon keeps its existing map placement unchanged.
    */
   placement?: { cx: number; cy: number; diameter: number };
+  /**
+   * When true the disc fills its (positioned, sized) parent instead of using
+   * the fixed map placement. Used by the landing gate, which sizes and places a
+   * wrapper responsively.
+   */
+  fillParent?: boolean;
+  /** Multiplier on the glow blur and spread (default 1); <1 for small moons. */
+  glowScale?: number;
 }
 
 /**
@@ -66,7 +74,13 @@ function undeadShare(rows: GraveyardRow[]): number {
   return (zombie + risen) / souls;
 }
 
-export default function Moon({ rows, className, placement }: MoonProps) {
+export default function Moon({
+  rows,
+  className,
+  placement,
+  fillParent = false,
+  glowScale = 1,
+}: MoonProps) {
   const treatment = moonTreatment(rows);
   const isBlood = treatment === "blood-red";
 
@@ -94,7 +108,9 @@ export default function Moon({ rows, className, placement }: MoonProps) {
   // Otherwise keep the fixed map position (`right-[24%] top-[8%]`, 130px disc).
   const positionClass = placement
     ? "absolute"
-    : "absolute right-[24%] top-[8%] h-[130px] w-[130px]";
+    : fillParent
+      ? "absolute inset-0"
+      : "absolute right-[24%] top-[8%] h-[130px] w-[130px]";
   const positionStyle = placement
     ? {
         left: `${placement.cx}px`,
@@ -117,7 +133,7 @@ export default function Moon({ rows, className, placement }: MoonProps) {
         // Health-encoding fill + glow stay identical in both placements, so the
         // disc remains visually distinct from the painted moon beneath it.
         backgroundColor: fill,
-        boxShadow: `0 0 ${Math.round(blur)}px ${Math.round(spread)}px ${glowColor}`,
+        boxShadow: `0 0 ${Math.round(blur * glowScale)}px ${Math.round(spread * glowScale)}px ${glowColor}`,
       }}
     >
       {/* Craters: a few token-tinted dimples so the disc reads as a moon. */}

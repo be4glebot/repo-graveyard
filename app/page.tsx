@@ -13,7 +13,7 @@ import ThemedButton from "@/components/ui/ThemedButton";
 export default function Home() {
   return (
     <GateScene>
-      <main className="flex flex-1 flex-col items-center justify-center gap-10 px-6 py-16">
+      <main className="landing-main flex flex-1 flex-col items-center justify-center gap-10 px-6 pb-16">
         <div className="landing-scrim flex w-full max-w-xl flex-col items-center gap-8 px-6 py-10 text-center">
           <div className="flex flex-col items-center gap-3">
             <h1 className="font-wordmark wordmark-glow text-5xl text-scene-fg sm:text-6xl">

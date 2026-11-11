@@ -71,7 +71,8 @@ import { type LifecycleState } from "@/lib/lifecycle";
 import {
   CREATURE_BASE_SIZE,
   DEPTH_ROWS,
-  COMPACT_MAX_WIDTH_PX,
+  COMPACT_CHROME_FALLBACK_PX,
+  stageBand,
   GHOST_DECAY_WORDS,
   ZOMBIE_DECAY_WORDS,
   compactStackLayout,
@@ -234,9 +235,15 @@ export interface DepthScatterProps {
    */
   topLimitPx?: number;
   /**
-   * Stage band (px, scene coordinates) for the compact layout. When set and the
-   * scene is at most `COMPACT_MAX_WIDTH_PX` wide, positions come from
-   * `compactStackLayout`; otherwise the desktop branches run unchanged.
+   * Whether the viewport is compact (from `useIsCompact`, the single source of
+   * truth). When true the layout is ALWAYS `compactStackLayout`; the desktop
+   * branches never run. Width measurements are never used to decide this.
+   */
+  compact?: boolean;
+  /**
+   * Stage band (px, scene coordinates) for the compact layout. When omitted
+   * while `compact`, a fallback band is derived from
+   * `COMPACT_CHROME_FALLBACK_PX` and the scene height.
    */
   compactBand?: StageBandPx;
 }
@@ -357,6 +364,7 @@ export default function DepthScatter({
   reducedMotion,
   plaqueStyle,
   topLimitPx,
+  compact = false,
   compactBand,
 }: DepthScatterProps) {
   // Compute the scatter layout once per (plot, place). The seed is the place id
@@ -391,13 +399,31 @@ export default function DepthScatter({
     return null;
   };
   const { width: sceneW, height: sceneH } = useSceneBox(rootRef);
-  const bandTop = compactBand?.top;
-  const bandBottom = compactBand?.bottom;
-  const isMobile =
-    sceneW > 0 &&
-    sceneW <= COMPACT_MAX_WIDTH_PX &&
-    bandTop !== undefined &&
-    bandBottom !== undefined;
+  // Compact is decided ONLY by the `compact` prop. Measured sizes feed layout
+  // math; when unmeasured (0) fall back to the viewport, then a safe default.
+  const isMobile = compact;
+  const layoutW =
+    sceneW > 0
+      ? sceneW
+      : typeof window !== "undefined" && window.innerWidth > 0
+        ? window.innerWidth
+        : 375;
+  const layoutH =
+    sceneH > 0
+      ? sceneH
+      : typeof window !== "undefined" && window.innerHeight > 0
+        ? window.innerHeight
+        : 812;
+  const fallbackBand = stageBand(
+    layoutH,
+    COMPACT_CHROME_FALLBACK_PX.header +
+      COMPACT_CHROME_FALLBACK_PX.returnLink +
+      COMPACT_CHROME_FALLBACK_PX.titleBlock +
+      COMPACT_CHROME_FALLBACK_PX.chips,
+    layoutH - COMPACT_CHROME_FALLBACK_PX.bottomBar,
+  );
+  const bandTop = compactBand?.top ?? fallbackBand.top;
+  const bandBottom = compactBand?.bottom ?? fallbackBand.bottom;
 
   const isGround = place === "ground";
   const isGate = place === "gate";
@@ -422,6 +448,8 @@ export default function DepthScatter({
     plaqueX: number;
     plaqueY: number;
     effectiveScale: number;
+    /** Compact only: the layout's plaque width (px) the DOM must honor. */
+    plaqueWidthPx?: number;
   }
 
   // The UPPER 60% (head + torso) of a creature rect — the part the no-overlap
@@ -434,22 +462,23 @@ export default function DepthScatter({
   const resolved = useMemo<Resolved[]>(() => {
     const out: Resolved[] = new Array(plot.length);
 
-    if (isMobile && bandTop !== undefined && bandBottom !== undefined) {
+    if (isMobile) {
       const stacked = compactStackLayout(
         placements,
-        sceneW,
+        layoutW,
         { top: bandTop, bottom: bandBottom },
-        sceneH > 0 ? sceneH : undefined,
+        layoutH,
       );
-      const H = sceneH > 0 ? sceneH : Math.max(1, bandBottom);
+      const H = layoutH;
       for (let i = 0; i < plot.length; i++) {
         const r = stacked[i];
         out[i] = {
           feetX: r.x,
           feetY: r.y,
-          plaqueX: r.plaque.cx / sceneW,
+          plaqueX: r.plaque.cx / layoutW,
           plaqueY: r.plaque.cy / H,
           effectiveScale: r.creatureHeightPx / CREATURE_BASE_SIZE,
+          plaqueWidthPx: r.plaque.right - r.plaque.left,
         };
       }
       return out;
@@ -492,7 +521,7 @@ export default function DepthScatter({
       };
     }
     return out;
-  }, [plot, placements, place, sceneW, sceneH, isMobile, topLimitPx, bandTop, bandBottom]);
+  }, [plot, placements, place, sceneW, sceneH, layoutW, layoutH, isMobile, topLimitPx, bandTop, bandBottom]);
 
   return (
     <div
@@ -606,6 +635,15 @@ export default function DepthScatter({
                 left: `${r.plaqueX * 100}%`,
                 top: `${r.plaqueY * 100}%`,
                 transform: "translate(-50%, -50%)",
+                // Compact: honor the layout's plaque width exactly so the text
+                // ellipsizes instead of overflowing into the neighbouring cell.
+                ...(r.plaqueWidthPx !== undefined
+                  ? {
+                      width: `${r.plaqueWidthPx}px`,
+                      maxWidth: `${r.plaqueWidthPx}px`,
+                      minWidth: 0,
+                    }
+                  : null),
               }}
               onPointerEnter={
                 hover
@@ -620,7 +658,12 @@ export default function DepthScatter({
               // click to the same activation so that region stays clickable.
               onClick={hover ? () => onSelect(row.name) : undefined}
             >
-              <Plaque name={row.name} sub={plaqueSub(row)} scale={placement.scale} />
+              <Plaque
+                name={row.name}
+                sub={plaqueSub(row)}
+                scale={placement.scale}
+                widthPx={r.plaqueWidthPx}
+              />
             </div>
           );
         })}

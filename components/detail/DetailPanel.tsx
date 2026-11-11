@@ -10,7 +10,7 @@ import { decayWord } from "@/lib/repoDetails/decayWord";
 import { explanationLine } from "@/lib/repoDetails/explanationLine";
 import { buildGitHubUrl } from "@/lib/repoDetails/githubUrl";
 import { homepageDomain, isValidHttpsHomepage } from "@/lib/repoDetails/homepage";
-import { COMPACT_MAX_WIDTH_PX } from "@/lib/estate-view";
+import { useIsCompact } from "@/components/ui/useIsCompact";
 import ExternalLink from "./ExternalLink";
 import Portrait from "./Portrait";
 import {
@@ -101,7 +101,7 @@ function PanelModal({
   const [shown, setShown] = useState(false);
   // Compact (< MOBILE_BREAKPOINT): full-height sheet. Layout classes below use
   // max-[767px]/min-[768px]; this query only picks the slide direction.
-  const compact = useMedia(`(max-width: ${COMPACT_MAX_WIDTH_PX}px)`, false);
+  const compact = useIsCompact();
   const reduced = useMedia("(prefers-reduced-motion: reduce)", true);
   const openerRefHolder = useRef<HTMLElement | null>(null);
 

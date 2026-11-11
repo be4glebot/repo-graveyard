@@ -98,6 +98,21 @@ describe("Menu_Disclosure (4.2-4.10)", () => {
     expect(menuButton().getAttribute("aria-expanded")).toBe("false");
   });
 
+  it("renders the lifecycle legend inside the menu panel, compact-only (own testid)", () => {
+    renderHeader();
+    const legend = screen.getByTestId("menu-legend");
+    expect(panel().contains(legend)).toBe(true);
+    expect(legend.className).toContain("min-[768px]:hidden");
+    expect(legend.querySelectorAll("[data-legend-place]").length).toBe(4);
+  });
+
+  it("hides the footer legend below 768px but keeps its testid", async () => {
+    const { default: Footer } = await import("@/components/scene/Footer");
+    render(<Footer mode="live" />);
+    const legend = screen.getByTestId("scene-footer-legend");
+    expect(legend.className).toContain("max-[767px]:hidden");
+  });
+
   it("has a 44px touch target (4.2)", () => {
     renderHeader();
     expect(menuButton().className).toContain("min-h-11");

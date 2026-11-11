@@ -141,6 +141,13 @@ describe("UsernameForm", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
+  it("renders the label and input in the UI font (font-ui)", () => {
+    render(<UsernameForm />);
+    const label = document.querySelector("label") as HTMLLabelElement;
+    expect(label.classList.contains("font-ui")).toBe(true);
+    expect(getInput().classList.contains("font-ui")).toBe(true);
+  });
+
   it("places the input before the button in tab order (input -> button)", async () => {
     const user = userEvent.setup();
     render(<UsernameForm />);

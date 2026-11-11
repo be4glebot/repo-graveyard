@@ -83,15 +83,34 @@ describe("Preservation: chrome controls fire their handlers", () => {
   });
 });
 
+/** Stubs matchMedia so the compact query matches iff width <= 767. */
+function stubCompactMedia(width: number) {
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: query === "(max-width: 767px)" ? width <= 767 : false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }));
+}
+
 describe("Preservation: mobile layout branch", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it.each([360, 500, 767])("width %i renders data-layout=two-column", (w) => {
     stubClientSize(w, 700);
+    stubCompactMedia(w);
     renderSky(5);
     expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBe("two-column");
   });
 
   it.each([768, 1280, 1440])("width %i renders data-layout=scatter", (w) => {
     stubClientSize(w, 800);
+    stubCompactMedia(w);
     renderSky(5);
     expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBe("scatter");
   });
