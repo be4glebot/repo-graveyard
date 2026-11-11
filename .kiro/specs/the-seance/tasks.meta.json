@@ -1481,6 +1481,61 @@
         "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
         "timestamp": 1794369536021
       }
+    ],
+    "17.1 Create scripts/secret-scan.mjs and the scan:secrets npm script": [
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369925961
+      },
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369975252
+      }
+    ],
+    "17.2 Write tests for the secret scanner": [
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369992584
+      },
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794370056595
+      }
+    ],
+    "17.3 Add the two Kiro hooks in .kiro/hooks/": [
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794370057089
+      },
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794370125451
+      }
+    ],
+    "17.4 Add a \"Kiro hooks\" section to docs/KIRO_JOURNEY.md": [
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794370125993
+      },
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794370167935
+      }
+    ],
+    "17. Kiro hooks: secret guard and tests for changed files (repo tooling, outside the séance feature)": [
+      {
+        "executionId": "4be1ef7f-4af1-4617-934d-6737512b81fc",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794370168058
+      }
     ]
   }
 }

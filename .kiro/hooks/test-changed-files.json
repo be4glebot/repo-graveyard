@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Test what I touched",
+      "description": "Runs only the Vitest tests related to uncommitted changes when a source file in lib, components or app is saved, for quick feedback without a full run.",
+      "trigger": "PostFileSave",
+      "matcher": "^(?!.*node_modules)(?:.*[\\\\/])?(?:lib[\\\\/].+\\.ts|components[\\\\/].+\\.tsx|app[\\\\/].+\\.ts)$",
+      "action": {
+        "type": "command",
+        "command": "npx vitest run --changed --reporter=dot"
+      },
+      "timeout": 120,
+      "enabled": true
+    }
+  ]
+}

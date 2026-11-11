@@ -47,6 +47,20 @@ Why three inclusion modes: always-on files are the product's memory; `design.md`
 | Run tests | Post Task Execution | command `npm test -- --run` | | | 0 |
 | API guard | File Create `app/api/**/route.ts` | agent prompt | | | |
 | New creature | File Create `components/creatures/*.tsx` | agent prompt | | | |
+| Secret guard | PostFileSave (all files except node_modules, .next, local env) | command: node scripts/secret-scan.mjs | | | 0 |
+| Test what I touched | PostFileSave (lib/components/app source) | command: npx vitest run --changed | | | 0 |
+
+### Kiro hooks (committed in .kiro/hooks/)
+
+I added two more hooks. Both are standalone JSON files in `.kiro/hooks/` (schema v1, trigger `PostFileSave`) and both use the **run command** action instead of an agent prompt, so they cost no credits and start no agent loop.
+
+**Secret guard** (`.kiro/hooks/secret-guard.json`) runs `node scripts/secret-scan.mjs` after a file is saved (any file except node_modules, .next and the local env file). The script is dependency-free Node, also available as `npm run scan:secrets`. It scans git-tracked and staged files for the Anthropic key prefix `sk-ant-`, GitHub tokens (`ghp_`, `github_pat_`) and a non-placeholder Upstash REST token. It skips `.env.example` and binary files, and fails if the local env file is ever tracked by git. On a hit it prints only `file:line: <pattern name>`, never the value or the line, and exits 1. Why: the app is public for the judges and holds an Anthropic key, a GitHub token and a Redis token, so a leaked key in a commit or a log is the one mistake that can't be undone. The guard keeps the secret handling honest and visible. It's covered by `tests/unit/secret-scan.test.ts` (matcher, placeholders, output never contains the key, one CLI run in a temp git repo).
+
+**Test what I touched** (`.kiro/hooks/test-changed-files.json`) runs `npx vitest run --changed --reporter=dot` when a file under `lib/**/*.ts`, `components/**/*.tsx` or `app/**/*.ts` is saved. Why: I get quick feedback on only the tests related to the uncommitted change (seconds) instead of the full suite (about 40 seconds), so regressions show up while the change is still fresh. The full run stays for checkpoints and the older "Run tests after each task" hook.
+
+`tests/unit/kiro-hooks.test.ts` checks that both hook files parse and that their path matchers (regexes, not globs) include and exclude the right paths.
+
+One honest note: in Kiro's v1 schema `PostFileSave` fires when the agent saves or edits a file, so edits I type by hand in the editor don't trigger it. For those, I run `npm run scan:secrets` (or `npx vitest run --changed`) by hand or before each commit.
 
 ## 6. MCP
 
