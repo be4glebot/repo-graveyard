@@ -38,6 +38,23 @@ export default defineConfig({
           include: ["tests/**/*.test.tsx"],
         },
       },
+      {
+        extends: true,
+        resolve: {
+          alias: {
+            "@": fileURLToPath(new URL("./", import.meta.url)).replace(
+              /[\\/]$/,
+              "",
+            ),
+          },
+        },
+        test: {
+          name: "mcp",
+          environment: "node",
+          include: ["mcp/graveyard-mcp/tests/**/*.test.ts"],
+          globalSetup: ["mcp/graveyard-mcp/tests/preflight.ts"],
+        },
+      },
     ],
   },
 });

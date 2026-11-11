@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "scan:secrets": "node scripts/secret-scan.mjs"
+    "scan:secrets": "node scripts/secret-scan.mjs",
+    "mcp:install": "npm ci --prefix mcp/graveyard-mcp",
+    "mcp:build": "npm run build --prefix mcp/graveyard-mcp",
+    "mcp:typecheck": "tsc -p mcp/graveyard-mcp --noEmit"
   },
   "dependencies": {
     "@octokit/graphql": "^9.0.5",

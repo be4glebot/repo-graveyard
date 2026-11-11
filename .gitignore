@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# graveyard-mcp
+/mcp/graveyard-mcp/node_modules
+/mcp/graveyard-mcp/dist

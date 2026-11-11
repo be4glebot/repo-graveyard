@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "graveyard": {
+      "command": "node",
+      "args": ["mcp/graveyard-mcp/dist/index.js"],
+      "env": { "GRAVEYARD_URL": "http://localhost:3000" }
+    }
+  }
+}

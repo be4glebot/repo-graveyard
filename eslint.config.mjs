@@ -22,6 +22,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Built output of the graveyard-mcp package.
+    "mcp/graveyard-mcp/dist/**",
   ]),
   // `lib/overrides.ts` is client-only (Req 6.7). Server-only modules and the
   // server-rendered graveyard route/page must never import it. Enforcing this

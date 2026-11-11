@@ -175,3 +175,79 @@ export function createRateLimiter(
     },
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* Generic bucket limiter (graveyard-mcp route). Requirements 1.19-1.22 */
+/* ------------------------------------------------------------------ */
+
+export const GRAVEYARD_ROUTE_BUCKET = "graveyard-route";
+
+export interface BucketConfig {
+  bucket: string;
+  limit: number;
+  windowMs: number;
+}
+
+export type BucketVerdict = { ok: true } | { ok: false; retryAfter: number };
+
+export interface BucketLimiter {
+  consume(ip: string): Promise<BucketVerdict>;
+}
+
+/**
+ * Independent sliding-window limiter on the sorted set
+ * `ratelimit:<bucket>:<ip>`. Falls back to a per-process in-memory window when
+ * the store is `null` or any store call throws.
+ */
+export function createBucketLimiter(
+  store: RateLimitStore | null,
+  clock: () => number,
+  config: BucketConfig,
+): BucketLimiter {
+  const { bucket, limit, windowMs } = config;
+  const mem = new Map<string, number[]>();
+  let seq = 0;
+
+  const denied: BucketVerdict = {
+    ok: false,
+    retryAfter: Math.max(1, Math.ceil(windowMs / limit / 1000)),
+  };
+
+  function memConsume(ip: string): BucketVerdict {
+    const now = clock();
+    const live = (mem.get(ip) ?? []).filter((t) => t > now - windowMs);
+    if (live.length >= limit) {
+      mem.set(ip, live);
+      return denied;
+    }
+    live.push(now);
+    mem.set(ip, live);
+    return { ok: true };
+  }
+
+  async function storeConsume(s: RateLimitStore, ip: string): Promise<BucketVerdict> {
+    const now = clock();
+    const key = `ratelimit:${bucket}:${ip}`;
+    await s.zremrangebyscore(key, 0, now - windowMs);
+    if (toCount(await s.zcard(key)) >= limit) {
+      return denied;
+    }
+    seq += 1;
+    await s.zadd(key, { score: now, member: `${now}:${seq}:${Math.random()}` });
+    await s.expire(key, Math.ceil(windowMs / 1000));
+    return { ok: true };
+  }
+
+  return {
+    async consume(ip) {
+      if (store !== null) {
+        try {
+          return await storeConsume(store, ip);
+        } catch {
+          // fall through to the in-memory limiter
+        }
+      }
+      return memConsume(ip);
+    },
+  };
+}
