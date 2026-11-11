@@ -274,8 +274,10 @@ describe("reduced motion (10.13, 10.14)", () => {
     renderPanel();
     hold();
     expect(ritual()!.getAttribute("data-reduced")).toBe("true");
-    expect(document.querySelector("[data-ritual-whisper]")).toBeNull();
-    expect(document.querySelector("[data-ritual-candle]")).toBeNull();
+    // Visual pass: reduced motion shows the five candles lit (no movement) and
+    // a stage-text line that is empty at stage 0 (it fades in with the stages).
+    expect(document.querySelectorAll('[data-ritual-candle][data-lit="true"]').length).toBe(5);
+    expect(document.querySelector("[data-ritual-whisper]")!.textContent).toBe("");
 
     await flush(0); // no 2 s floor
     expect(ritual()).toBeNull();

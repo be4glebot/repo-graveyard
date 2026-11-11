@@ -48,6 +48,10 @@ import { useSeance, type UseSeance } from "./useSeance";
 import { SeanceControl } from "./SeanceControl";
 import { SilentFallback, VeilState, WeakGhostState } from "./SeanceStates";
 import Ritual from "./Ritual";
+import RitualExit from "./RitualExit";
+import { useRitualStage } from "./useRitualStage";
+import { useRitualExit } from "./useRitualExit";
+import { ritualStageText } from "@/lib/seance-ritual";
 import SpiritTranscript from "./SpiritTranscript";
 import CauseOfDeath from "./CauseOfDeath";
 import { causeHeading } from "@/lib/seance-schema";
@@ -89,12 +93,39 @@ export function SeanceProvider({
 
 /** The "Hold a séance" control wired to the shared hook (Actions slot). */
 export function SeanceButton() {
-  const { state, start } = useSeanceContext();
-  const busy =
-    state.phase === "ritual" ||
-    state.phase === "revealing" ||
-    state.phase === "settled";
-  return <SeanceControl busy={busy} onActivate={start} />;
+  const { state, start, again } = useSeanceContext();
+  // Running: the ritual or the reveal. Once a result or a fallback is showing
+  // the control is enabled again and offers another séance.
+  const busy = state.phase === "ritual" || state.phase === "revealing";
+  const done =
+    state.phase === "settled" ||
+    state.phase === "veil" ||
+    state.phase === "weak" ||
+    state.phase === "silent";
+  return <SeanceControl busy={busy} again={done} onActivate={done ? again : start} />;
+}
+
+/* ---- Scrolling ------------------------------------------------------------ */
+
+/** The fixed site header's height in px (`--site-header-h`), or 0 when unknown. */
+function siteHeaderPx(): number {
+  try {
+    const root = document.documentElement;
+    const raw = getComputedStyle(root).getPropertyValue("--site-header-h").trim();
+    const m = /^(\d*\.?\d+)(rem|px)$/.exec(raw);
+    if (!m) return 0;
+    const n = parseFloat(m[1]);
+    if (m[2] === "px") return n;
+    return n * (parseFloat(getComputedStyle(root).fontSize) || 16);
+  } catch {
+    return 0;
+  }
+}
+
+/** Scrolls an element's top into view (the target's scroll-margin clears the header). */
+function scrollToStart(el: HTMLElement | null, reduced: boolean): void {
+  if (!el || typeof el.scrollIntoView !== "function") return;
+  el.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
 }
 
 /* ---- Region --------------------------------------------------------------- */
@@ -116,20 +147,36 @@ export interface SeanceRegionProps {
  * Sticky zero-height layer so the ritual covers the dialog's visible area
  * (the dialog is the scroll container). Height is measured once at start.
  */
-function RitualLayer({ children }: { children: ReactNode }) {
+function RitualLayer({
+  children,
+  anchorRef,
+}: {
+  children: ReactNode;
+  /** Receives the layer element; the region scrolls it into view when a séance starts. */
+  anchorRef?: MutableRefObject<HTMLDivElement | null>;
+}) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [height, setHeight] = useState<number | null>(null);
 
   useLayoutEffect(() => {
     const dialog = wrapRef.current?.closest('[role="dialog"]');
-    setHeight(dialog instanceof HTMLElement ? dialog.clientHeight : 0);
+    // The fixed site header covers the top of the viewport, so the ritual
+    // fills the visible area below it (the layer is scrolled to start there).
+    setHeight(
+      dialog instanceof HTMLElement
+        ? Math.max(0, dialog.clientHeight - siteHeaderPx())
+        : 0,
+    );
   }, []);
 
   return (
     <div
-      ref={wrapRef}
+      ref={(node) => {
+        wrapRef.current = node;
+        if (anchorRef) anchorRef.current = node;
+      }}
       data-ritual-layer
-      className="pointer-events-auto sticky top-0 z-10 h-0"
+      className="seance-scroll-target pointer-events-auto sticky top-0 z-10 h-0"
     >
       <div
         className="absolute inset-x-0 top-0"
@@ -142,7 +189,6 @@ function RitualLayer({ children }: { children: ReactNode }) {
 }
 
 export function SeanceRegion({
-  owner,
   repo,
   state: creatureState,
   decayLevel,
@@ -152,6 +198,17 @@ export function SeanceRegion({
 }: SeanceRegionProps) {
   const { state, retry, skip, settle } = useSeanceContext();
   const { phase, result, attemptId } = state;
+
+  // The ritual builds on a fixed clock while the request is in flight; the
+  // exit (gutter or snuff) plays over the result as the ritual unmounts.
+  const stage = useRitualStage(phase === "ritual", attemptId, state.skipped);
+  const stageText = ritualStageText(stage, repo);
+  const exit = useRitualExit(phase, reduced);
+
+  // Scroll: the ritual into view when a séance starts, the transcript's top
+  // into view when the result reveals. Once per attempt; focus is not moved.
+  const ritualAnchorRef = useRef<HTMLDivElement | null>(null);
+  const scrolledFor = useRef({ ritual: 0, reveal: 0 });
 
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const [copy, setCopy] = useState({ attemptId: 0, message: "" });
@@ -198,14 +255,27 @@ export function SeanceRegion({
   }, [ritualActive]);
 
   // Move focus to the heading once per attempt: as results render (< 100 ms)
-  // or when the Silent_Fallback appears (< 500 ms).
+  // or when the Silent_Fallback appears (< 500 ms). Scrolling is handled
+  // separately (smooth, or instant under reduced motion), so focus does not jump.
   const focusedAttempt = useRef(0);
   useEffect(() => {
     if (phase !== "revealing" && phase !== "silent") return;
     if (focusedAttempt.current === attemptId) return;
     focusedAttempt.current = attemptId;
-    headingRef.current?.focus();
+    headingRef.current?.focus({ preventScroll: true });
   }, [phase, attemptId]);
+
+  useEffect(() => {
+    if (phase !== "ritual" || scrolledFor.current.ritual === attemptId) return;
+    scrolledFor.current.ritual = attemptId;
+    scrollToStart(ritualAnchorRef.current, reduced);
+  }, [phase, attemptId, reduced]);
+
+  useEffect(() => {
+    if (phase !== "revealing" || scrolledFor.current.reveal === attemptId) return;
+    scrolledFor.current.reveal = attemptId;
+    scrollToStart(headingRef.current, reduced);
+  }, [phase, attemptId, reduced]);
 
   // The copy status belongs to one attempt; a new attempt hides the old one.
   const announceCopy = useCallback(
@@ -230,22 +300,44 @@ export function SeanceRegion({
   return (
     <>
       {phase === "ritual" ? (
-        <RitualLayer>
+        <RitualLayer anchorRef={ritualAnchorRef}>
           <Ritual
             onSkip={skip}
             reduced={reduced}
-            seed={`${owner}/${repo}`}
+            repo={repo}
             creature={creatureState}
+            decayLevel={decayLevel}
+            stage={stage}
+            skipped={state.skipped}
+          />
+        </RitualLayer>
+      ) : null}
+
+      {exit ? (
+        <RitualLayer>
+          <RitualExit
+            kind={exit}
+            stage={stage}
+            repo={repo}
+            creature={creatureState}
+            decayLevel={decayLevel}
           />
         </RitualLayer>
       ) : null}
 
       <div aria-live="polite" data-seance-region="">
+        {/* Announced once per stage (the text only changes when the stage does). */}
+        {phase === "ritual" && stageText ? (
+          <p data-seance-stage="" className="sr-only">
+            {stageText}
+          </p>
+        ) : null}
+
         {hasContent ? (
           <h3
             ref={headingRef}
             tabIndex={-1}
-            className="m-0 mb-2 font-heading text-[13px] uppercase tracking-[2px] text-moon-300"
+            className="seance-scroll-target m-0 mb-2 font-heading text-[13px] uppercase tracking-[2px] text-moon-300"
           >
             AI · from the facts above
           </h3>

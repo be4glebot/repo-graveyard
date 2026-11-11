@@ -41,8 +41,12 @@ Scope and constraints taken from the existing project:
 - **Veil_State**: The in-voice state shown when the Rate_Limiter blocks a request, with the copy "The veil is too thin tonight. Return after midnight."
 - **Weak_Ghost_State**: The in-voice state shown when the Daily_Budget is reached, drawn from the "The ghost is too weak to speak" board in `States.dc.html`.
 - **Silent_Fallback**: The in-voice failure state: "The spirits are silent tonight. The candle gutters out." with a "Light another candle" button.
-- **Ritual**: The 2 to 4 second summoning animation shown before the Spirit_Transcript.
-- **Whisper_Text**: The low-contrast cycling phrases shown during the Ritual.
+- **Ritual**: The staged summoning animation shown before the Spirit_Transcript. It lasts at least 2 seconds and its final stage is held until the Seance_Result arrives.
+- **Ritual_Stage**: One of four stages (0 to 3) of the Ritual, timed from the start of the attempt at 0, 1200, 2500 and 4500 ms and never tied to server progress. Stage 3 is the Held_Stage. The stages are defined by pure functions in `lib/seance-ritual.ts`.
+- **Held_Stage**: Ritual_Stage 3, which stays on screen until the Seance_Result or a failure arrives. There is no automatic end.
+- **Stage_Text**: The short smoke text line of the Ritual: none at stage 0, "Calling {repo} back…" at stage 1, "Reading its last words…" at stage 2, "Something is answering…" at stage 3. It replaces the earlier cycling Whisper_Text.
+- **Whisper_Text**: The earlier cycling phrases (`WHISPER_LINES`). Still exported by `lib/seance-ritual.ts` for compatibility, but no longer used by the Ritual.
+- **Ritual_Exit**: The decorative, `aria-hidden` layer (`components/seance/RitualExit.tsx`) played over the reveal after the Ritual unmounts: the flames gutter out together (`ok`) or the candles are snuffed one by one (silent, veil or weak).
 - **Spirit_Transcript**: The smoke-field text block in which the voice manifests.
 - **Smoke_Field**: The dark translucent background of the Spirit_Transcript with ragged edges masked by `public/art/fog-wisps.webp`. It is placed below the portrait, rising from it, at full panel width minus padding.
 - **Settled_State**: The state after the word reveal ends, or after skip, or under reduced motion: all text fully visible and all effects stopped.
@@ -64,7 +68,7 @@ Scope and constraints taken from the existing project:
 
 1. WHEN the Detail_Panel opens for a repo, THE Detail_Panel SHALL render exactly one Seance_Control inside the Actions_Slot.
 2. WHEN the Detail_Panel opens for a repo of type ghost, risen, zombie, tombstone or coffin, THE Seance_Control SHALL be rendered in the enabled state.
-3. THE Seance_Control SHALL be styled as an iron plaque showing a candle glyph followed by the visible text label "Hold a séance".
+3. THE Seance_Control SHALL be styled as the primary control of the Actions_Slot (class `.seance-primary`), showing a candle glyph followed by the visible text label "Hold a séance", with `ghost-300` text on a `night-800` background and a 1px `ember-500` border.
 4. THE Seance_Control SHALL be a native `button` element that receives focus through the Tab key, activates on Enter and Space, and shows a visible focus ring using the `candle-400` color while focused.
 5. WHEN the visitor activates the enabled Seance_Control, THE Seance_System SHALL start the Ritual and send exactly one request for the Seance_Result.
 6. WHILE a séance is running or displayed for the open repo, THE Seance_Control SHALL be disabled, expose `aria-disabled="true"`, and ignore activation so that no additional Ritual or Seance_Result request starts.
@@ -72,6 +76,10 @@ Scope and constraints taken from the existing project:
 8. WHEN the Detail_Panel opens for any repo after being closed, THE Seance_System SHALL be in the idle state with the Seance_Control enabled.
 9. IF the Seance_Result request fails, THEN THE Seance_System SHALL end the Ritual and show the Silent_Fallback described in Requirement 9.
 10. THE Actions_Slot SHALL keep its existing markup attributes `aria-label="Actions"` and `data-slot="actions"`.
+11. THE Seance_Control SHALL be full width below 768 px and auto width with a minimum of 16rem from 768 px, and THE "Open on GitHub" and homepage links of the Detail_Panel SHALL stay secondary, outline-only controls.
+12. WHEN the Seance_Control is hovered or has keyboard focus, THE Seance_Control SHALL fade in an inner ember glow (an `::after` layer with an inset `ember-500` box-shadow) over 700 ms (`--motion-seance-glow`) and then breathe it on a 4 s loop (`--motion-seance-breathe`), and the focus ring SHALL be a 3px `candle-400` ring (`.seance-focus`).
+13. WHILE a séance is running or displayed, THE Seance_Control SHALL show the visible label "The circle is open…", have the accessible name "Hold a séance. The circle is open…", show no glow, and remain focusable; WHILE the Seance_System is idle, THE Seance_Control SHALL show the label "Hold a séance".
+14. THE Actions_Slot SHALL contain exactly one Seance_Control and no other control for the séance.
 
 ### Requirement 2: Sample estate uses fixtures
 
@@ -260,22 +268,26 @@ Scope and constraints taken from the existing project:
 
 #### Acceptance Criteria
 
-1. WHEN a séance starts, THE Ritual SHALL run for a minimum of 2 seconds and a maximum of 4 seconds, measured from Ritual start to the moment the Seance_Result is shown, unless the visitor skips it or the Seance_Result is not ready (see criterion 12).
+1. WHEN a séance starts, THE Ritual SHALL run for a minimum of 2 seconds (`RITUAL_MIN_MS`, the same number as the hook's `RITUAL_FLOOR_MS`), measured from Ritual start to the moment the Seance_Result is shown, even on a cache hit or a Fixture_Seance, and THE Ritual SHALL advance through Ritual_Stages 0 to 3 at 0, 1200, 2500 and 4500 ms from the start of the attempt, never tied to server progress (see criterion 12).
 2. WHEN the Ritual starts, THE Detail_Panel SHALL reduce its content opacity to a value between 0.3 and 0.6, compared with 1.0 in its normal state, within 300 ms.
-3. WHILE the Ritual is running, THE Ritual SHALL ignite between 3 and 6 candles one at a time around the portrait, with a gap of 200 to 600 ms between ignitions, and each lit candle SHALL show a flame flicker and a warm glow whose opacity grows from 0 to its full value over 500 ms to 1500 ms.
-4. WHILE the Ritual is running, THE Ritual SHALL display smoke using `public/art/fog-wisps.webp` that rises from the bottom edge of the Detail_Panel and thickens, with its opacity increasing from 0 to a value between 0.4 and 0.8 over the Ritual duration.
+3. WHILE Ritual_Stage 0 is active (0 to 1.2 s), THE Ritual SHALL light five candles (`RITUAL_CANDLE_COUNT`) one at a time around the portrait, one ignition every 240 ms (`RITUAL_CANDLE_GAP_MS`) with all five lit by 1.2 s, and THE Ritual SHALL dim the panel edges with a vignette that reaches opacity 0.85 over 1.2 s.
+4. WHILE Ritual_Stage 1 is active (1.2 to 2.5 s), THE Ritual SHALL display smoke (the existing `public/art/fog-wisps.webp` art) that rises from the candles and gathers above the portrait, together with the Stage_Text "Calling {repo} back…".
 5. WHILE the Ritual is running, THE portrait's creature SHALL increase its brightness by 20% to 50% above its normal state, and its decay behaviour SHALL intensify for no more than 1.5 seconds in total: a ghost creature SHALL show increased drift and flicker, and a zombie creature SHALL show increased twitch.
-6. WHILE the Ritual is running, THE Ritual SHALL cycle through at least 2 Whisper_Text lines, such as "…someone is listening…" and "…the candle burns lower…", showing one line at a time, each for 1 to 2 seconds, at a text opacity of 0.3 to 0.5.
+6. WHILE Ritual_Stage 2 is active (2.5 to 4.5 s), THE Ritual SHALL creep frost inward from the four panel corners (`ghost-300` radial gradients at low opacity), lean the candle flames toward the portrait, and show the Stage_Text "Reading its last words…".
 7. THE Ritual SHALL animate only the `transform`, `opacity` and `filter` CSS properties.
 8. THE Ritual SHALL NOT produce any flash or flicker at a rate above 3 times per second at any point.
-9. WHEN the visitor clicks the Ritual area or presses Escape during the Ritual, THE Ritual SHALL end within 100 ms and SHALL show the Seance_Result as soon as it is ready.
+9. WHEN the visitor clicks the Ritual area, uses the Skip control or presses Escape during the Ritual, THE Ritual SHALL jump to the Held_Stage immediately within 100 ms with no build-up (`data-instant`), SHALL NOT skip the wait for the Seance_Result, and SHALL show the Seance_Result as soon as it is ready; WHEN the Seance_Result is already in, the reveal behaviour SHALL be unchanged.
 10. WHEN Escape is pressed during the Ritual, THE Seance_System SHALL skip the Ritual and SHALL NOT close the Detail_Panel.
 11. WHEN Escape is pressed and no Ritual is running and no transcript Escape handling is pending, THE Detail_Panel SHALL close.
-12. IF the Seance_Result is not ready when the Ritual reaches 4 seconds, THEN THE Ritual SHALL continue looping its candle, smoke and Whisper_Text display until the Seance_Result arrives or the séance fails, and WHEN the séance fails, THE Ritual SHALL end and THE Seance_System SHALL show the Silent_Fallback.
+12. WHILE the Held_Stage (from 4.5 s) is active, THE Ritual SHALL show the Stage_Text "Something is answering…", flicker the flames slowly on a 3.2 s loop and breathe the frost on a 6 s loop, and SHALL hold this stage until the Seance_Result arrives or the séance fails, with no automatic end; WHEN the séance fails, THE Ritual SHALL end and THE Seance_System SHALL show the Silent_Fallback.
 13. IF the Seance_Result is ready before the Ritual reaches 2 seconds and the visitor has not skipped, THEN THE Ritual SHALL continue until 2 seconds have elapsed and then show the Seance_Result.
-14. WHILE Reduced_Motion is active, THE Ritual SHALL replace all animation with a single 200 ms opacity fade, with no flicker, drift, twitch or smoke movement.
+14. WHILE Reduced_Motion is active, THE Ritual SHALL show the five candles lit and static and a static vignette, with no smoke, frost, lean, flame flicker, creature surge or Ritual_Exit, no inline transform and `animation: none` and `transform: none` on the Ritual classes, and THE Stage_Text SHALL still change at the same stage times and fade in over 200 ms using opacity only (`--motion-ritual-fade-reduced`).
 15. WHEN the Ritual ends, THE Ritual SHALL be removed from the DOM within 500 ms.
-16. THE Whisper_Text SHALL be hidden from assistive technology so that it is not announced by the live region.
+16. THE visible Stage_Text and every decorative Ritual layer SHALL be hidden from assistive technology (`aria-hidden="true"`), and THE Seance_Region SHALL announce the current Stage_Text through a visually hidden element (`data-seance-stage`) inside the existing `aria-live="polite"` region, once per Ritual_Stage and never per frame, with stage 0 announcing nothing.
+17. THE Ritual SHALL be dim, slow and smoky, using CSS and SVG only with no new image assets, animating only `transform`, `opacity` and `filter`, using Design_Tokens only (no hex literal in the séance CSS block), and with no cartoon shapes, bounce or bright colours.
+18. WHEN the Seance_Result arrives with outcome `ok`, THE Ritual SHALL unmount and THE Ritual_Exit SHALL play over the reveal, gutting the flames together over 450 ms (`RITUAL_EXIT_MS.resolved` is 600 ms in total) and dissolving the Stage_Text, after which the Spirit_Transcript reveal SHALL run unchanged.
+19. WHEN the outcome is silent, veil or weak, THE Ritual_Exit SHALL snuff the candles one by one, 180 ms apart (`RITUAL_SNUFF_GAP_MS`, `RITUAL_EXIT_MS.silent` is 1400 ms in total), while the frost recedes, and no Spirit_Transcript SHALL be shown.
+20. THE Ritual_Exit SHALL be decorative (`aria-hidden`), SHALL NOT be rendered under Reduced_Motion, and SHALL NOT play when the Detail_Panel is closed.
 
 ### Requirement 11: The spirit transcript (smoke field)
 
@@ -479,4 +491,6 @@ Scope and constraints taken from the existing project:
 33. THE test suite SHALL include Seance_Schema tests that upbeat status phrasing in `voice` or `causeOfDeath` is accepted (prompt-only rule), that completed-work language in a `detail` is rejected while "never completed" and "half-completed" pass, that a sentence containing "memory" and "faded" is rejected in `voice`, `title`, `detail` and `verdictReason` (including the exact sentence), and that in `causeOfDeath` it is accepted only when the whole value is exactly "My memory of that has faded.", together with a grounding test that this `causeOfDeath` is rejected when the README or a commit exists and accepted when both are missing.
 34. THE test suite SHALL include tests that a quote of 11 characters from the README is rejected, a quote of 12 characters is accepted, an exact Fact_Line copy such as "open issues: 0" is accepted, the cache key carries `:d{decayLevel}` after the state suffix for a ghost and no decay suffix for any other state, and the prompt carries the tone for each ghost decay level.
 35. THE test suite SHALL include a test that, WHEN attempt 1 fails a rule, the system prompt of the second AI_Client call ends with the feedback note listing the failed rule codes and field paths (at most 8, deduplicated), contains no text from the model's attempt 1 output, and is paired with a user message identical to the first call's; a test that an AI_Client error or timeout on attempt 1 sends the second call with no note; a test that the call count stays at most 2; and a test that each failed attempt's diagnostic entry carries `ruleCodes` and no model text.
-36. THE test suite SHALL include tests that: one ungrounded Business_Item among three is dropped and the response is accepted with two items; a response whose Business_Items are all ungrounded rejects the attempt with the per-item drop reasons as feedback for attempt 2; curly-quote and backtick evidence matches its plain README source after normalization; a 4-sentence oice is trimmed to 3 sentences; and a inish verdict whose erdictReason has next-step words is still a hard reject. The test suite SHALL also check that a oice needing no repair is returned byte-for-byte unchanged and that diagnostic entries carry epairedCodes and the epaired category without model text.
+36. THE test suite SHALL include tests that: one ungrounded Business_Item among three is dropped and the response is accepted with two items; a response whose Business_Items are all ungrounded rejects the attempt with the per-item drop reasons as feedback for attempt 2; curly-quote and backtick evidence matches its plain README source after normalization; a 4-sentence oice is trimmed to 3 sentences; and a inish verdict whose erdictReason has next-step words is still a hard reject. The test suite SHALL also check that a oice needing no repair is returned byte-for-byte unchanged and that diagnostic entries carry 
+epairedCodes and the 
+epaired category without model text.

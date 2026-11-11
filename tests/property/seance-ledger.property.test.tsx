@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render } from "@testing-library/react";
 import * as fc from "fast-check";
+import { displayEvidence } from "@/lib/seance-display";
 import LedgerList from "@/components/seance/LedgerList";
 
 afterEach(cleanup);
@@ -38,7 +39,8 @@ describe("seance-ledger property tests", () => {
             expect(spans.length).toBe(3);
             expect(spans[0].textContent).toBe(items[i].title);
             expect(spans[1].textContent).toBe(items[i].detail);
-            expect(spans[2].textContent).toBe(items[i].evidence);
+            // Evidence is shown trimmed and in quotation marks (display only).
+            expect(spans[2].textContent).toBe(displayEvidence(items[i].evidence));
             const FOLLOWING = Node.DOCUMENT_POSITION_FOLLOWING;
             expect(spans[0].compareDocumentPosition(spans[1]) & FOLLOWING).toBeTruthy();
             expect(spans[1].compareDocumentPosition(spans[2]) & FOLLOWING).toBeTruthy();

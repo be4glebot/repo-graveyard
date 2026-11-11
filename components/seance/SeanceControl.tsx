@@ -1,9 +1,13 @@
 "use client";
 
 /**
- * "Hold a séance" control. Native button on the existing `.btn2` iron plaque.
- * While a séance is running or shown it uses `aria-disabled="true"` (never the
- * `disabled` attribute) so it stays focusable, and clicks are ignored.
+ * "Hold a séance": the primary control of the Actions section. Native button,
+ * ember border, ghost-300 text on night-800, full width on mobile (see
+ * `.seance-primary`). While a séance is running or shown it uses
+ * `aria-disabled="true"` (never the `disabled` attribute) so it stays
+ * focusable, reads "The circle is open…" and ignores clicks. The accessible
+ * name keeps "Hold a séance" and contains the visible text. Once a result or
+ * fallback is showing it is enabled again and reads "Hold another séance".
  *
  * Requirements: 1.1, 1.2, 1.3, 18.4, 18.5
  */
@@ -11,8 +15,10 @@
 import type { MouseEvent } from "react";
 
 export interface SeanceControlProps {
-  /** True while a séance is running or its result is shown. */
+  /** True while a séance is running (ritual or reveal). */
   busy: boolean;
+  /** True once a result or fallback is showing: the control offers another séance. */
+  again?: boolean;
   onActivate: () => void;
 }
 
@@ -33,7 +39,7 @@ function CandleGlyph() {
   );
 }
 
-export function SeanceControl({ busy, onActivate }: SeanceControlProps) {
+export function SeanceControl({ busy, again = false, onActivate }: SeanceControlProps) {
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     if (busy) {
       event.preventDefault();
@@ -45,12 +51,13 @@ export function SeanceControl({ busy, onActivate }: SeanceControlProps) {
   return (
     <button
       type="button"
-      className="btn2 seance-focus"
+      className="seance-primary seance-focus"
       aria-disabled={busy ? "true" : undefined}
+      aria-label={busy ? "Hold a séance. The circle is open…" : undefined}
       onClick={handleClick}
     >
       <CandleGlyph />
-      <span>Hold a séance</span>
+      <span>{busy ? "The circle is open…" : again ? "Hold another séance" : "Hold a séance"}</span>
     </button>
   );
 }

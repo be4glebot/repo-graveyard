@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render } from "@testing-library/react";
 import * as fc from "fast-check";
+import { displayEvidence } from "@/lib/seance-display";
 import SpiritTranscript from "@/components/seance/SpiritTranscript";
 import CauseOfDeath from "@/components/seance/CauseOfDeath";
 import LedgerList from "@/components/seance/LedgerList";
@@ -97,7 +98,8 @@ describe("seance-render property tests", () => {
             const t = li.textContent ?? "";
             expect(t).toContain(items[i].title);
             expect(t).toContain(items[i].detail);
-            expect(t).toContain(items[i].evidence);
+            // Evidence is shown trimmed and in quotation marks (display only).
+            expect(t).toContain(displayEvidence(items[i].evidence));
           });
 
           expect(

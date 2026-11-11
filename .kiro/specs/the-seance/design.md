@@ -138,7 +138,7 @@ stateDiagram-v2
 | `lib/ai.ts` | pure | `buildSeancePrompt`, `buildFeedbackNote`, `businessItemBudget`, prompt constants (marker strings, ignore-instructions rule, "memory faded" sentence, tone examples). Follows `voice.md`. |
 | `lib/seance-transcript.ts` | pure | `buildTranscriptText`, `VERDICT_COPY`. |
 | `lib/seance-decay.ts` | pure | `selectDecayProfile`, `DECAY_PROFILES`, `flickerFor(repoName, lineIndex, lineLength)`. |
-| `lib/seance-ritual.ts` | pure | `buildRitualPlan(seed)`, `WHISPER_LINES`. |
+| `lib/seance-ritual.ts` | pure | Staged ritual: `ritualStageAt`, `ritualStageText`, `ritualVisuals`, `ritualCandles`, `ritualNextStageStartMs` and the constants `RITUAL_MIN_MS`, `RITUAL_STAGE_STARTS_MS`, `RITUAL_FINAL_STAGE`, `RITUAL_CANDLE_COUNT`, `RITUAL_CANDLE_GAP_MS`, `RITUAL_EXIT_MS`, `RITUAL_SNUFF_GAP_MS`. Still exports `WHISPER_LINES` and `buildRitualPlan(seed)` unchanged for compatibility; `Ritual` no longer uses them. |
 | `lib/seance-contrast.ts` | pure | colour parsing, `compositeOver`, `contrastRatio`. |
 | `lib/seance-state.ts` | pure | `seanceReducer`, state and event types. |
 | `lib/seance-gather.ts` | server | the GraphQL query and `fetchEvidence(transport, owner, repo)`. |
@@ -148,7 +148,7 @@ stateDiagram-v2
 | `lib/ratelimit.ts` | server | `createRateLimiter(store, clock)`, `parseDailyLimit`, `clientIp`, in-memory fallback. |
 | `lib/cache.ts` | server (extended) | adds `seanceCacheKey`, `seanceCacheGet`, `seanceCacheSet` beside the graveyard helpers. `timeout()` is shared. |
 | `app/api/seance/route.ts` | server | `export const maxDuration = 30`; `POST` handler. |
-| `components/seance/*` | client | see Components and Interfaces. |
+| `components/seance/*` | client | see Components and Interfaces. Visual pass additions: `SeanceControl.tsx` (primary control), `RitualParts.tsx` (stage parts), `RitualExit.tsx` (exit layer), `useRitualStage.ts` (stage clock) and `useRitualExit.ts` (exit decision and timing). |
 | `components/detail/DetailPanel.tsx` | client (edited) | portrait, facts section, Actions slot control, AI section, Escape claim. |
 | `data/estate.json`, `lib/estate-schema.ts` | data (edited) | adds `seanceResult` per repo. |
 | `app/globals.css` | styles (edited) | new tokens and séance classes. |
@@ -451,9 +451,10 @@ Rules the reducer enforces: `START` only acts in `idle` (1.6); `RETRY` only acts
 
 | Component | Responsibility |
 |---|---|
-| `SeanceControl` | Native `<button type="button">` styled with `.btn2`, candle glyph and the text "Hold a séance". Uses `aria-disabled="true"` (not the `disabled` attribute) while a séance is running or shown, and ignores clicks in that state, so it stays focusable. Focus ring uses `candle-400`, at least 2px. |
+| `SeanceControl` | Native `<button type="button">` styled with `.btn2`, candle glyph and the text "Hold a séance". Uses `aria-disabled="true"` (not the `disabled` attribute) while a séance is running or shown, and ignores clicks in that state, so it stays focusable. Focus ring uses `candle-400`, at least 2px. **Visual pass:** the control is the primary control of the Actions section (class `.seance-primary`, plus `.seance-focus` for a 3px `candle-400` ring): full width on mobile, auto width with `min-width: 16rem` from 768px, `ghost-300` text on `night-800`, a 1px border in the new token `--color-ember-500` (early `@theme` block), and an `::after` inner glow (inset ember box-shadow) that fades in over `--motion-seance-glow` (700ms) on hover and keyboard focus, then breathes on a 4s loop (`--motion-seance-breathe`). While running or shown it reads "The circle is open…", its accessible name is "Hold a séance. The circle is open…", and it has no glow. The Actions section holds only this control; "Open on GitHub" and the homepage link stay secondary outline links. |
 | `SeanceRegion` | Always-mounted `<div aria-live="polite" data-seance-region>`. Empty while idle. Holds the AI section: the Seance_Heading (`<h3 tabIndex={-1}>`, text "AI · from the facts above", receives focus), then the state view. Moves focus to the heading within 100 ms of results rendering and within 500 ms of the Silent_Fallback appearing. |
-| `Ritual` | Candles, smoke, creature surge, Whisper_Text, Skip control. Everything decorative has `aria-hidden="true"`. Unmounts within 500 ms of ending. |
+| `Ritual` | Staged ritual (see Ritual stages below): five candles, vignette, smoke, frost, creature surge, one Stage_Text line, Skip control. Stage parts live in `RitualParts.tsx`; the stage clock lives in `useRitualStage.ts` (timers started with the attempt, reset per attempt, a skip returns the held final stage). Everything decorative and the visible Stage_Text have `aria-hidden="true"`; a visually hidden `data-seance-stage` element in the `aria-live` Seance_Region holds the current stage text, so it is announced once per stage (stage 0 announces nothing). Unmounts within 500 ms of ending. No inline transform; CSS and SVG only. |
+| `RitualExit` | Decorative `aria-hidden` exit layer driven by `useRitualExit`, played over the reveal after `Ritual` unmounts. `ok`: flames gutter out together (450 ms) and the stage text dissolves, then the unchanged `SpiritTranscript` reveal runs. Silent, veil or weak: candles snuffed one by one 180 ms apart while the frost recedes, no transcript. Not rendered under Reduced_Motion and not played when the panel is closed. |
 | `SpiritTranscript` | The Smoke_Field and word reveal. Carries `data-decay-profile`. |
 | `CauseOfDeath` and `LedgerList` | Engraved line (Cinzel capitals) under the heading from `causeHeading(state)`, and a real `<ol>` of items: `title`, `detail`, `evidence` in that order, evidence in `font-fact`. Held in the DOM but visually hidden until Settled_State (14.9). |
 | `VerdictCard` | One per repo. States the verdict in words. Accent and `data-treatment` per verdict. No controls. |
@@ -575,7 +576,24 @@ The selector is pure and total. A ghost with a non-integer or out-of-range decay
 - Gaps between ignitions are 200 to 600 ms. Fades are 500 to 1500 ms.
 - If the last candle would not be fully lit by 2000 ms, gaps are shortened toward 200 ms from the end until it is. With at most 5 gaps this always fits (5 x 200 = 1000, plus a 500 ms fade).
 - `WHISPER_LINES` has at least four lines ("…someone is listening…", "…the candle burns lower…", and two more in the same voice). One shows at a time for 1 to 2 seconds at opacity 0.3 to 0.5, cycling until the ritual ends. Whisper text is `aria-hidden`.
-- The ritual loops candle, smoke and whisper display if no result is ready at 4 seconds (10.12).
+- This plan is retained for compatibility (Property 17 is unchanged) but the `Ritual` component no longer uses it; the staged ritual below replaces the cycling whispers and the loop at 4 seconds.
+
+### Ritual stages (`lib/seance-ritual.ts`, visual pass)
+
+The stages are timed from the start of the attempt and never tied to server progress. Pure functions: `ritualStageAt(elapsedMs)`, `ritualStageText(stage, repo)`, `ritualVisuals(stage)`, `ritualCandles(elapsedMs)` and `ritualNextStageStartMs(elapsedMs)`. Constants: `RITUAL_MIN_MS = 2000` (same number as the hook's `RITUAL_FLOOR_MS`), `RITUAL_STAGE_STARTS_MS = [0, 1200, 2500, 4500]`, `RITUAL_FINAL_STAGE = 3`, `RITUAL_CANDLE_COUNT = 5`, `RITUAL_CANDLE_GAP_MS = 240`, `RITUAL_EXIT_MS = { resolved: 600, silent: 1400 }`, `RITUAL_SNUFF_GAP_MS = 180`.
+
+| Stage | Window | Visuals | Stage_Text |
+|---|---|---|---|
+| 0 | 0 to 1.2 s | five candles lit one at a time (every 240 ms, all lit by 1.2 s); vignette to opacity 0.85 over 1.2 s | none |
+| 1 | 1.2 to 2.5 s | smoke (fog-wisps art) rises from the candles and gathers above the portrait | "Calling {repo} back…" |
+| 2 | 2.5 to 4.5 s | frost creeps in from the four corners (`ghost-300` radial gradients, low opacity); flames lean toward the portrait | "Reading its last words…" |
+| 3 | from 4.5 s, held | slow flame flicker (3.2 s loop), frost breathing (6 s loop) | "Something is answering…" |
+
+- Stage 3 is held until the response arrives; there is no automatic end. Skip (button or click on the ritual area) jumps straight to stage 3 with `data-instant` (no build-up) and does not skip the wait for the response. Escape behaviour is unchanged.
+- The transcript never shows before `RITUAL_MIN_MS`, even on a cache hit or a fixture.
+- Only `transform`, `opacity` and `filter` animate. The séance CSS block uses tokens only (no hex), no cartoon shapes, no bounce, no new image assets.
+- Reduced_Motion: five static lit candles, static vignette, no smoke, frost, lean, flicker, surge or exit layer; the Stage_Text still changes at the same stage times with a 200 ms opacity fade (`--motion-ritual-fade-reduced`); no inline transform; `animation: none` and `transform: none` on the new classes.
+- Exit layer: `ok` guts the flames together (450 ms, 600 ms total) and dissolves the text; silent, veil and weak snuff the candles 180 ms apart (1400 ms total) while the frost recedes.
 
 ### Word reveal and accessibility
 
@@ -762,6 +780,9 @@ This feature suits randomized testing because most of its logic is pure function
 *For any* seed string, `buildRitualPlan` returns 3 to 6 candles. Gaps between consecutive ignitions are 200 to 600 ms. Each fade is 500 to 1500 ms. The last candle is fully lit by 2000 ms.
 
 **Validates: Requirements 10.3**
+
+*Stage plan (example tests and a monotonic property, no new numbered Property).* `tests/unit/seance-ritual-stages.test.ts` covers the stage boundaries at 0, 1.2, 2.5 and 4.5 s, the hold at stage 3, skip, totality of `ritualStageAt`, a fast-check monotonic property (a later time never gives an earlier stage), the stage texts, `ritualVisuals` per stage, five candles lit one at a time, the 2 s minimum and the exit timing. This supersedes the 3 to 6 candle count of Property 17 for the Ritual component only; Property 17 still checks `buildRitualPlan` unchanged.
+**Validates: Requirements 10.1, 10.3, 10.4, 10.6, 10.12, 10.18, 10.19**
 
 ### Property 18: The client reducer never has two requests in flight and never shows results early
 

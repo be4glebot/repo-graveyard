@@ -5,6 +5,7 @@ import {
   seanceResponseSchema,
   seanceResultSchema,
 } from "@/lib/seance-schema";
+import { RITUAL_MIN_MS } from "@/lib/seance-ritual";
 import {
   initialSeanceState,
   seanceReducer,
@@ -12,7 +13,7 @@ import {
 } from "@/lib/seance-state";
 
 /** Ritual floor before a result may be revealed (10.1). */
-export const RITUAL_FLOOR_MS = 2000;
+export const RITUAL_FLOOR_MS = RITUAL_MIN_MS;
 /** Client-side request deadline (9.4). */
 export const REQUEST_TIMEOUT_MS = 30_000;
 
@@ -30,6 +31,8 @@ export interface UseSeance {
   state: SeanceState;
   start: () => void;
   retry: () => void;
+  /** Hold another séance after a result or fallback is showing. */
+  again: () => void;
   skip: () => void;
   settle: () => void;
   close: () => void;
@@ -56,6 +59,10 @@ export function useSeance({
   );
   const retry = useCallback(
     () => dispatch({ type: "RETRY", reduced: latest.current.reduced }),
+    [],
+  );
+  const again = useCallback(
+    () => dispatch({ type: "RESTART", reduced: latest.current.reduced }),
     [],
   );
   const skip = useCallback(() => dispatch({ type: "SKIP" }), []);
@@ -131,5 +138,5 @@ export function useSeance({
     };
   }, [attemptId]);
 
-  return { state, start, retry, skip, settle, close };
+  return { state, start, retry, again, skip, settle, close };
 }

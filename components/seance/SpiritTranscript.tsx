@@ -254,12 +254,6 @@ export default function SpiritTranscript({
 
   return (
     <>
-      <p
-        data-decay-label=""
-        className="m-0 mb-1 font-fact text-[13px] text-moon-300"
-      >
-        {profile.label}
-      </p>
       <div
         ref={rootRef}
         className="smoke-field"

@@ -9,7 +9,7 @@ Ground rules for every task:
 - Language is TypeScript (matches the design). Tests use Vitest 5, Testing Library and fast-check 4, run once with `npx vitest --run`.
 - All tests mock the AI client (`LlmClient`), the cache, the limiter store and the GitHub transport. No test calls a real AI provider or the real GitHub API. DOM tests stub `fetch` to fail on any URL they were not told about.
 - Never touch, read, print or commit `.env.local`. Never run `next build` and never start a dev server (the user's dev server is running). Type check with `npx tsc --noEmit` and lint with `npm run lint`.
-- Existing tests stay unchanged. The single exception is the approved update in task 12.3. `app/globals.css` only gains tokens and classes; nothing is renamed or removed.
+- Existing tests stay unchanged. The exceptions are the approved update in task 12.3 and the deliberate reduced-motion assertion update in `tests/dom/SeanceFlow.test.tsx` (task 11.11). `app/globals.css` only gains tokens and classes; nothing is renamed or removed.
 - Tests are required in this project. No test sub-task is marked optional.
 - Each property test is one test with at least 100 runs and carries the tag comment `// Feature: the-seance, Property N: <title>`.
 
@@ -353,7 +353,7 @@ Ground rules for every task:
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6, 8.5, 8.6, 8.7, 8.8, 9.1, 9.2, 9.3, 9.7, 9.9, 18.4, 18.5_
 
   - [x] 11.4 Create `components/seance/Ritual.tsx`
-    - Candles from `buildRitualPlan(seed)`, smoke, creature surge class, Whisper_Text cycling (1 to 2 s per line, opacity 0.3 to 0.5), loops if no result at 4 s, on-screen Skip control, click-to-skip
+    - Original build: candles from `buildRitualPlan(seed)`, smoke, creature surge class, Whisper_Text cycling, loop at 4 s, on-screen Skip control, click-to-skip. Superseded by the staged ritual in task 11.9 (five candles, stage text, held final stage); the Skip control and click-to-skip remain
     - Every decorative layer and the whispers carry `aria-hidden="true"`; unmounts within 500 ms of ending; reduced motion replaces everything with one 200 ms fade
     - _Requirements: 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 10.12, 10.14, 10.15, 10.16, 18.7, 18.10_
 
@@ -376,6 +376,35 @@ Ground rules for every task:
     - Order: transcript → cause of death → ledger → VerdictCard → KiroSlot → Copy button; maps phases to Ritual, states and result view
     - Registers the Escape claim function (skips ritual or settles reveal and returns true; otherwise returns false)
     - _Requirements: 8.5, 8.6, 9.6, 10.9, 10.10, 10.11, 11.10, 15.1, 15.10, 18.1, 18.2, 18.3, 18.6, 18.9_
+
+  - [x] 11.8 Visual pass: primary control (`SeanceControl.tsx`, `.seance-primary`)
+    - Add the token `--color-ember-500` to the early `@theme` block, plus `--motion-seance-glow` (700ms) and `--motion-seance-breathe` (4s)
+    - Style `.seance-primary` in `app/globals.css`: full width on mobile, auto width with min 16rem from 768px, `ghost-300` text on `night-800`, 1px ember border, `::after` inner glow (inset ember box-shadow) fading in on hover and keyboard focus and then breathing on a 4s loop; `.seance-focus` 3px `candle-400` ring; secondary links unchanged
+    - Disabled state: `aria-disabled="true"` (not `disabled`), visible label "The circle is open…", accessible name "Hold a séance. The circle is open…", no glow, clicks ignored; idle label "Hold a séance"; the Actions section holds exactly this one control
+    - No change to the API, prompt, schema or cache
+    - _Requirements: 1.3, 1.6, 1.11, 1.12, 1.13, 1.14_
+
+  - [x] 11.9 Visual pass: staged ritual (`lib/seance-ritual.ts`, `Ritual`, `RitualParts`, `useRitualStage`)
+    - Add pure `ritualStageAt`, `ritualStageText`, `ritualVisuals`, `ritualCandles`, `ritualNextStageStartMs` and the constants `RITUAL_MIN_MS = 2000`, `RITUAL_STAGE_STARTS_MS = [0, 1200, 2500, 4500]`, `RITUAL_FINAL_STAGE = 3`, `RITUAL_CANDLE_COUNT = 5`, `RITUAL_CANDLE_GAP_MS = 240`, `RITUAL_EXIT_MS = { resolved: 600, silent: 1400 }`, `RITUAL_SNUFF_GAP_MS = 180`; keep `WHISPER_LINES` and `buildRitualPlan` exported unchanged
+    - `useRitualStage.ts`: stage clock timed from the start of the attempt, reset per attempt, a skip returns the final stage immediately (`data-instant`); the final stage is held with no automatic end; the skip never skips the wait for the response
+    - `RitualParts.tsx` and `Ritual.tsx`: stage 0 five candles one by one and vignette; stage 1 smoke and "Calling {repo} back…"; stage 2 frost from the corners, flames lean, "Reading its last words…"; stage 3 "Something is answering…" with 3.2s flame flicker and 6s frost breathing; minimum 2s before the transcript even on a cache hit or fixture
+    - CSS and SVG only, only `transform`, `opacity` and `filter` animate, tokens only (no hex in the séance CSS block), no new image assets
+    - Reduced motion: five static lit candles, static vignette, no smoke, frost, lean, flicker, surge or exit layer; stage text changes at the same times with a 200ms opacity fade (`--motion-ritual-fade-reduced`); no inline transform; `animation: none` and `transform: none` on the new classes
+    - Accessibility: visible stage text and decoration `aria-hidden`; a visually hidden `data-seance-stage` element in the `aria-live` Seance_Region announces each stage once; stage 0 announces nothing
+    - _Requirements: 10.1, 10.3, 10.4, 10.6, 10.7, 10.8, 10.9, 10.12, 10.13, 10.14, 10.16, 10.17, 18.7_
+
+  - [x] 11.10 Visual pass: ritual exit layer (`RitualExit.tsx`, `useRitualExit.ts`)
+    - On `ok`: the ritual unmounts and an `aria-hidden` exit layer guts the flames together (450 ms) and dissolves the stage text, then the existing `SpiritTranscript` reveal runs unchanged
+    - On silent, veil or weak: snuff the candles one by one (180 ms apart) while the frost recedes; no transcript
+    - Decorative only, not rendered under Reduced_Motion, not played when the panel is closed
+    - _Requirements: 10.15, 10.18, 10.19, 10.20_
+
+  - [x] 11.11 Write the visual pass tests
+    - `tests/unit/seance-ritual-stages.test.ts`: stage boundaries at 0, 1.2, 2.5 and 4.5 s, hold, skip, totality, monotonic property (fast-check), texts, visuals per stage, five candles one at a time, 2s minimum, exit timing
+    - `tests/dom/SeanceRitualStages.test.tsx`: accessible name and disabled state; stages and hold; once-per-stage announcement observed with a `MutationObserver`; skip goes to the held stage and cannot skip the wait; 2s minimum on an instant response; gutter on ok; snuff on silent; no exit on close; reduced motion has lit candles, no movement layers and no inline transforms
+    - `tests/unit/seance-visual-css.test.ts`: primary control and ritual CSS rules read from `app/globals.css` as text
+    - Deliberate update to `tests/dom/SeanceFlow.test.tsx`: the reduced-motion test used to assert no candles and no whisper element; it now asserts five lit candles and an empty stage-text line at stage 0. Property 17 (`buildRitualPlan` bounds) and the existing CSS tests are unchanged and still pass
+    - _Requirements: 1.3, 1.6, 1.11, 1.12, 1.13, 1.14, 10.1, 10.3, 10.4, 10.6, 10.9, 10.12, 10.14, 10.16, 10.17, 10.18, 10.19, 10.20_
 
 - [x] 12. Detail panel and estate wiring
   - [x] 12.1 Update `components/detail/DetailPanel.tsx` and add `Portrait`

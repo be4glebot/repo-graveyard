@@ -35,6 +35,7 @@ type Command =
   | { type: "FAILURE"; delta: number }
   | { type: "SETTLE" }
   | { type: "RETRY"; reduced: boolean }
+  | { type: "RESTART"; reduced: boolean }
   | { type: "CLOSE" };
 
 const delta = fc.constantFrom(-2, -1, 0, 0, 0, 1);
@@ -50,6 +51,7 @@ const commandArb: fc.Arbitrary<Command> = fc.oneof(
   fc.record({ type: fc.constant("FAILURE" as const), delta }),
   fc.constant({ type: "SETTLE" as const }),
   fc.record({ type: fc.constant("RETRY" as const), reduced: fc.boolean() }),
+  fc.record({ type: fc.constant("RESTART" as const), reduced: fc.boolean() }),
   fc.constant({ type: "CLOSE" as const }),
 );
 
@@ -92,11 +94,19 @@ function step(m: Model, e: SeanceEvent): Model {
       : n;
   switch (e.type) {
     case "START":
-    case "RETRY": {
+    case "RETRY":
+    case "RESTART": {
       const allowed =
         e.type === "START"
           ? m.phase === "idle"
-          : m.phase === "silent" && !m.inFlight;
+          : e.type === "RETRY"
+            ? m.phase === "silent" && !m.inFlight
+            : // RESTART (Hold another séance): only once a result or fallback is showing.
+              (m.phase === "settled" ||
+                m.phase === "veil" ||
+                m.phase === "weak" ||
+                m.phase === "silent") &&
+              !m.inFlight;
       return allowed
         ? {
             phase: "ritual",

@@ -195,6 +195,14 @@ body {
   --motion-word-stagger: 60ms;
   --motion-word-fade: 300ms;
   --motion-ritual-fade-reduced: 200ms;
+
+  /* Séance visual pass: warm ember accent (borders, flame glow) and slow ritual timings. */
+  --color-ember-500: #b4531c;
+  --motion-seance-glow: 700ms; /* primary control inner glow fade */
+  --motion-seance-breathe: 4s; /* primary control inner glow breathing */
+  --motion-ritual-candle: 240ms; /* one candle igniting */
+  --motion-ritual-flicker: 3.2s; /* held-stage flame flicker */
+  --motion-ritual-breathe: 6s; /* held-stage frost breathing */
 }
 
 /* ----------------------------------------------------------------------------
@@ -896,14 +904,12 @@ body {
 
 /* ---- Ledger and engraved cause line (Req 13.5-13.7) ----------------------- */
 .cause-engraved {
-  font-family: var(--font-heading), serif;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+  font-family: var(--font-narrative), Georgia, serif;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1.5;
   color: var(--color-candle-tan);
   font-size: 15px;
-  text-shadow:
-    0 1px 0 var(--color-night-cover-top),
-    0 -1px 0 var(--color-plaque-inset);
 }
 .ledger-list {
   margin: 0;
@@ -1117,5 +1123,451 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .verdict-card {
     animation: verdict-card-fade var(--motion-ritual-fade-reduced) linear;
+  }
+}
+
+/* ============================================================================
+   Séance visual pass: the primary control and the building ritual.
+   Tokens only; transform, opacity and filter only; everything dim, slow and
+   smoky. Timings that depend on the stage plan are set inline by the
+   components; the plan itself lives in lib/seance-ritual.ts.
+   ============================================================================ */
+
+/* ---- Primary control: ember border, ghost-300 text on night-800 ----------- */
+.seance-primary {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 1.25rem;
+  overflow: hidden;
+  background: var(--color-night-800);
+  color: var(--color-ghost-300);
+  border: 1px solid var(--color-ember-500);
+  border-radius: 6px;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+/* Slow inner glow: a child layer whose opacity fades in on hover and focus. */
+.seance-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow: inset 0 0 18px 2px var(--color-ember-500);
+  opacity: 0;
+  transition: opacity var(--motion-seance-glow) ease;
+}
+.seance-primary:hover::after,
+.seance-primary:focus-visible::after {
+  opacity: 0.85;
+  animation: seance-glow-breathe var(--motion-seance-breathe) ease-in-out infinite;
+}
+@keyframes seance-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+/* Disabled while a séance runs: still focusable (aria-disabled), no glow. */
+.seance-primary[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.75;
+}
+.seance-primary[aria-disabled="true"]::after,
+.seance-primary[aria-disabled="true"]:hover::after,
+.seance-primary[aria-disabled="true"]:focus-visible::after {
+  opacity: 0.3;
+  animation: none;
+}
+@media (min-width: 768px) {
+  .seance-primary {
+    width: auto;
+    min-width: 16rem;
+    align-self: flex-start;
+  }
+}
+
+/* ---- Ritual stages --------------------------------------------------------- */
+/* Panel edges dim (stage 0). */
+.ritual-vignette {
+  background: radial-gradient(ellipse at 50% 40%, transparent 35%, var(--color-night-sky) 100%);
+  opacity: 0;
+  transition: opacity 1200ms ease;
+}
+.ritual-vignette[data-on="true"] {
+  opacity: 0.85;
+}
+
+/* A candle: wax and flame. The wrapper fades in (delay set inline, one at a
+   time); the lean wrapper tilts it toward the portrait in stage 2. */
+.ritual-candle {
+  margin-left: -9px; /* centre the 18px candle on its ring point */
+  opacity: 0;
+  transition: opacity var(--motion-ritual-candle) ease-out;
+}
+.ritual-candle[data-lit="true"] {
+  opacity: 1;
+}
+.ritual-lean {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 18px;
+  transform-origin: 50% 100%;
+  transition: transform 1400ms ease-in-out;
+}
+.ritual-lean[data-lean="true"] {
+  transform: rotate(var(--lean, 0deg));
+}
+/* A soft blurred teardrop: a rounded square turned to a point, inside a box
+   that carries the flicker (so the flicker's scale never fights the turn). */
+.ritual-flame {
+  position: relative;
+  width: 18px;
+  height: 28px;
+  opacity: 0.85;
+  filter: blur(1.2px);
+  transform-origin: 50% 100%;
+}
+.ritual-flame::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  bottom: 4px;
+  width: 16px;
+  height: 16px;
+  background: var(--color-candle-400);
+  border-radius: 0 50% 50% 50%;
+  transform: rotate(45deg);
+}
+/* A faint warm glow on the smoke behind the flame. */
+.ritual-glow {
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+  background: radial-gradient(circle, var(--color-ember-500), transparent 70%);
+  opacity: 0.3;
+  filter: blur(6px);
+  pointer-events: none;
+}
+.ritual-flame[data-holding="true"] {
+  animation: ritual-flame-hold var(--motion-ritual-flicker) ease-in-out infinite;
+}
+@keyframes ritual-flame-hold {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scaleY(0.94);
+  }
+  40% {
+    opacity: 0.9;
+    transform: scaleY(1.06);
+  }
+  70% {
+    opacity: 0.72;
+    transform: scaleY(0.98);
+  }
+}
+.ritual-wax {
+  width: 12px;
+  height: var(--wax-h, 48px);
+  margin: 0 auto;
+  background: var(--color-candle-tan);
+  opacity: 0.45;
+}
+
+/* The repo's own creature at the centre of the ritual: dimmed, over a faint
+   cold halo (a blurred radial glow, never a solid shape). Both are centred on
+   a zero-size anchor using fixed offsets, so nothing needs a transform. */
+.ritual-halo {
+  position: absolute;
+  left: -120px;
+  top: -120px;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, var(--color-ghost-300), transparent 65%);
+  opacity: 0.16;
+  filter: blur(14px);
+}
+.ritual-portrait {
+  position: absolute;
+  left: -68px;
+  top: -68px;
+  width: 136px;
+  height: 136px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+
+/* Scrolled into view below the fixed site header. */
+.seance-scroll-target {
+  scroll-margin-top: var(--site-header-h);
+}
+
+/* Smoke rises from the candles and gathers above the portrait (stage 1). */
+.ritual-smoke-rise {
+  opacity: 0;
+  transform: translateY(18%);
+  transition:
+    opacity 1300ms ease-out,
+    transform 2600ms ease-out;
+}
+.ritual-smoke-rise[data-on="true"] {
+  opacity: 0.4;
+  transform: translateY(-4%);
+}
+
+/* Frost creeps in from the four corners (stage 2) and breathes while held. */
+/* Frost: a soft pool plus fine crystal rays from the corner (a repeating
+   conic gradient), both feathered out by a radial mask so the edge breaks up
+   into crystals instead of a smooth fade. */
+.ritual-frost {
+  position: absolute;
+  width: 62%;
+  height: 62%;
+  opacity: 0;
+  transform: scale(0.5);
+  background:
+    radial-gradient(circle at var(--fx) var(--fy), var(--color-ghost-300), transparent 46%),
+    repeating-conic-gradient(
+      from 0deg at var(--fx) var(--fy),
+      var(--color-ghost-300) 0deg 1.5deg,
+      transparent 1.5deg 7deg
+    ),
+    repeating-conic-gradient(
+      from 3deg at var(--fx) var(--fy),
+      var(--color-ghost-300) 0deg 0.8deg,
+      transparent 0.8deg 11deg
+    );
+  -webkit-mask-image: radial-gradient(circle at var(--fx) var(--fy), black 0%, black 30%, transparent 78%);
+  mask-image: radial-gradient(circle at var(--fx) var(--fy), black 0%, black 30%, transparent 78%);
+  transition:
+    opacity 2000ms ease-out,
+    transform 2600ms ease-out;
+}
+.ritual-frost[data-corner="tl"] {
+  top: 0;
+  left: 0;
+  --fx: 0%;
+  --fy: 0%;
+  transform-origin: 0 0;
+}
+.ritual-frost[data-corner="tr"] {
+  top: 0;
+  right: 0;
+  --fx: 100%;
+  --fy: 0%;
+  transform-origin: 100% 0;
+}
+.ritual-frost[data-corner="bl"] {
+  bottom: 0;
+  left: 0;
+  --fx: 0%;
+  --fy: 100%;
+  transform-origin: 0 100%;
+}
+.ritual-frost[data-corner="br"] {
+  bottom: 0;
+  right: 0;
+  --fx: 100%;
+  --fy: 100%;
+  transform-origin: 100% 100%;
+}
+.ritual-frost[data-on="true"] {
+  opacity: 0.45;
+  transform: scale(1);
+}
+.ritual-frost[data-holding="true"] {
+  animation: ritual-frost-breathe var(--motion-ritual-breathe) ease-in-out infinite;
+}
+@keyframes ritual-frost-breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.36;
+    transform: scale(1.04);
+  }
+}
+
+/* The small smoke text; remounted per stage so each line fades in once. */
+.ritual-text {
+  opacity: 0;
+  text-shadow:
+    0 0 8px var(--color-night-sky),
+    0 0 20px var(--color-night-sky);
+}
+.ritual-text[data-visible="true"] {
+  animation: ritual-text-in 900ms ease-out both;
+}
+@keyframes ritual-text-in {
+  0% {
+    opacity: 0;
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 0.85;
+    filter: blur(0);
+  }
+}
+
+/* Skip: jump straight to the held stage with no build-up. */
+.ritual-root[data-instant="true"] .ritual-candle,
+.ritual-root[data-instant="true"] .ritual-lean,
+.ritual-root[data-instant="true"] .ritual-smoke-rise,
+.ritual-root[data-instant="true"] .ritual-frost,
+.ritual-root[data-instant="true"] .ritual-vignette {
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+}
+.ritual-root[data-instant="true"] .ritual-text[data-visible="true"] {
+  animation-duration: 200ms;
+}
+
+/* ---- Ritual exit (decorative; the ritual itself is already unmounted) ------ */
+@keyframes ritual-gutter {
+  0% {
+    opacity: 0.9;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+}
+@keyframes ritual-dissolve {
+  0% {
+    opacity: 0.85;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+@keyframes ritual-recede {
+  0% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+@keyframes ritual-fade-out {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* Response arrived: the flames gutter out together, the text dissolves. */
+.ritual-exit-resolved .ritual-flame {
+  animation: ritual-gutter 450ms ease-in both;
+}
+.ritual-exit-resolved .ritual-wax {
+  animation: ritual-dissolve 500ms ease-in both;
+}
+/* Silent result: the candles are snuffed one by one (inline --snuff-delay). */
+.ritual-exit-silent .ritual-flame {
+  animation: ritual-gutter 400ms ease-in both;
+  animation-delay: var(--snuff-delay, 0ms);
+}
+.ritual-exit-silent .ritual-wax {
+  animation: ritual-dissolve 500ms ease-in both;
+  animation-delay: var(--snuff-delay, 0ms);
+}
+@keyframes ritual-out {
+  to {
+    opacity: 0;
+  }
+}
+.ritual-exit .ritual-portrait,
+.ritual-exit .ritual-halo {
+  animation: ritual-out 600ms ease-in both;
+}
+.ritual-exit-resolved .ritual-glow {
+  animation: ritual-out 450ms ease-in both;
+}
+.ritual-exit-silent .ritual-glow {
+  animation: ritual-out 400ms ease-in both;
+  animation-delay: var(--snuff-delay, 0ms);
+}
+.ritual-exit .ritual-text {
+  animation: ritual-dissolve 500ms ease-in both;
+}
+.ritual-exit .ritual-frost[data-on="true"] {
+  animation: ritual-recede 900ms ease-in both;
+}
+.ritual-exit .ritual-smoke-rise[data-on="true"] {
+  animation: ritual-fade-out 700ms ease-in both;
+}
+.ritual-exit .ritual-vignette[data-on="true"] {
+  animation: ritual-fade-out 700ms ease-in both;
+}
+
+/* ---- Reduced motion: no movement; candles lit, text fades over 200 ms ------ */
+@keyframes ritual-text-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ritual-flame,
+  .ritual-flame[data-holding="true"],
+  .ritual-frost,
+  .ritual-frost[data-holding="true"],
+  .ritual-text,
+  .ritual-exit .ritual-flame,
+  .ritual-exit .ritual-glow,
+  .ritual-exit .ritual-portrait,
+  .ritual-exit .ritual-halo,
+  .seance-primary::after,
+  .seance-primary:hover::after,
+  .seance-primary:focus-visible::after {
+    animation: none;
+  }
+  .ritual-lean,
+  .ritual-lean[data-lean="true"],
+  .ritual-smoke-rise,
+  .ritual-smoke-rise[data-on="true"],
+  .ritual-frost,
+  .ritual-frost[data-on="true"],
+  .ritual-flame {
+    transform: none;
+    transition: none;
+  }
+  .ritual-candle,
+  .ritual-vignette,
+  .seance-primary::after {
+    transition: opacity var(--motion-ritual-fade-reduced) linear;
+  }
+  .ritual-text[data-visible="true"] {
+    animation: ritual-text-fade var(--motion-ritual-fade-reduced) linear both;
   }
 }

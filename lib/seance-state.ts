@@ -35,6 +35,8 @@ export type SeanceEvent =
   | { type: "FAILURE"; attemptId: number }
   | { type: "SETTLE" }
   | { type: "RETRY"; reduced: boolean }
+  /** Hold another séance once a result (or fallback) is showing; never mid-ritual. */
+  | { type: "RESTART"; reduced: boolean }
   | { type: "CLOSE" };
 
 export const initialSeanceState: SeanceState = {
@@ -81,6 +83,15 @@ export function seanceReducer(
 
     case "RETRY":
       return state.phase === "silent" && !state.inFlight
+        ? begin(state, event.reduced)
+        : state;
+
+    case "RESTART":
+      return (state.phase === "settled" ||
+        state.phase === "veil" ||
+        state.phase === "weak" ||
+        state.phase === "silent") &&
+        !state.inFlight
         ? begin(state, event.reduced)
         : state;
 
