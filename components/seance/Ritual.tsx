@@ -17,9 +17,10 @@
  * Requirements: 10.2-10.9, 10.12, 10.14-10.16, 18.7, 18.10
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ritualVisuals } from "@/lib/seance-ritual";
 import { RitualCandles, RitualFrost, RitualPortrait, RitualSmoke } from "./RitualParts";
+import { useRitualGeometry } from "./useRitualBox";
 
 export type RitualCreature = "ghost" | "zombie" | string;
 
@@ -48,6 +49,8 @@ export function ritualSurgeClass(creature: RitualCreature): string {
 export default function Ritual({ onSkip, reduced, repo, creature, decayLevel = null, stage, skipped }: RitualProps) {
   const visuals = ritualVisuals(stage, repo);
   const [shown, setShown] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const geometry = useRitualGeometry(rootRef);
 
   // Start the opacity transitions one frame after mount.
   useEffect(() => {
@@ -74,7 +77,8 @@ export default function Ritual({ onSkip, reduced, repo, creature, decayLevel = n
       aria-hidden="true"
       data-ritual-whisper=""
       data-visible={visuals.text === null ? "false" : "true"}
-      className="ritual-text pointer-events-none absolute inset-x-0 top-[80%] m-0 px-4 text-center font-narrative text-[16px] italic text-moon-300"
+      className="ritual-text pointer-events-none absolute inset-x-0 m-0 px-4 text-center font-narrative text-[16px] italic text-moon-300"
+      style={{ top: geometry.textTop }}
     >
       {visuals.text}
     </p>
@@ -82,6 +86,7 @@ export default function Ritual({ onSkip, reduced, repo, creature, decayLevel = n
 
   return (
     <div
+      ref={rootRef}
       data-seance-ritual=""
       data-reduced={reduced ? "true" : undefined}
       data-ritual-stage={stage}
@@ -103,9 +108,10 @@ export default function Ritual({ onSkip, reduced, repo, creature, decayLevel = n
       )}
 
       {/* The repo's own creature at the centre, dimmed, over a cold halo. */}
-      <RitualPortrait name={repo} state={creature} decayLevel={decayLevel} />
+      <RitualPortrait name={repo} state={creature} decayLevel={decayLevel} placement={geometry.portrait} />
 
       <RitualCandles
+        positions={geometry.candles}
         lit={reduced ? true : shown}
         lean={!reduced && visuals.lean}
         holding={!reduced && visuals.holding}

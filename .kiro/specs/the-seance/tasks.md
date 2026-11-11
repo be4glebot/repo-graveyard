@@ -9,7 +9,7 @@ Ground rules for every task:
 - Language is TypeScript (matches the design). Tests use Vitest 5, Testing Library and fast-check 4, run once with `npx vitest --run`.
 - All tests mock the AI client (`LlmClient`), the cache, the limiter store and the GitHub transport. No test calls a real AI provider or the real GitHub API. DOM tests stub `fetch` to fail on any URL they were not told about.
 - Never touch, read, print or commit `.env.local`. Never run `next build` and never start a dev server (the user's dev server is running). Type check with `npx tsc --noEmit` and lint with `npm run lint`.
-- Existing tests stay unchanged. The exceptions are the approved update in task 12.3 and the deliberate reduced-motion assertion update in `tests/dom/SeanceFlow.test.tsx` (task 11.11). `app/globals.css` only gains tokens and classes; nothing is renamed or removed.
+- Existing tests stay unchanged. The exceptions are the approved update in task 12.3, the deliberate reduced-motion assertion update in `tests/dom/SeanceFlow.test.tsx` (task 11.11), and the deliberate additive edits of task 11.17: `tests/property/seance-state.property.test.ts` (model gained `RESTART`) and the evidence assertions in `tests/property/seance-ledger.property.test.tsx` and `tests/property/seance-render.property.test.tsx` (now compared with `displayEvidence`). `app/globals.css` only gains tokens and classes; nothing is renamed or removed.
 - Tests are required in this project. No test sub-task is marked optional.
 - Each property test is one test with at least 100 runs and carries the tag comment `// Feature: the-seance, Property N: <title>`.
 
@@ -406,6 +406,44 @@ Ground rules for every task:
     - Deliberate update to `tests/dom/SeanceFlow.test.tsx`: the reduced-motion test used to assert no candles and no whisper element; it now asserts five lit candles and an empty stage-text line at stage 0. Property 17 (`buildRitualPlan` bounds) and the existing CSS tests are unchanged and still pass
     - _Requirements: 1.3, 1.6, 1.11, 1.12, 1.13, 1.14, 10.1, 10.3, 10.4, 10.6, 10.9, 10.12, 10.14, 10.16, 10.17, 10.18, 10.19, 10.20_
 
+  - [x] 11.12 Visual fixes: scroll behaviour (`SeanceRegion.tsx`, `app/globals.css`)
+    - When a séance starts, scroll the ritual layer (`data-ritual-layer`, class `seance-scroll-target`) with `scrollIntoView({ block: "start", behavior: "smooth" })`, once per attempt; when the phase becomes `revealing`, scroll the Seance_Heading the same way, once per attempt; `behavior: "auto"` under Reduced_Motion; scroll again for another séance
+    - `.seance-scroll-target` sets `scroll-margin-top: var(--site-header-h)`; the ritual layer height is the dialog height minus `--site-header-h` (read with `getComputedStyle`, rem or px)
+    - No focus move at start; on reveal focus still moves to the heading, now with `preventScroll`
+    - _Requirements: 10.21, 10.22, 10.23, 10.24_
+
+  - [x] 11.13 Visual fixes: portrait in the ritual replaces the disc (`RitualParts.tsx`, `Ritual.tsx`, `RitualExit.tsx`)
+    - Remove the opaque `.ritual-surge-ghost` / `.ritual-surge-zombie` disc layer (`data-ritual-creature`) from the ritual and the exit layer
+    - Add `RitualPortrait`: the repo's `Creature` art (same as `components/detail/Portrait`, decorative, `aria-hidden`) at `RITUAL_CENTER` (50%, 40%), 60% opacity (`.ritual-portrait`), over `.ritual-halo`; shown under Reduced_Motion and in the exit layer, where it fades with the exit
+    - Place the five candles in an elliptical ring (`RITUAL_RING` rx 34, ry 26); keep `ritualSurgeClass` exported from `Ritual.tsx` and applied to the panel Portrait; keyframes unchanged
+    - _Requirements: 10.25, 10.26, 10.27_
+
+  - [x] 11.14 Visual fixes: candles, frost and stage text (`lib/seance-ritual.ts`, `app/globals.css`)
+    - `ritualCandles`: flame 18x28 px, wax 12 px wide, `StageCandle.heightScale` from [1, 0.84, 1.14, 0.92, 1.06] times a 48 px base (`--wax-h`); blurred teardrop flame with a `.ritual-glow` behind it; 240 ms stagger unchanged
+    - Frost peak 0.45 (breathing 0.45 to 0.36, recede from 0.45) with a crystalline, radially masked edge covering 62%
+    - Stage text 16px, `moon-300`, `night-sky` text-shadow, peak opacity 0.85 (also the reduced-motion fade), top 80%
+    - _Requirements: 10.28, 10.29, 10.30_
+
+  - [x] 11.15 Visual fixes: "Hold another séance" and `RESTART` (`lib/seance-state.ts`, `useSeance.ts`, `SeanceControl.tsx`, `SeanceRegion.tsx`)
+    - Add reducer event `RESTART`, allowed only from settled, veil, weak or silent with nothing in flight; `START` stays idle-only and `RETRY` silent-only; expose it as `again` from `useSeance`
+    - `SeanceControl` `again` prop: enabled and labelled "Hold another séance" after a result; "The circle is open…" and `aria-disabled` while the ritual or reveal runs
+    - No API, prompt, schema or cache change
+    - _Requirements: 1.6, 1.13, 1.15, 1.16, 1.17_
+
+  - [x] 11.16 Visual fixes: decay label removal, cause line and evidence display (`SpiritTranscript.tsx`, `CauseOfDeath.tsx`, `LedgerList.tsx`, `lib/seance-display.ts`, `app/globals.css`)
+    - Remove the visible decay label; keep the profile id only as `data-decay-profile` on the smoke field (`lib/seance-decay.ts` labels unchanged)
+    - `.cause-engraved`: IM Fell English, sentence case, `text-transform: none`, normal letter-spacing, line-height 1.5
+    - Add `displayEvidence(raw)` (display only) and use it in `LedgerList`; grounding, schema and stored data unchanged
+    - _Requirements: 14.1, 14.10, 14.11, 14.12_
+
+  - [x] 11.17 Write the visual fixes tests
+    - `tests/unit/seance-display.test.ts` (6, including a property), `tests/unit/seance-restart.test.ts` (6)
+    - `tests/dom/SeanceVisualFixes.test.tsx` (19): scroll calls with a mocked `scrollIntoView` (block start, smooth, `auto` under reduced motion, once per attempt, no focus move at start, focus still moves on reveal); the button re-enabled as "Hold another séance" after ok, veil, weak and silent and disabled again during the next run; portrait present in the ritual, in reduced motion and in the exit layer and equal in `src` to `components/detail/Portrait`; no `.ritual-surge-ghost` and no solid disc; five staggered candles with uneven heights and a glow each; no `[data-decay-label]` and no decay text; quoted evidence; cause line classes
+    - Append 6 cases to `tests/unit/seance-visual-css.test.ts` (candle size and teardrop, portrait and halo, frost peak and crystalline mask, stage text shadow, cause line font, scroll margin) and 1 case to `tests/unit/seance-ritual-stages.test.ts` (uneven heights and ring)
+    - Deliberate additive edits to existing tests: `tests/property/seance-state.property.test.ts` (the model gained `RESTART`), `tests/property/seance-ledger.property.test.tsx` and `tests/property/seance-render.property.test.tsx` (the evidence assertion compares with `displayEvidence(item.evidence)`)
+    - Result: 124 files, 1185 tests pass; `tsc` clean; lint 0 errors
+    - _Requirements: 1.13, 1.15, 1.16, 1.17, 10.21, 10.22, 10.23, 10.24, 10.25, 10.26, 10.27, 10.28, 10.29, 10.30, 14.1, 14.10, 14.11, 14.12_
+
 - [x] 12. Detail panel and estate wiring
   - [x] 12.1 Update `components/detail/DetailPanel.tsx` and add `Portrait`
     - Add `components/detail/Portrait.tsx`: decorative `Creature` (`aria-hidden`, no button) with the ritual surge class
@@ -491,6 +529,39 @@ Ground rules for every task:
   - This is verified by eye, not by automated pixel tests (17.1, 20.31); the coding agent does not run or start the app
   - _Requirements: 17.1, 20.31_
 
+- [x] 16. Ritual layout, candles and frost (second browser check)
+  - [x] 16.1 Fix `components/seance/RitualParts.tsx` for pixel layout
+    - Stop importing `RITUAL_CENTER` and `RITUAL_RING` (removed from `lib/seance-ritual.ts`)
+    - `RitualCandles` takes `positions: RitualGeometry["candles"]` and places each candle with `left`/`top` in px (x, y from `ritualGeometry`)
+    - `RitualPortrait` takes `placement: RitualGeometry["portrait"]` and sets `left`/`top` in px and the CSS variable `--portrait-size`
+    - Candles gain a `.ritual-wick` element between the flame and the wax; wax height still comes from `--wax-h` using `RITUAL_WAX_BASE_PX`
+    - `lib/seance-ritual.ts` already exports `ritualGeometry`, `RitualGeometry`, `RITUAL_DEFAULT_BOX` and `RITUAL_WAX_BASE_PX`; `components/seance/useRitualBox.ts` already exports `useRitualGeometry(ref)`
+    - Done when `npx tsc --noEmit` is clean
+    - _Requirements: 10.31 to 10.38_
+
+  - [x] 16.2 Wire the layout, the scroll and the ritual height into `Ritual`, `RitualExit` and `SeanceRegion`
+    - `Ritual.tsx` and `RitualExit.tsx` call `useRitualGeometry` on their root element, pass `geometry.candles` and `geometry.portrait` to the parts, and position the stage text with an inline `top: geometry.textTop` px (remove the `top-[80%]` class)
+    - `SeanceRegion.tsx` `RitualLayer`: the sticky layer sits below the fixed header (class `ritual-layer`, CSS `top: var(--site-header-h)`, not `top-0`); the inner box gets class `ritual-box` (CSS `max-height: calc(100dvh - var(--site-header-h) - 96px)`)
+    - The ritual scroll happens after the ritual has mounted and laid out: a stable ref callback on the layer schedules `requestAnimationFrame` and calls an `onLaidOut(el)` callback (latest value kept in a ref), returning a cleanup that cancels the frame
+    - The region calls `scrollToStart` there once per attempt (guarded by `scrolledFor.current.ritual === attemptId`)
+    - Remove the old `useEffect`-based ritual scroll and the `anchorRef` prop; the reveal scroll to the heading stays as is; never scroll from the click handler
+    - _Requirements: 10.31 to 10.38_
+
+  - [x] 16.3 CSS: soft frost, candle wax and wick, smoke edge fade, portrait size (`app/globals.css`)
+    - Frost: remove every `repeating-conic-gradient` and every straight-line pattern; each corner is a blurred radial cold tint (`ghost-300` to transparent, `filter: blur`) masked by an SVG `feTurbulence` `fractalNoise` data-URL mask (low base frequency, `numOctaves` 3, alpha boosted by a `feColorMatrix`, `#` encoded as `%23`, no semicolons, no braces), `mask-size` about 220%, a different `mask-position` per corner; peak opacity 0.4 (breathing 0.4 to 0.32, recede from 0.4); transitions stay opacity and transform only
+    - Candle: wax about 11px wide with a vertical `linear-gradient` from `moon-300` (dim ivory) to `night-sky` (shadow), a slightly irregular rounded top (asymmetric `border-radius`), opacity about 0.6; `.ritual-wick` 2px by 7px `night-sky`; keep the blurred teardrop flame and warm glow
+    - Smoke: `.ritual-smoke-rise` gets `-webkit-mask-image` and `mask-image` of `linear-gradient(to bottom, transparent, black 25%, black 75%, transparent)`
+    - Portrait: `.ritual-portrait` and `.ritual-halo` sized from `var(--portrait-size, 168px)` (box, negative half offsets, halo 1.8x); the art fills the box (`img` width and height 100%, `object-fit: contain`, wrappers `display: block` at 100%)
+    - `.ritual-layer { top: var(--site-header-h) }` and `.ritual-box { max-height: calc(100dvh - var(--site-header-h) - 96px) }`
+    - No hex or rgb literals in the séance block; keyframes animate only `transform`, `opacity` and `filter`
+    - _Requirements: 10.31 to 10.38_
+
+  - [x] 16.4 Update and add tests for the layout, frost, candles, smoke and scroll-after-mount
+    - `tests/unit/seance-visual-css.test.ts`: replace the frost test (peak 0.4, no repeating, conic or linear gradient in `.ritual-frost`, contains `feTurbulence` and `fractalNoise`, `radial-gradient` tint, blur) and the wax width test (10 to 12px); add wax gradient, wick, smoke mask, `ritual-layer` and `ritual-box` checks
+    - `tests/dom/SeanceVisualFixes.test.tsx`: the ritual scroll now happens after a frame (not in the click handler): not called right after the click, called once after a frame with the ritual mounted and the layer connected; adjust the reduced-motion expectations; add a test that candle boxes read from inline `left`/`top` px are outside the portrait box
+    - Run the full suite with `npx vitest --run`, then `npx tsc --noEmit` and `npm run lint`
+    - _Requirements: 10.31 to 10.38_
+
 ## Notes
 
 - Tests are required in this project. Every test sub-task above is a normal (non-optional) task.
@@ -511,7 +582,10 @@ Ground rules for every task:
     { "id": 4, "tasks": ["3.5", "7.2", "7.3", "7.7", "12.1", "13.1", "13.6", "13.7", "13.8"] },
     { "id": 5, "tasks": ["3.6", "7.4", "7.8", "7.9", "12.2", "12.3", "13.2", "13.4", "13.9", "13.10"] },
     { "id": 6, "tasks": ["3.7", "7.5", "13.3", "13.5"] },
-    { "id": 7, "tasks": ["7.6"] }
+    { "id": 7, "tasks": ["7.6"] },
+    { "id": 8, "tasks": ["16.1", "16.3"] },
+    { "id": 9, "tasks": ["16.2"] },
+    { "id": 10, "tasks": ["16.4"] }
   ]
 }
 ```

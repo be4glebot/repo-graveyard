@@ -85,3 +85,96 @@ describe("ritual styles", () => {
     expect(fade).not.toMatch(/transform|filter/);
   });
 });
+describe("visual fixes from the browser check", () => {
+  it("candles are about twice as large, with a teardrop flame and a warm glow", () => {
+    const flame = rule(".ritual-flame");
+    expect(flame).toMatch(/width:\s*18px/);
+    expect(flame).toMatch(/height:\s*28px/);
+    expect(flame).toMatch(/filter:\s*blur\(/);
+    const drop = rule(".ritual-flame::before");
+    expect(drop).toMatch(/border-radius:\s*0 50% 50% 50%/);
+    expect(drop).toMatch(/transform:\s*rotate\(45deg\)/);
+    const wax = rule(".ritual-wax");
+    expect(wax).toMatch(/width:\s*(10|11|12)px/);
+    expect(wax).toMatch(/height:\s*var\(--wax-h/);
+    expect(wax).toContain("linear-gradient(to bottom, var(--color-moon-300), var(--color-night-sky))");
+    expect(wax).toMatch(/border-radius:\s*45% 55% 0 0/);
+    const wick = rule(".ritual-wick");
+    expect(wick).toMatch(/width:\s*2px/);
+    expect(wick).toMatch(/height:\s*7px/);
+    expect(wick).toMatch(/background:\s*var\(--color-night-sky\)/);
+    const glow = rule(".ritual-glow");
+    expect(glow).toMatch(/radial-gradient\([^;]*var\(--color-ember-500\)/);
+    expect(glow).toMatch(/filter:\s*blur\(/);
+  });
+
+  it("the portrait is dimmed to 60% over a blurred, low-opacity cold halo", () => {
+    expect(rule(".ritual-portrait")).toMatch(/opacity:\s*0\.6/);
+    const halo = rule(".ritual-halo");
+    expect(halo).toMatch(/radial-gradient\([^;]*var\(--color-ghost-300\)[^;]*transparent/);
+    expect(halo).toMatch(/filter:\s*blur\(/);
+    expect(Number(/opacity:\s*([\d.]+)/.exec(halo)?.[1])).toBeLessThanOrEqual(0.25);
+    expect(halo).not.toMatch(/background:\s*var\(/);
+  });
+
+  it("frost is soft: a blurred radial tint masked by fractal noise, no straight lines, peak 0.4", () => {
+    expect(rule('.ritual-frost[data-on="true"]')).toMatch(/opacity:\s*0\.4\b/);
+    const frost = rule(".ritual-frost");
+    expect(frost).not.toMatch(/repeating-|conic-gradient|linear-gradient/);
+    expect(frost).toMatch(/radial-gradient\([^;]*var\(--color-ghost-300\)[^;]*transparent/);
+    expect(frost).toMatch(/filter:\s*blur\(/);
+    const noise = /--frost-noise:\s*([^;]*);/.exec(frost)?.[1] ?? "";
+    expect(noise).toContain("feTurbulence");
+    expect(noise).toContain("fractalNoise");
+    expect(noise).toContain("numOctaves");
+    expect(noise).not.toContain("#");
+    expect(frost).toMatch(/(^|[\s;])mask-image:\s*var\(--frost-noise\)/);
+    expect(frost).toMatch(/-webkit-mask-image:\s*var\(--frost-noise\)/);
+    expect(css).not.toContain("repeating-conic-gradient");
+    expect(css).not.toContain("conic-gradient");
+    expect(css).toMatch(
+      /@keyframes ritual-frost-breathe\s*\{\s*0%,\s*100%\s*\{\s*opacity:\s*0\.4;[^}]*\}\s*50%\s*\{\s*opacity:\s*0\.32/,
+    );
+    for (const c of ["tl", "tr", "bl", "br"]) {
+      const body = rule(`.ritual-frost[data-corner="${c}"]`);
+      expect(body).toMatch(/--mx:/);
+      expect(body).toMatch(/--my:/);
+    }
+  });
+
+  it("smoke fades at its top and bottom edge", () => {
+    const smoke = rule(".ritual-smoke-rise");
+    const grad = "linear-gradient(to bottom, transparent, black 25%, black 75%, transparent)";
+    expect(smoke).toContain(`mask-image: ${grad}`);
+    expect(smoke).toContain(`-webkit-mask-image: ${grad}`);
+  });
+
+  it("portrait is sized from --portrait-size", () => {
+    const portrait = rule(".ritual-portrait");
+    expect(portrait).toMatch(/width:\s*var\(--portrait-size, 168px\)/);
+    expect(portrait).toMatch(/opacity:\s*0\.6/);
+    expect(rule(".ritual-halo")).toMatch(/width:\s*calc\(var\(--portrait-size, 168px\) \* 1\.8\)/);
+    expect(css).toMatch(/\.ritual-portrait img\s*\{[^}]*object-fit:\s*contain/);
+  });
+
+  it("ritual layer sits below the header and the box fits the screen", () => {
+    expect(rule(".ritual-layer")).toMatch(/top:\s*var\(--site-header-h\)/);
+    expect(rule(".ritual-box")).toMatch(/max-height:\s*calc\(100dvh - var\(--site-header-h\) - 96px\)/);
+  });
+
+  it("stage text reads over smoke: a soft text-shadow and a brighter peak", () => {
+    expect(rule(".ritual-text")).toMatch(/text-shadow:[^;]*var\(--color-night-sky\)/);
+    expect(css).toMatch(/@keyframes ritual-text-in[\s\S]*?100%\s*\{\s*opacity:\s*0\.85/);
+  });
+
+  it("the cause line is sentence case in the narrative font", () => {
+    const cause = rule(".cause-engraved");
+    expect(cause).toMatch(/font-family:\s*var\(--font-narrative\)/);
+    expect(cause).toMatch(/text-transform:\s*none/);
+    expect(cause).not.toMatch(/uppercase|--font-heading/);
+  });
+
+  it("scroll targets clear the fixed site header", () => {
+    expect(rule(".seance-scroll-target")).toMatch(/scroll-margin-top:\s*var\(--site-header-h\)/);
+  });
+});

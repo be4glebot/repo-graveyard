@@ -1284,46 +1284,76 @@ body {
     transform: scaleY(0.98);
   }
 }
+.ritual-wick {
+  width: 2px;
+  height: 7px;
+  margin: 0 auto;
+  background: var(--color-night-sky);
+}
 .ritual-wax {
-  width: 12px;
+  width: 11px;
   height: var(--wax-h, 48px);
   margin: 0 auto;
-  background: var(--color-candle-tan);
-  opacity: 0.45;
+  background: linear-gradient(to bottom, var(--color-moon-300), var(--color-night-sky));
+  border-radius: 45% 55% 0 0 / 18% 12% 0 0;
+  opacity: 0.6;
 }
 
-/* The repo's own creature at the centre of the ritual: dimmed, over a faint
-   cold halo (a blurred radial glow, never a solid shape). Both are centred on
-   a zero-size anchor using fixed offsets, so nothing needs a transform. */
+/* The repo's own creature at the centre of the ritual: slightly larger (sized
+   by --portrait-size, set inline on the anchor), still dimmed to 60%, over a
+   faint cold halo (a blurred radial glow, never a solid shape). Both are
+   centred on a zero-size anchor using calc offsets, so nothing needs a
+   transform. */
 .ritual-halo {
   position: absolute;
-  left: -120px;
-  top: -120px;
-  width: 240px;
-  height: 240px;
+  left: calc(var(--portrait-size, 168px) * -0.9);
+  top: calc(var(--portrait-size, 168px) * -0.9);
+  width: calc(var(--portrait-size, 168px) * 1.8);
+  height: calc(var(--portrait-size, 168px) * 1.8);
   background: radial-gradient(circle, var(--color-ghost-300), transparent 65%);
   opacity: 0.16;
   filter: blur(14px);
 }
 .ritual-portrait {
   position: absolute;
-  left: -68px;
-  top: -68px;
-  width: 136px;
-  height: 136px;
+  left: calc(var(--portrait-size, 168px) / -2);
+  top: calc(var(--portrait-size, 168px) / -2);
+  width: var(--portrait-size, 168px);
+  height: var(--portrait-size, 168px);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0.6;
+}
+.ritual-portrait > *,
+.ritual-portrait > * > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ritual-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Scrolled into view below the fixed site header. */
 .seance-scroll-target {
   scroll-margin-top: var(--site-header-h);
 }
+/* The sticky ritual layer sits below the fixed site header, and the box is
+   capped so the whole ritual (stage text included) fits on screen. */
+.ritual-layer {
+  top: var(--site-header-h);
+}
+.ritual-box {
+  max-height: calc(100dvh - var(--site-header-h) - 96px);
+}
 
 /* Smoke rises from the candles and gathers above the portrait (stage 1). */
 .ritual-smoke-rise {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
   opacity: 0;
   transform: translateY(18%);
   transition:
@@ -1336,29 +1366,23 @@ body {
 }
 
 /* Frost creeps in from the four corners (stage 2) and breathes while held. */
-/* Frost: a soft pool plus fine crystal rays from the corner (a repeating
-   conic gradient), both feathered out by a radial mask so the edge breaks up
-   into crystals instead of a smooth fade. */
+/* Soft frost: a blurred radial cold tint masked by fractal noise, so the edge
+   is ragged and crystalline. No straight lines or conic patterns. */
 .ritual-frost {
   position: absolute;
   width: 62%;
   height: 62%;
   opacity: 0;
   transform: scale(0.5);
-  background:
-    radial-gradient(circle at var(--fx) var(--fy), var(--color-ghost-300), transparent 46%),
-    repeating-conic-gradient(
-      from 0deg at var(--fx) var(--fy),
-      var(--color-ghost-300) 0deg 1.5deg,
-      transparent 1.5deg 7deg
-    ),
-    repeating-conic-gradient(
-      from 3deg at var(--fx) var(--fy),
-      var(--color-ghost-300) 0deg 0.8deg,
-      transparent 0.8deg 11deg
-    );
-  -webkit-mask-image: radial-gradient(circle at var(--fx) var(--fy), black 0%, black 30%, transparent 78%);
-  mask-image: radial-gradient(circle at var(--fx) var(--fy), black 0%, black 30%, transparent 78%);
+  --frost-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.016' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 2.4 -0.7'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)'/%3E%3C/svg%3E");
+  background: radial-gradient(circle at var(--fx) var(--fy), var(--color-ghost-300), transparent 70%);
+  filter: blur(5px);
+  -webkit-mask-image: var(--frost-noise);
+  mask-image: var(--frost-noise);
+  -webkit-mask-size: 220% 220%;
+  mask-size: 220% 220%;
+  -webkit-mask-position: var(--mx) var(--my);
+  mask-position: var(--mx) var(--my);
   transition:
     opacity 2000ms ease-out,
     transform 2600ms ease-out;
@@ -1368,6 +1392,8 @@ body {
   left: 0;
   --fx: 0%;
   --fy: 0%;
+  --mx: 0%;
+  --my: 0%;
   transform-origin: 0 0;
 }
 .ritual-frost[data-corner="tr"] {
@@ -1375,6 +1401,8 @@ body {
   right: 0;
   --fx: 100%;
   --fy: 0%;
+  --mx: 100%;
+  --my: 0%;
   transform-origin: 100% 0;
 }
 .ritual-frost[data-corner="bl"] {
@@ -1382,6 +1410,8 @@ body {
   left: 0;
   --fx: 0%;
   --fy: 100%;
+  --mx: 0%;
+  --my: 100%;
   transform-origin: 0 100%;
 }
 .ritual-frost[data-corner="br"] {
@@ -1389,10 +1419,12 @@ body {
   right: 0;
   --fx: 100%;
   --fy: 100%;
+  --mx: 100%;
+  --my: 100%;
   transform-origin: 100% 100%;
 }
 .ritual-frost[data-on="true"] {
-  opacity: 0.45;
+  opacity: 0.4;
   transform: scale(1);
 }
 .ritual-frost[data-holding="true"] {
@@ -1401,11 +1433,11 @@ body {
 @keyframes ritual-frost-breathe {
   0%,
   100% {
-    opacity: 0.45;
+    opacity: 0.4;
     transform: scale(1);
   }
   50% {
-    opacity: 0.36;
+    opacity: 0.32;
     transform: scale(1.04);
   }
 }
@@ -1467,7 +1499,7 @@ body {
 }
 @keyframes ritual-recede {
   0% {
-    opacity: 0.45;
+    opacity: 0.4;
     transform: scale(1);
   }
   100% {

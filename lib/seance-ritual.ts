@@ -190,9 +190,6 @@ export function ritualVisuals(stage: number, repo: string): RitualVisuals {
   };
 }
 
-/** Where the ritual is centred (percent of the ritual area) and the candle ring around it. */
-export const RITUAL_CENTER = { x: 50, y: 40 } as const;
-export const RITUAL_RING = { rx: 34, ry: 26 } as const;
 
 /** Slightly uneven candle heights, as a multiple of the base wax height. */
 const CANDLE_HEIGHT_SCALES = [1, 0.84, 1.14, 0.92, 1.06] as const;
@@ -224,4 +221,133 @@ export function ritualCandles(): StageCandle[] {
     });
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------
+// Layout. Pixel geometry computed from the ritual's measured size, so the
+// five candles always sit on an ellipse clearly outside the portrait's box
+// (the top candle above its head) and the stage text fits below. Pure.
+// ---------------------------------------------------------------------------
+
+/** Used until the ritual has been measured (and in jsdom, which has no layout). */
+export const RITUAL_DEFAULT_BOX = { width: 420, height: 560 } as const;
+
+/** Candle parts in px: flame box, wick and the base wax height (scaled per candle). */
+export const RITUAL_FLAME_PX = 28;
+export const RITUAL_WICK_PX = 7;
+export const RITUAL_WAX_BASE_PX = 48;
+/** Width of one candle column (flame width). */
+export const RITUAL_CANDLE_WIDTH_PX = 18;
+
+export const RITUAL_PORTRAIT_MAX_PX = 168;
+export const RITUAL_PORTRAIT_MIN_PX = 96;
+/** Clear space between the portrait box and any candle box. */
+export const RITUAL_PORTRAIT_GAP_PX = 10;
+/** Space kept free at the bottom for the stage text and the Skip control. */
+export const RITUAL_TEXT_RESERVE_PX = 112;
+const EDGE_PX = 8;
+
+export interface PxBox {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+export interface RitualGeometry {
+  box: { width: number; height: number };
+  portrait: { cx: number; cy: number; size: number; box: PxBox };
+  candles: Array<{
+    index: number;
+    /** Top centre of the candle (the flame's top), in px. */
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    box: PxBox;
+  }>;
+  /** Top of the stage text line, in px. */
+  textTop: number;
+}
+
+const round1 = (n: number): number => Math.round(n * 10) / 10;
+
+function dimension(value: unknown, fallback: number, min: number): number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0
+    ? Math.max(min, value)
+    : fallback;
+}
+
+/** Candle height in px for a height scale (flame + wick + wax). */
+export function ritualCandleHeight(heightScale: number): number {
+  return RITUAL_FLAME_PX + RITUAL_WICK_PX + Math.round(RITUAL_WAX_BASE_PX * heightScale);
+}
+
+export function ritualGeometry(input?: { width?: number; height?: number }): RitualGeometry {
+  const width = dimension(input?.width, RITUAL_DEFAULT_BOX.width, 200);
+  const height = dimension(input?.height, RITUAL_DEFAULT_BOX.height, 200);
+  const stages = ritualCandles();
+
+  const tallest = Math.max(...stages.map((c) => ritualCandleHeight(c.heightScale)));
+  const usableH = Math.max(0, height - RITUAL_TEXT_RESERVE_PX - 2 * EDGE_PX);
+  const lowSin = Math.sin((54 * Math.PI) / 180); // the two lower candles
+  const k = 1 + lowSin; // vertical extent of the ring in units of ry
+
+  // The biggest portrait that lets the whole block fit vertically, and that
+  // leaves the side candles clear of it horizontally.
+  const fitV = 2 * ((usableH - tallest) / k - RITUAL_PORTRAIT_GAP_PX - tallest);
+  const fitH = 2 * (width / 2 - EDGE_PX - RITUAL_CANDLE_WIDTH_PX - RITUAL_PORTRAIT_GAP_PX);
+  const size = Math.floor(
+    Math.max(RITUAL_PORTRAIT_MIN_PX, Math.min(RITUAL_PORTRAIT_MAX_PX, fitV, fitH)),
+  );
+
+  // Top candle sits above the portrait's head; the ellipse is a little wider than tall.
+  const ry = size / 2 + RITUAL_PORTRAIT_GAP_PX + tallest;
+  const cos18 = Math.cos((18 * Math.PI) / 180);
+  const maxRx = (width / 2 - EDGE_PX - RITUAL_CANDLE_WIDTH_PX / 2) / cos18;
+  const rx = Math.min(maxRx, Math.max(ry * 1.1, size / 2 + RITUAL_PORTRAIT_GAP_PX + RITUAL_CANDLE_WIDTH_PX));
+
+  const total = k * ry + tallest;
+  const cx = width / 2;
+  const cy = EDGE_PX + Math.max(0, (usableH - total) / 2) + ry;
+
+  const candles = stages.map((c) => {
+    const rad = (c.angleDeg * Math.PI) / 180;
+    const x = round1(cx + Math.cos(rad) * rx);
+    const y = round1(cy + Math.sin(rad) * ry);
+    const h = ritualCandleHeight(c.heightScale);
+    return {
+      index: c.index,
+      x,
+      y,
+      width: RITUAL_CANDLE_WIDTH_PX,
+      height: h,
+      box: {
+        left: round1(x - RITUAL_CANDLE_WIDTH_PX / 2),
+        top: y,
+        right: round1(x + RITUAL_CANDLE_WIDTH_PX / 2),
+        bottom: round1(y + h),
+      },
+    };
+  });
+
+  const candlesBottom = Math.max(...candles.map((c) => c.box.bottom));
+  const textTop = Math.round(Math.min(candlesBottom + 12, height - 104));
+
+  return {
+    box: { width, height },
+    portrait: {
+      cx: round1(cx),
+      cy: round1(cy),
+      size,
+      box: {
+        left: round1(cx - size / 2),
+        top: round1(cy - size / 2),
+        right: round1(cx + size / 2),
+        bottom: round1(cy + size / 2),
+      },
+    },
+    candles,
+    textTop,
+  };
 }

@@ -1426,6 +1426,61 @@
         "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
         "timestamp": 1794332050469
       }
+    ],
+    "16.1 Fix `components/seance/RitualParts.tsx` for pixel layout": [
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369035227
+      },
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369154963
+      }
+    ],
+    "16.2 Wire the layout, the scroll and the ritual height into `Ritual`, `RitualExit` and `SeanceRegion`": [
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369176444
+      },
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369251798
+      }
+    ],
+    "16.3 CSS: soft frost, candle wax and wick, smoke edge fade, portrait size (`app/globals.css`)": [
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369266563
+      },
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369331121
+      }
+    ],
+    "16.4 Update and add tests for the layout, frost, candles, smoke and scroll-after-mount": [
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369367414
+      },
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369535898
+      }
+    ],
+    "16. Ritual layout, candles and frost (second browser check)": [
+      {
+        "executionId": "7a8be8af-dae4-4f9d-b3bc-bb61b69f2875",
+        "chatSessionId": "sess_0982975c-e214-49ab-9dd6-e176d2dc0e54",
+        "timestamp": 1794369536021
+      }
     ]
   }
 }

@@ -12,6 +12,7 @@ import {
   RITUAL_MIN_MS,
   RITUAL_STAGE_STARTS_MS,
   ritualCandles,
+  ritualGeometry,
   ritualNextStageStartMs,
   ritualStageAt,
   ritualStageText,
@@ -144,5 +145,20 @@ describe("exit timing", () => {
   it("gutter is short, snuffing candles one by one takes longer", () => {
     expect(RITUAL_EXIT_MS.resolved).toBeLessThan(RITUAL_EXIT_MS.silent);
     expect(RITUAL_EXIT_MS.resolved).toBeGreaterThanOrEqual(400);
+  });
+});
+
+describe("uneven candle heights and ring", () => {
+  it("heights differ but stay near the base, and the ring surrounds the ritual centre", () => {
+    const scales = ritualCandles().map((c) => c.heightScale);
+    expect(new Set(scales).size).toBeGreaterThan(1);
+    for (const s of scales) {
+      expect(s).toBeGreaterThan(0.7);
+      expect(s).toBeLessThan(1.3);
+    }
+    // The ring is laid out in pixels around the portrait (see seance-ritual-geometry.test.ts).
+    const g = ritualGeometry();
+    expect(g.candles).toHaveLength(RITUAL_CANDLE_COUNT);
+    expect(g.portrait.cx).toBe(g.box.width / 2);
   });
 });

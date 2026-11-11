@@ -149,14 +149,26 @@ export interface SeanceRegionProps {
  */
 function RitualLayer({
   children,
-  anchorRef,
+  onLaidOut,
 }: {
   children: ReactNode;
-  /** Receives the layer element; the region scrolls it into view when a séance starts. */
-  anchorRef?: MutableRefObject<HTMLDivElement | null>;
+  /** Called one frame after the layer mounts and its height is laid out. */
+  onLaidOut?: (el: HTMLElement) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [height, setHeight] = useState<number | null>(null);
+  const laidOutRef = useRef(onLaidOut);
+  useEffect(() => {
+    laidOutRef.current = onLaidOut;
+  });
+
+  // Stable ref callback: schedules the callback after the layout commits.
+  const setWrap = useCallback((node: HTMLDivElement | null) => {
+    wrapRef.current = node;
+    if (!node) return undefined;
+    const id = requestAnimationFrame(() => laidOutRef.current?.(node));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   useLayoutEffect(() => {
     const dialog = wrapRef.current?.closest('[role="dialog"]');
@@ -171,15 +183,12 @@ function RitualLayer({
 
   return (
     <div
-      ref={(node) => {
-        wrapRef.current = node;
-        if (anchorRef) anchorRef.current = node;
-      }}
+      ref={setWrap}
       data-ritual-layer
-      className="seance-scroll-target pointer-events-auto sticky top-0 z-10 h-0"
+      className="ritual-layer seance-scroll-target pointer-events-auto sticky z-10 h-0"
     >
       <div
-        className="absolute inset-x-0 top-0"
+        className="ritual-box absolute inset-x-0 top-0"
         style={{ height: height ? `${height}px` : "100%" }}
       >
         {children}
@@ -207,7 +216,6 @@ export function SeanceRegion({
 
   // Scroll: the ritual into view when a séance starts, the transcript's top
   // into view when the result reveals. Once per attempt; focus is not moved.
-  const ritualAnchorRef = useRef<HTMLDivElement | null>(null);
   const scrolledFor = useRef({ ritual: 0, reveal: 0 });
 
   const headingRef = useRef<HTMLHeadingElement | null>(null);
@@ -266,12 +274,6 @@ export function SeanceRegion({
   }, [phase, attemptId]);
 
   useEffect(() => {
-    if (phase !== "ritual" || scrolledFor.current.ritual === attemptId) return;
-    scrolledFor.current.ritual = attemptId;
-    scrollToStart(ritualAnchorRef.current, reduced);
-  }, [phase, attemptId, reduced]);
-
-  useEffect(() => {
     if (phase !== "revealing" || scrolledFor.current.reveal === attemptId) return;
     scrolledFor.current.reveal = attemptId;
     scrollToStart(headingRef.current, reduced);
@@ -300,7 +302,13 @@ export function SeanceRegion({
   return (
     <>
       {phase === "ritual" ? (
-        <RitualLayer anchorRef={ritualAnchorRef}>
+        <RitualLayer
+          onLaidOut={(el) => {
+            if (scrolledFor.current.ritual === attemptId) return;
+            scrolledFor.current.ritual = attemptId;
+            scrollToStart(el, reduced);
+          }}
+        >
           <Ritual
             onSkip={skip}
             reduced={reduced}

@@ -57,7 +57,20 @@ const ritual = () => document.querySelector<HTMLElement>("[data-seance-ritual]")
 const heading = () => screen.queryByRole("heading", { name: /AI · from the facts above/ });
 
 beforeEach(() => {
-  vi.useFakeTimers();
+  // Frames must follow the fake clock: the ritual scroll runs inside a requestAnimationFrame.
+  vi.useFakeTimers({
+    toFake: [
+      "setTimeout",
+      "clearTimeout",
+      "setInterval",
+      "clearInterval",
+      "setImmediate",
+      "clearImmediate",
+      "Date",
+      "requestAnimationFrame",
+      "cancelAnimationFrame",
+    ],
+  });
   resolveFetch = null;
   scroll = vi.fn();
   Object.defineProperty(Element.prototype, "scrollIntoView", {
@@ -80,11 +93,17 @@ describe("scrolling", () => {
     expect(scroll).not.toHaveBeenCalled();
     fireEvent.click(button());
     await flush(0);
+    // Not in the click handler: it waits for the layer to be laid out.
+    expect(scroll).not.toHaveBeenCalled();
+    await flush(50);
     expect(scroll).toHaveBeenCalledTimes(1);
     expect(scroll).toHaveBeenCalledWith({ block: "start", behavior: "smooth" });
     const target = scroll.mock.contexts[0] as HTMLElement;
     expect(target.hasAttribute("data-ritual-layer")).toBe(true);
-    expect(target.className).toContain("seance-scroll-target");
+    expect(target.isConnected).toBe(true);
+    expect(target.querySelector("[data-seance-ritual]")).not.toBeNull();
+    expect(target.classList.contains("ritual-layer")).toBe(true);
+    expect(target.classList.contains("seance-scroll-target")).toBe(true);
     expect(target.contains(ritual())).toBe(true);
 
     await flush(10_000);
@@ -95,7 +114,7 @@ describe("scrolling", () => {
     stubFetch("instant");
     mount();
     fireEvent.click(button());
-    await flush(0);
+    await flush(50);
     expect(scroll).toHaveBeenCalledTimes(1);
     await flush(2100);
     expect(heading()).not.toBeNull();
@@ -108,10 +127,15 @@ describe("scrolling", () => {
   });
 
   it("uses behavior auto under reduced motion", async () => {
-    stubFetch("instant");
+    stubFetch("pending");
     mount(true);
     fireEvent.click(button());
-    await flush(0);
+    await flush(50);
+    expect(scroll).toHaveBeenCalledTimes(1);
+    expect(scroll).toHaveBeenCalledWith({ block: "start", behavior: "auto" });
+    await act(async () => {
+      resolveFetch!({ kind: "ok", result: RESULT });
+    });
     await flush(100);
     expect(scroll).toHaveBeenCalledTimes(2);
     for (const call of scroll.mock.calls) {
@@ -142,11 +166,46 @@ describe("scrolling", () => {
     mount(true);
     fireEvent.click(button());
     await flush(100);
-    expect(scroll).toHaveBeenCalledTimes(2);
+    const n = scroll.mock.calls.length;
+    expect(n).toBeGreaterThanOrEqual(1);
+    expect(button().textContent).toContain("Hold another séance");
+    fireEvent.click(button());
+    await flush(100);
+    expect(scroll.mock.calls.length).toBeGreaterThan(n);
+    expect(scroll.mock.contexts[scroll.mock.contexts.length - 1]).toBe(heading());
+  });
+
+  it("the scroll runs after the ritual is mounted and laid out", async () => {
+    const seen: { connected: boolean; hasRitual: boolean; hasBox: boolean }[] = [];
+    scroll.mockImplementation(function (this: HTMLElement) {
+      seen.push({
+        connected: this.isConnected,
+        hasRitual: !!this.querySelector("[data-seance-ritual]"),
+        hasBox: !!this.querySelector(".ritual-box"),
+      });
+    });
+    stubFetch("pending");
+    mount();
+    fireEvent.click(button());
+    await flush(50);
+    expect(seen).toHaveLength(1);
+    expect(seen[0]).toEqual({ connected: true, hasRitual: true, hasBox: true });
+  });
+
+  it("no ritual scroll when the ritual is gone before the first frame", async () => {
+    // The instant stub still keeps the ritual up for a few frames, so the "gone
+    // before the first frame" case is produced by unmounting with the frame pending.
+    stubFetch("pending");
+    const view = mount(true);
     fireEvent.click(button());
     await flush(0);
-    expect(scroll).toHaveBeenCalledTimes(3);
-    expect((scroll.mock.contexts[2] as HTMLElement).hasAttribute("data-ritual-layer")).toBe(true);
+    expect(scroll).not.toHaveBeenCalled();
+    view.unmount();
+    await flush(100);
+    expect(scroll).not.toHaveBeenCalled();
+    for (const ctx of scroll.mock.contexts as HTMLElement[]) {
+      expect(ctx.hasAttribute("data-ritual-layer")).toBe(false);
+    }
   });
 });
 
@@ -190,9 +249,10 @@ describe("the button after a result", () => {
     expect(b.getAttribute("aria-disabled")).toBeNull();
     expect(b.textContent).toContain("Hold another séance");
     fireEvent.click(b);
-    await flush(0);
-    expect(fetchFn).toHaveBeenCalledTimes(2);
+    // The ritual starts at once; an instant veil, weak or silent answer then ends it.
     expect(ritual()).not.toBeNull();
+    expect(fetchFn).toHaveBeenCalledTimes(2);
+    await flush(0);
   });
 
   it("an extra click during a run does nothing", async () => {
@@ -280,6 +340,67 @@ describe("the ritual shows the creature, not a disc", () => {
     await flush(0);
     const exit = document.querySelector("[data-seance-ritual-exit]")!;
     expect(exit.querySelector("[data-ritual-portrait] img")).not.toBeNull();
+  });
+
+  it("candles sit outside the portrait box (pixel layout)", async () => {
+    stubFetch("pending");
+    mount();
+    fireEvent.click(button());
+    await flush(0);
+    const r = ritual()!;
+    const anchor = r.querySelector<HTMLElement>("[data-ritual-portrait]")!;
+    const px = (v: string) => Number.parseFloat(v);
+    const cx = px(anchor.style.left);
+    const cy = px(anchor.style.top);
+    const size = px(anchor.style.getPropertyValue("--portrait-size"));
+    expect(size).toBeGreaterThan(136);
+    const portrait = { l: cx - size / 2, r: cx + size / 2, t: cy - size / 2, b: cy + size / 2 };
+    const candles = [...r.querySelectorAll<HTMLElement>("[data-ritual-candle]")];
+    expect(candles).toHaveLength(5);
+    const boxes = candles.map((c) => {
+      const wax = px(c.querySelector<HTMLElement>(".ritual-lean")!.style.getPropertyValue("--wax-h"));
+      const left = px(c.style.left);
+      const top = px(c.style.top);
+      return { l: left - 9, r: left + 9, t: top, b: top + 28 + 7 + wax };
+    });
+    for (const b of boxes) {
+      const hGap = Math.max(b.l - portrait.r, portrait.l - b.r);
+      const vGap = Math.max(b.t - portrait.b, portrait.t - b.b);
+      expect(Math.max(hGap, vGap)).toBeGreaterThanOrEqual(8);
+    }
+    expect(boxes[0].b).toBeLessThan(portrait.t);
+  });
+
+  it("stage text uses a pixel top and the ritual has a wick per candle", async () => {
+    stubFetch("pending");
+    mount();
+    fireEvent.click(button());
+    await flush(0);
+    const r = ritual()!;
+    const whisper = r.querySelector<HTMLElement>("[data-ritual-whisper]")!;
+    expect(whisper.style.top.endsWith("px")).toBe(true);
+    expect(whisper.className).not.toContain("top-[80%]");
+    expect(r.querySelectorAll(".ritual-wick")).toHaveLength(5);
+    expect(r.querySelectorAll(".ritual-glow")).toHaveLength(5);
+    const layer = document.querySelector("[data-ritual-layer]")!;
+    expect(layer.firstElementChild!.classList.contains("ritual-box")).toBe(true);
+  });
+
+  it("the exit layer keeps the candles where they were", async () => {
+    stubFetch("pending");
+    mount();
+    fireEvent.click(button());
+    await flush(3000);
+    const place = (root: Element) =>
+      [...root.querySelectorAll<HTMLElement>("[data-ritual-candle]")].map((c) => [c.style.left, c.style.top]);
+    const before = place(ritual()!);
+    expect(before).toHaveLength(5);
+    await act(async () => {
+      resolveFetch!({ kind: "ok", result: RESULT });
+    });
+    await flush(0);
+    const exit = document.querySelector("[data-seance-ritual-exit]")!;
+    expect(place(exit)).toEqual(before);
   });
 });
 
