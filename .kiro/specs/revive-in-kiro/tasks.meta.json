@@ -1,0 +1,536 @@
+{
+  "pbtResults": {
+    "2.2 Write property test for determinism": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373440972
+    },
+    "1.5 Write property test for slugs": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373442403
+    },
+    "1.3 Write property test for sanitised text": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373445376
+    },
+    "1.4 Write property test for names and the clone command": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373469112
+    },
+    "2.3 Write property test for fixed brief structure": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373487466
+    },
+    "2.7 Write property test for size caps": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373640854
+    },
+    "2.4 Write property test for hostile text and document skeleton": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373645715
+    },
+    "2.6 Write property test for prompt grounding": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373645919
+    },
+    "2.5 Write property test for content survival when nothing is cut": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373660114
+    },
+    "2.8 Write property test for ordered shortening": {
+      "status": "passed",
+      "lastRunTimestamp": 1794373666807
+    },
+    "2.9 Write property test for well-formed Unicode": {
+      "status": "passed",
+      "lastRunTimestamp": 1794409911296
+    }
+  },
+  "executionHistory": {
+    "1.1 Create `lib/revive-brief.ts` with the shared exports and text pipeline": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373213746
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373220553
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373286463
+      }
+    ],
+    "1.2 Create the shared fast-check generators in `tests/property/revive-arbitraries.ts`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373213800
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373307073
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373381229
+      }
+    ],
+    "1.3 Write property test for sanitised text": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373213905
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373411988
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373495994
+      }
+    ],
+    "1.4 Write property test for names and the clone command": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373213968
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373412121
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373496245
+      }
+    ],
+    "1.5 Write property test for slugs": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214046
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373412464
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373496956
+      }
+    ],
+    "2.1 Add `renderReviveBrief`, `buildReviveBrief` and `buildKiroPrompt` to `lib/revive-brief.ts`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214104
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373307225
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373381982
+      }
+    ],
+    "2.2 Write property test for determinism": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214145
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373412959
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373497726
+      }
+    ],
+    "2.3 Write property test for fixed brief structure": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214186
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373413562
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373498299
+      }
+    ],
+    "2.4 Write property test for hostile text and document skeleton": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214247
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373601632
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373683673
+      }
+    ],
+    "2.5 Write property test for content survival when nothing is cut": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214324
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373602813
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373684470
+      }
+    ],
+    "2.6 Write property test for prompt grounding": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214401
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373604428
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373685299
+      }
+    ],
+    "2.7 Write property test for size caps": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214441
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373607861
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373686106
+      }
+    ],
+    "2.8 Write property test for ordered shortening": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214483
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373610371
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373686881
+      }
+    ],
+    "2.9 Write property test for well-formed Unicode": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214530
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373778357
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409982177
+      }
+    ],
+    "2.10 Write unit tests in `tests/unit/revive-brief.test.ts`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214588
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373779112
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409881060
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409881533
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409982928
+      }
+    ],
+    "3.1 Build the portaled modal dialog": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214705
+      },
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373779723
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409887282
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409983826
+      }
+    ],
+    "4.1 Build the button and open state": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214774
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410071646
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410108081
+      }
+    ],
+    "5.1 Update `components/seance/KiroSlot.tsx` additively": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214855
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410126037
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410167128
+      }
+    ],
+    "5.2 Update `components/seance/SeanceRegion.tsx` additively": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373214927
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410184945
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410254601
+      }
+    ],
+    "6.1 Write `tests/dom/ReviveInKiro.test.tsx`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373215069
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410275511
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410493618
+      }
+    ],
+    "7.1 Write `tests/dom/ReviveDialog.test.tsx`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373215143
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410276733
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410385395
+      }
+    ],
+    "8.1 Write `tests/dom/ReviveActions.test.tsx`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373215238
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410277459
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410385720
+      }
+    ],
+    "9.1 Write `tests/unit/revive-source-scan.test.ts`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373215330
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410278324
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410385981
+      }
+    ],
+    "10. Final checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373215400
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410514019
+      },
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410571464
+      }
+    ],
+    "1. Build the pure text foundation in `lib/revive-brief.ts`": [
+      {
+        "executionId": "c730777e-7551-4b5b-a730-821a4b946111",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794373497026
+      }
+    ],
+    "2. Implement the brief and prompt renderers with size caps": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409983049
+      }
+    ],
+    "3. Implement `components/seance/ReviveDialog.tsx`": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794409984011
+      }
+    ],
+    "4. Implement `components/seance/ReviveInKiro.tsx`": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410108208
+      }
+    ],
+    "5. Wire the slot into the séance": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410254734
+      }
+    ],
+    "7. Add DOM tests for the dialog": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410385524
+      }
+    ],
+    "8. Add DOM tests for copy, download and announcements": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410385827
+      }
+    ],
+    "9. Add the source scan test": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410386058
+      }
+    ],
+    "6. Add DOM tests for slot and button": [
+      {
+        "executionId": "4b222860-0cc2-48db-ae29-6c0ee57fe371",
+        "chatSessionId": "sess_da4a46a9-d56c-4f8f-827b-5ea805c40d03",
+        "timestamp": 1794410493773
+      }
+    ]
+  }
+}

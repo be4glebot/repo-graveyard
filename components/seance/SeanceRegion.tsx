@@ -198,6 +198,7 @@ function RitualLayer({
 }
 
 export function SeanceRegion({
+  owner,
   repo,
   state: creatureState,
   decayLevel,
@@ -375,7 +376,11 @@ export function SeanceRegion({
             </div>
             <LedgerList items={result.unfinishedBusiness} settled={settled} />
             <VerdictCard result={result} />
-            <KiroSlot />
+            <KiroSlot
+              result={result}
+              facts={{ owner, repo, state: creatureState }}
+              onAnnounce={announceCopy}
+            />
             {settled ? (
               <CopyTranscriptButton result={result} onAnnounce={announceCopy} />
             ) : null}

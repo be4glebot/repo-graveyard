@@ -562,23 +562,7 @@ Ground rules for every task:
     - Run the full suite with `npx vitest --run`, then `npx tsc --noEmit` and `npm run lint`
     - _Requirements: 10.31 to 10.38_
 
-- [x] 17. Kiro hooks: secret guard and tests for changed files (repo tooling, outside the séance feature)
-  - [x] 17.1 Create scripts/secret-scan.mjs and the scan:secrets npm script
-    - Dependency-free Node ESM script that works on Windows; scans git-tracked files (`git ls-files -z`) plus staged files (`git diff --cached --name-only -z`) for `sk-ant-`, `ghp_`, `github_pat_` and `UPSTASH_REDIS_REST_TOKEN=` with a non-placeholder value; skips `.env.example` and binary files; fails if `git ls-files .env.local` returns anything; prints only `file:line: <pattern name>` (never the value or any part of the line); exit 1 on a hit, otherwise prints "secret-scan: clean" and exits 0
-    - Exports pure functions for tests; runs main only when executed directly; `package.json` gets `"scan:secrets": "node scripts/secret-scan.mjs"`
-    - _Requirements: none (repo tooling)_
-
-  - [x] 17.2 Write tests for the secret scanner
-    - `tests/unit/secret-scan.test.ts`: a fake key built at runtime is detected; `.env.example` placeholders are not; output never contains the key text; one CLI run in a temporary git repo
-    - _Requirements: none (repo tooling)_
-
-  - [x] 17.3 Add the two Kiro hooks in .kiro/hooks/
-    - `.kiro/hooks/secret-guard.json` (PostFileSave, command `node scripts/secret-scan.mjs`) and `.kiro/hooks/test-changed-files.json` (PostFileSave, command `npx vitest run --changed --reporter=dot`), schema v1, command actions
-    - _Requirements: none (repo tooling)_
-
-  - [x] 17.4 Add a "Kiro hooks" section to docs/KIRO_JOURNEY.md
-    - What each hook does and why: protects the Anthropic and GitHub keys; quick feedback without a full run
-    - _Requirements: none (repo tooling)_
+- Former task group 17 (Kiro hooks: secret guard and tests for changed files) moved to `.kiro/specs/kiro-hooks/`; it was repo tooling outside the séance feature.
 
 ## Notes
 
@@ -603,10 +587,7 @@ Ground rules for every task:
     { "id": 7, "tasks": ["7.6"] },
     { "id": 8, "tasks": ["16.1", "16.3"] },
     { "id": 9, "tasks": ["16.2"] },
-    { "id": 10, "tasks": ["16.4"] },
-    { "id": 11, "tasks": ["17.1"] },
-    { "id": 12, "tasks": ["17.2", "17.3"] },
-    { "id": 13, "tasks": ["17.4"] }
+    { "id": 10, "tasks": ["16.4"] }
   ]
 }
 ```
