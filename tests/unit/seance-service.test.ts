@@ -140,12 +140,12 @@ describe("retry (20.3, 20.4, 8.10)", () => {
     expect(h.calls.cacheSet).toBe(0);
   });
 
-  it("an ungrounded evidence reference counts as invalid", async () => {
+  it("when every evidence reference is ungrounded the attempt is invalid", async () => {
     const bad = JSON.stringify({
       ...JSON.parse(VALID),
       unfinishedBusiness: [
         { title: "A", detail: "Made up.", evidence: "commit abc1234 never happened" },
-        { title: "B", detail: "Made up too.", evidence: "open issues: 1" },
+        { title: "B", detail: "Made up too.", evidence: "also never in the facts" },
       ],
     });
     const h = harness({ outputs: [bad] });

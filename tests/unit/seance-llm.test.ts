@@ -68,6 +68,7 @@ describe("anthropic adapter request shape", () => {
     expect(body).toEqual({
       model: "test-model",
       max_tokens: 321,
+      thinking: { type: "disabled" },
       system: "sys prompt",
       messages: [{ role: "user", content: "user prompt" }],
     });

@@ -14,6 +14,7 @@ import "server-only";
 import {
   LLM_TIMEOUT_MS,
   MAX_OUTPUT_TOKENS,
+  buildFeedbackNote,
   buildSeancePrompt,
   extractJsonObject,
 } from "./ai";
@@ -25,13 +26,18 @@ import {
   type GraveyardData,
 } from "./cache";
 import type { LoadError, Result } from "./github";
+import { classify } from "./lifecycle";
 import type { LlmClient } from "./llm";
 import type { RateLimiter } from "./ratelimit";
-import { deriveEvidence, validateGrounding } from "./seance";
+import { deriveEvidence, groundingFailures } from "./seance";
+import { repairSeance } from "./seance-repair";
 import { GATHER_TIMEOUT_MS, type FetchedEvidence } from "./seance-gather";
 import {
   DATE_RULE_MESSAGE,
+  NEXT_STEP_MESSAGE,
+  ruleFailuresFromIssues,
   seanceResultSchema,
+  type RuleFailure,
   type SeanceOutcome,
   type SeanceResult,
 } from "./seance-schema";
@@ -56,10 +62,14 @@ export type SeanceDiagCategory =
   | "http"
   | "parse"
   | "no-text"
+  | "truncated"
   | "abort"
   | "schema"
+  | "verdict"
   | "grounding"
-  | "date-rule";
+  | "date-rule"
+  /** Accepted after repair: some items or sentences were dropped. */
+  | "repaired";
 
 /**
  * One line per failed attempt. Holds only a category, numbers and zod issue
@@ -73,6 +83,18 @@ export interface SeanceDiag {
   anthropicErrorType?: string;
   elapsedMs: number;
   schemaIssuePaths?: string[];
+  /** Rule codes that failed this attempt (parse, schema or grounding). Codes only. */
+  ruleCodes?: string[];
+  /** Codes of items or sentences dropped by repair this attempt. Codes only. */
+  repairedCodes?: string[];
+  /** For `no-text` and `truncated`: structure of the response (names and counts, no text). */
+  responseShape?: {
+    stopReason?: string;
+    blockTypes: string[];
+    textLengths: number[];
+    outputTokens?: number;
+    keys: string[];
+  };
 }
 
 export interface SeanceDeps {
@@ -84,6 +106,8 @@ export interface SeanceDeps {
   log: (entry: { repo: string; reason: string }) => void;
   /** Optional, dev-only diagnostic sink (the route passes it outside production). */
   diag?: (entry: SeanceDiag) => void;
+  /** ISO "now" for classifying the creature state; defaults to the clock. */
+  now?: () => string;
 }
 
 const LLM_CATEGORIES = new Set<SeanceDiagCategory>([
@@ -91,6 +115,7 @@ const LLM_CATEGORIES = new Set<SeanceDiagCategory>([
   "http",
   "parse",
   "no-text",
+  "truncated",
   "abort",
 ]);
 
@@ -103,6 +128,7 @@ function describeLlmError(err: unknown): Partial<SeanceDiag> & {
       category?: unknown;
       httpStatus?: unknown;
       anthropicErrorType?: unknown;
+      responseShape?: unknown;
     };
     if (
       typeof e.category === "string" &&
@@ -113,6 +139,9 @@ function describeLlmError(err: unknown): Partial<SeanceDiag> & {
         ...(typeof e.httpStatus === "number" ? { httpStatus: e.httpStatus } : {}),
         ...(typeof e.anthropicErrorType === "string"
           ? { anthropicErrorType: e.anthropicErrorType }
+          : {}),
+        ...(e.responseShape && typeof e.responseShape === "object"
+          ? { responseShape: e.responseShape as SeanceDiag["responseShape"] }
           : {}),
       };
     }
@@ -188,8 +217,20 @@ async function inner(
     return SILENT;
   }
 
-  // 2. Cache key from server-held values only; a hit costs nothing.
-  const key = seanceCacheKey(req.owner, req.repo, facts.pushedAt, facts.createdAt);
+  // 2. Cache key from server-held values only; a hit costs nothing. The state
+  // is computed here (never taken from the client) because it sets the voice.
+  const classified = classify(facts, undefined, (deps.now ?? (() => new Date().toISOString()))());
+  const creatureState = classified.state;
+  // Only a ghost's tone depends on its decay level, so only a ghost's key carries it.
+  const decayLevel = creatureState === "ghost" ? (classified.decayLevel ?? 0) : null;
+  const key = seanceCacheKey(
+    req.owner,
+    req.repo,
+    facts.pushedAt,
+    facts.createdAt,
+    creatureState,
+    decayLevel,
+  );
   const cached = await seanceCacheGet(deps.cache, key);
   if (state.cancelled) return SILENT;
   if (cached) return { kind: "ok", result: cached };
@@ -221,15 +262,19 @@ async function inner(
 
   // 6. Derive evidence and build the prompt.
   const derived = deriveEvidence({
+    owner: req.owner,
     facts,
     readme: fetched?.readme ?? null,
     commits: fetched?.commits ?? [],
   });
-  const prompt = buildSeancePrompt(req.owner, derived);
+  const prompt = buildSeancePrompt(req.owner, derived, creatureState, decayLevel);
 
   // 7. Up to two attempts; every call is consumed first and never refunded.
   let failure: "invalid-output" | "llm-error" = "llm-error";
   let valid: SeanceResult | null = null;
+  // Set after a validation failure: rule codes and field paths only.
+  let feedback: string | null = null;
+  const codesOf = (fs: RuleFailure[]) => [...new Set(fs.map((f) => f.code))];
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     const consumed = await deps.limiter.consume(req.ip);
     if (state.cancelled) return SILENT;
@@ -260,7 +305,7 @@ async function inner(
     try {
       const r = await race(
         llm.complete({
-          system: prompt.system,
+          system: feedback ? `${prompt.system}\n\n${feedback}` : prompt.system,
           user: prompt.user,
           maxOutputTokens: MAX_OUTPUT_TOKENS,
           timeoutMs: LLM_TIMEOUT_MS,
@@ -290,29 +335,52 @@ async function inner(
       parsed = JSON.parse(json);
     } catch {
       failure = "invalid-output";
-      emit("parse");
+      emit("parse", { ruleCodes: ["not-json"] });
+      feedback = buildFeedbackNote(attempt, [{ code: "not-json", path: "(root)" }]);
       continue;
     }
-    const checkedResult = seanceResultSchema.safeParse(parsed);
-    if (!checkedResult.success) {
+    // Repair before validating: drop bad items and bad voice sentences, keep the rest.
+    const repair = repairSeance(parsed, derived);
+    const repairedCodes = codesOf(repair.repaired);
+    const checkedResult = seanceResultSchema.safeParse(repair.value);
+    if (!checkedResult.success || repair.rejected.length > 0) {
       failure = "invalid-output";
-      const issues = checkedResult.error.issues;
+      const issues = checkedResult.success ? [] : checkedResult.error.issues;
       const paths = [
         ...new Set(issues.map((i) => i.path.join(".") || "(root)")),
       ].slice(0, 10);
-      emit(
-        issues.some((i) => i.message === DATE_RULE_MESSAGE)
-          ? "date-rule"
-          : "schema",
-        { schemaIssuePaths: paths },
+      let failures = ruleFailuresFromIssues(issues);
+      // When no item survived, the per-item reasons replace the bare "too few items".
+      const otherIssues = issues.filter(
+        (i) => !(i.path.length === 1 && i.path[0] === "unfinishedBusiness"),
       );
+      if (repair.rejected.length > 0) {
+        failures = [
+          ...failures.filter((f) => f.path !== "unfinishedBusiness"),
+          ...repair.rejected,
+        ].slice(0, 8);
+      }
+      emit(
+        otherIssues.some((i) => i.message === DATE_RULE_MESSAGE)
+          ? "date-rule"
+          : otherIssues.some((i) => i.message === NEXT_STEP_MESSAGE)
+            ? "verdict"
+            : otherIssues.length === 0
+              ? "grounding"
+              : "schema",
+        { schemaIssuePaths: paths, ruleCodes: codesOf(failures), repairedCodes },
+      );
+      feedback = buildFeedbackNote(attempt, failures);
       continue;
     }
-    if (!validateGrounding(checkedResult.data, derived).ok) {
+    const groundFailures = groundingFailures(checkedResult.data, derived);
+    if (groundFailures.length > 0) {
       failure = "invalid-output";
-      emit("grounding");
+      emit("grounding", { ruleCodes: codesOf(groundFailures), repairedCodes });
+      feedback = buildFeedbackNote(attempt, groundFailures);
       continue;
     }
+    if (repairedCodes.length > 0) emit("repaired", { repairedCodes });
     valid = checkedResult.data;
     break;
   }

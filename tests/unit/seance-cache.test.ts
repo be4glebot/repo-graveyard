@@ -57,13 +57,13 @@ describe("seance cache", () => {
   describe("seanceCacheKey", () => {
     it("lowercases owner and repo", () => {
       expect(seanceCacheKey("OctoCat", "Hello-World", "2024-01-01T00:00:00Z", "x")).toBe(
-        "seance:v1:octocat/hello-world:2024-01-01T00:00:00Z",
+        "seance:v6:octocat/hello-world:2024-01-01T00:00:00Z",
       );
     });
 
     it("falls back to createdAt when pushedAt is null", () => {
       expect(seanceCacheKey("a", "b", null, "2020-05-05T00:00:00Z")).toBe(
-        "seance:v1:a/b:2020-05-05T00:00:00Z",
+        "seance:v6:a/b:2020-05-05T00:00:00Z",
       );
     });
   });

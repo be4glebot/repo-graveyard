@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import fc from "fast-check";
 import {
   VERDICTS,
+  hasNextStepLanguage,
   seanceResultSchema,
   type SeanceResult,
 } from "@/lib/seance-schema";
@@ -37,17 +38,17 @@ const item = fc.record({
   title: fc
     .array(word, { minLength: 1, maxLength: 8 })
     .map((w) => w.join(" ")),
-  detail: sentences(1, 3).filter((s) => s.length <= 300),
+  detail: sentence, // exactly one sentence, well under 140 characters
   evidence,
 });
 
 const validResult: fc.Arbitrary<SeanceResult> = fc.record({
-  voice: sentences(2, 4),
+  voice: sentences(2, 3),
   causeOfDeath: sentence,
-  unfinishedBusiness: fc.array(item, { minLength: 2, maxLength: 5 }),
+  unfinishedBusiness: fc.array(item, { minLength: 2, maxLength: 4 }),
   verdict: fc.constantFrom(...VERDICTS),
   verdictReason: sentences(1, 3).filter((s) => s.length <= 300),
-});
+}).filter((r) => r.verdict === "revive" || !hasNextStepLanguage(r.verdictReason));
 
 describe("seance schema property tests", () => {
   // Feature: the-seance, Property 1: Schema round trip
@@ -81,9 +82,9 @@ const withItem = (r: SeanceResult, i: number, patch: Partial<SeanceResult["unfin
 });
 
 const topStringKeys = ["voice", "causeOfDeath", "verdictReason"] as const;
-const topMax = { voice: 600, causeOfDeath: 200, verdictReason: 300 } as const;
+const topMax = { voice: 320, causeOfDeath: 200, verdictReason: 300 } as const;
 const itemKeys = ["title", "detail", "evidence"] as const;
-const itemMax = { title: 80, detail: 300, evidence: 200 } as const;
+const itemMax = { title: 80, detail: 140, evidence: 200 } as const;
 
 const blank = fc.integer({ min: 1, max: 12 }).map((n) => " \t\n".repeat(n).slice(0, Math.max(n, 8)));
 
@@ -97,15 +98,15 @@ const mutation: fc.Arbitrary<Mutation> = fc
     fc.constantFrom(...topStringKeys),
     fc.constantFrom(...itemKeys),
     fc.nat(),
-    fc.constantFrom(0, 1, 6),
+    fc.constantFrom(0, 1, 5),
     badVerdict,
     blank,
     fc.stringMatching(/^[a-z]{1,8}$/),
     sentences(5, 5),
     sentences(2, 2),
-    fc.constantFrom("a", "b"), // spare entropy
+    sentences(4, 4),
   )
-  .chain(([, , idx, badLen, bv, bl, extra, five, two]) =>
+  .chain(([, , idx, badLen, bv, bl, extra, five, two, four]) =>
     fc.constantFrom<Mutation>(
       ...topStringKeys.flatMap((k) => [
         { name: `${k} at max`, accept: true, apply: (r: SeanceResult) => ({ ...r, [k]: padTo(r[k], topMax[k]) }) },
@@ -119,15 +120,15 @@ const mutation: fc.Arbitrary<Mutation> = fc
         { name: `item ${k} blank`, accept: false, apply: (r: SeanceResult) => withItem(r, idx % r.unfinishedBusiness.length, { [k]: bl }) },
         { name: `item ${k} deleted`, accept: false, apply: (r: SeanceResult) => ({ ...r, unfinishedBusiness: r.unfinishedBusiness.map((it, j) => { if (j !== idx % r.unfinishedBusiness.length) return it; const c: Record<string, unknown> = { ...it }; delete c[k]; return c; }) }) },
       ]),
-      { name: "array length 2..5 kept", accept: true, apply: (r) => r },
+      { name: "array length 2..4 kept", accept: true, apply: (r) => r },
       {
         name: `array length ${badLen}`,
-        accept: false,
+        accept: badLen === 1, // the ledger minimum is 1 (repair-over-reject)
         apply: (r) => ({
           ...r,
           unfinishedBusiness:
-            badLen === 6
-              ? [...r.unfinishedBusiness, ...r.unfinishedBusiness, ...r.unfinishedBusiness].slice(0, 6)
+            badLen === 5
+              ? [...r.unfinishedBusiness, ...r.unfinishedBusiness, ...r.unfinishedBusiness].slice(0, 5)
               : r.unfinishedBusiness.slice(0, badLen),
         }),
       },
@@ -136,6 +137,7 @@ const mutation: fc.Arbitrary<Mutation> = fc
       { name: "extra top-level key", accept: false, apply: (r) => ({ ...r, [extra + "x"]: "v" }) },
       { name: "extra item key", accept: false, apply: (r) => withItem(r, idx % r.unfinishedBusiness.length, { [extra + "x"]: "v" } as never) },
       { name: "voice 1 sentence", accept: false, apply: (r) => ({ ...r, voice: r.voice.split(/(?<=[.!?])\s/)[0] }) },
+      { name: "voice 4 sentences", accept: false, apply: (r) => ({ ...r, voice: four }) },
       { name: "voice 5 sentences", accept: false, apply: (r) => ({ ...r, voice: five }) },
       { name: "causeOfDeath 2 sentences", accept: false, apply: (r) => ({ ...r, causeOfDeath: two }) },
     ),

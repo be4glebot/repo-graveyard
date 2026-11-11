@@ -36,17 +36,21 @@ Ground rules for every task:
 
 - [x] 2. Schema, sentence splitting and date rule
   - [x] 2.1 Create `lib/seance-schema.ts`
-    - Export `VERDICTS`, `Verdict`, `BusinessItem`, `SeanceResult`, strict `seanceResultSchema` with every length rule from the design
+    - Export `VERDICTS`, `Verdict`, `BusinessItem`, `SeanceResult`, strict `seanceResultSchema` with every length rule from the design (`unfinishedBusiness` minimum lowered from 2 to 1, maximum stays 4; the prompt still asks for 2 to 4)
     - Export `splitSentences`, `countSentences` (no `Intl.Segmenter`) and `containsDateOrDayCount`
     - Apply the date rule to `voice`, `causeOfDeath`, `verdictReason`, item `title` and `detail`, not to `evidence`
+    - No schema check for upbeat status phrasing (prompt-only, no `hasUpbeatPhrasing`); reject completed-work language in an item `detail` (was/were/is/been + closed, fixed, added, updated, completed, merged, resolved, finished, implemented; bare "completed") except negated forms such as "never completed" and "half-completed"; reject any sentence containing both "memory" and "faded" in `voice`, `title`, `detail` or `verdictReason` (including the exact phrase); in `causeOfDeath` allow it only as the entire value "My memory of that has faded."
+    - Export `ruleFailuresFromIssues(issues)` mapping zod issues to `{ path, code }` with the codes `not-json`, `date-rule`, `next-step`, `memory-faded`, `completed-work`, `sentence-count`, `length`, `blank`, `unknown-key`, `type`, `value`, `evidence-not-grounded`, `schema`
+    - Export `CAUSE_HEADINGS` and `causeHeading` (ghost "What keeps me here", risen "Why I returned", zombie "Cause of death", tombstone "How I was laid to rest", coffin "Why I was sealed"; unknown state falls back to the zombie heading), shared by prompt, UI and tests
     - Export `seanceRequestSchema` (owner 1..39, repo 1..100, unknown keys stripped) and `seanceResponseSchema` (discriminated union on `kind`)
-    - Keep the file client-safe (no `server-only`)
-    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 5.6, 19.2_
+    - Keep the file client-safe (no `server-only`); export the item-level predicates (completed-work, date-rule, memory-faded, sentence-count, blank) so `lib/seance-repair.ts` reuses them
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.20, 4.21, 4.22, 5.6, 19.2_
 
   - [x] 2.2 Write unit tests for the schema
     - Create `tests/unit/seance-schema.test.ts`
     - One valid result accepted, one test per invalid field rejected, unknown key rejected, missing key rejected
     - For each length limit: value at the limit accepted, limit + 1 rejected
+    - Upbeat phrasing in `voice` or `causeOfDeath` passes; completed-work `detail` fails while "never completed" and "half-completed" pass; "memory" plus "faded" fails in `voice`, `title`, `detail` and `verdictReason` (even the exact phrase), and in `causeOfDeath` passes only when the whole value is exactly "My memory of that has faded."; `ruleFailuresFromIssues` returns the expected codes and paths
     - Dates: "I may never wake." passes, "I died on May 3." fails; `2024-05-01`, `5/1/2024`, "3 May", "March 2024", "12 days" each fail; "march" and "august" in ordinary sentences pass
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 5.6, 20.2, 20.25_
 
@@ -68,13 +72,16 @@ Ground rules for every task:
 - [x] 3. Evidence, grounding and prompt
   - [x] 3.1 Create `lib/seance.ts`
     - Export `EvidencePack`, `FactLine`, `DerivedEvidence`, `deriveEvidence`, `renderEvidenceText`, `truncateUtf8`, `neutralizeMarkers` (loops until no marker remains), `isGroundedEvidence` and `validateGrounding`
-    - `deriveEvidence` produces both the model-facing text and the validation corpus in one pass, in the fixed `[F#]`, `[C#]`, `[R]` order
-    - _Requirements: 3.3, 3.5, 3.8, 3.9, 3.11, 6.4, 6.6, 6.8_
+    - `deriveEvidence(pack, owner)` produces both the model-facing text and the validation corpus in one pass, in the fixed `[F#]`, `[C#]`, `[R]` order, and builds the `names` list (repo, owner, `owner/repo`, punctuation removed and case folded)
+    - Export `normalizeForMatch` (curly quotes to ASCII, en/em dashes to `-`, ellipsis to `...`, non-breaking space to space, remove `` ` `` `*` `_` `#` `>` `[` `]` `(` `)`, fold case, collapse and trim whitespace) and apply it to both the evidence block text and the model's evidence string; `isGroundedEvidence`: README or commit quote must be 12 to 80 characters after normalization (was 8); an exact Fact_Line copy is valid at any length of at least 8; evidence equal to one of `names` is rejected even if it occurs in the README
+    - `deriveEvidence` strips README markdown first (emphasis, backticks, headings, list markers, links to text, images, HTML tags, code fences, whitespace collapsed); marker neutralising runs after stripping; a README empty after stripping is treated as none
+    - _Requirements: 3.3, 3.5, 3.8, 3.9, 3.11, 3.12, 6.4, 6.6, 6.8, 6.12, 6.14_
 
   - [x] 3.2 Create `lib/ai.ts`
-    - Export `OPEN_MARKER`, `CLOSE_MARKER`, `IGNORE_INSTRUCTIONS_RULE`, `FORMAT_LOCK_RULE`, the "My memory of that has faded." sentence, `buildSeancePrompt(owner, derived)` and the constants for 1000 output tokens and 8000 ms
+    - Export `OPEN_MARKER`, `CLOSE_MARKER`, `IGNORE_INSTRUCTIONS_RULE`, `FORMAT_LOCK_RULE`, the "My memory of that has faded." sentence, `buildSeancePrompt(owner, derived)`, `buildFeedbackNote(failures)` (returns "Attempt 1 rejected: <path> [<rule-code>]: <fixed phrase>; ... Fix only these and keep everything else valid.", at most 8 deduplicated entries, codes, paths and fixed phrases only, never model text) and the constants for 1500 output tokens and 8000 ms
+    - `buildSeancePrompt(owner, derived, state, decayLevel)` adds a ghost tone by decay level (0 restless, present, a little uneasy; 1 thinning, details slipping away; 2 to 3 barely holding on, fragmentary, flickering, dread, forgetting shown through broken images and never by saying memory faded), an undertone of unease or dread for every state, a prompt-only ban on upbeat status phrasing in `voice` and `causeOfDeath`, a rule that "My memory of that has faded." never appears in `voice`, `title`, `detail` or `verdictReason` and is used only as the entire `causeOfDeath` when the README and commits are both missing, a ghost `causeOfDeath` of one sentence naming the single unfinished thing that binds the spirit, details that describe something not yet done, a 12 to 80 character quote rule, and also adds a per-state intro and tone note (ghost restless, risen uneasy on borrowed time, zombie dead but walking, tombstone at rest and proud, coffin sealed and cold) and names the `causeHeading(state)` heading
     - Put Untrusted_Text only inside delimited blocks; system text follows `voice.md` and rules 5.1 to 5.5 and 6.5
-    - _Requirements: 4.15, 4.16, 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.2, 6.3, 6.5_
+    - _Requirements: 4.15, 4.16, 4.21, 4.23, 4.24, 4.25, 5.1, 5.2, 5.3, 5.4, 5.5, 5.17, 5.18, 5.19, 5.20, 6.1, 6.2, 6.3, 6.5_
 
   - [x] 3.3 Write property test for derivable evidence accepted
     - Create `tests/property/seance-evidence.property.test.ts` with arbitraries for Evidence_Packs (README null or text, 0 to 5 commits, unicode, astral characters, marker fragments)
@@ -82,9 +89,9 @@ Ground rules for every task:
     - **Validates: Requirements 6.5, 6.6, 20.6**
 
   - [x] 3.4 Write property test for non-derivable evidence rejected
-    - Add to `tests/property/seance-evidence.property.test.ts`; use unique tokens so a generated README cannot contain the evidence by accident
+    - Add to `tests/property/seance-evidence.property.test.ts`; use unique tokens so a generated README cannot contain the evidence by accident; also cover a README or commit quote of 11 characters (rejected) versus 12 (accepted), an exact Fact_Line copy such as "open issues: 0" (accepted), and evidence equal to the repo name, owner name or `owner/repo` (rejected even when it occurs in the README)
     - **Property 5: Non-derivable evidence is rejected**
-    - **Validates: Requirements 6.6, 6.7, 6.8, 20.6, 20.26**
+    - **Validates: Requirements 6.6, 6.7, 6.8, 6.12, 20.6, 20.26**
 
   - [x] 3.5 Write property test for deterministic Evidence_Text
     - Add to `tests/property/seance-evidence.property.test.ts`
@@ -103,10 +110,23 @@ Ground rules for every task:
 
   - [x] 3.8 Write unit tests for the prompt
     - Create `tests/unit/seance-prompt.test.ts`
-    - Wording for 4.16 and 5.1 to 5.5, the evidence rule 6.5, request constants (1000 tokens, 8000 ms)
+    - Wording for 4.16 and 5.1 to 5.5, the evidence rule 6.5, request constants (1500 tokens, 8000 ms)
     - Injection README example: prompt wraps the README as quoted evidence, the ignore-instructions rule is present, and a mock output following the injected instruction fails validation
     - _Requirements: 4.15, 4.16, 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.2, 6.3, 6.5, 20.7_
 
+  - [x] 3.9 Create `lib/seance-repair.ts`
+    - Export pure `repairSeance(parsed, derived)` and `repairVoice(voice)`; no I/O, no clock, no model text in outputs
+    - Ledger repaired per item: drop an item when its evidence is not grounded (`isGroundedEvidence`, including the bare-name rule and the 12-character minimum) or when it breaks an item rule (`completed-work`, `date-rule`, `memory-faded`, `length`, `sentence-count`, `blank`, `unknown-key`, `type`); keep at most 4 (extras dropped with code `length`); return `dropped` as `{ code, path }` entries; 0 survivors means the caller rejects the attempt and uses the drop reasons as `ruleCodes` and the attempt 2 feedback note
+    - `repairVoice`: remove sentences with a date or day count or the faded-memory wording, then keep the leading sentences that fit within 3 sentences and 320 characters; if fewer than 2 would remain or fit, return the voice untouched; a voice that needs no repair is returned byte-for-byte unchanged
+    - Do not repair: `finish`/`seal` reason with next-step words, `causeOfDeath`, `verdict`, `verdictReason`, unknown or missing top-level keys, anything else the strict schema checks
+    - Non-object input or a missing `unfinishedBusiness` array is returned untouched
+    - _Requirements: 4.3, 4.8, 4.29, 4.30, 4.31, 4.32, 6.7, 6.8, 6.12_
+
+  - [x] 3.10 Write tests for repair
+    - Create `tests/unit/seance-repair.test.ts`: one ungrounded item among three is dropped and two remain; all items ungrounded gives 0 survivors with the drop codes and paths; curly-quote and backtick evidence matches its plain README source; a 4-sentence voice is trimmed to 3; a voice with a dated sentence loses it; fewer than 2 sentences left leaves the voice untouched; an unchanged voice is the same string; a `finish` verdict with next-step words, a bad `causeOfDeath` and an unknown top-level key are not repaired and still fail the schema
+    - Create `tests/property/seance-repair.property.test.ts`
+    - **Property 28: Repair is per item and never touches what it should not**
+    - **Validates: Requirements 4.3, 4.29, 4.30, 4.31, 4.32, 4.33, 6.7, 6.14, 20.36**
 - [x] 4. GitHub evidence fetch
   - [x] 4.1 Create `lib/seance-gather.ts`
     - Export the single read-only GraphQL document with the four README aliases (`README.md`, `readme.md`, `README`, `README.rst`) and `history(first: 5)`
@@ -165,9 +185,9 @@ Ground rules for every task:
     - **Validates: Requirements 8.1, 8.3, 8.9**
 
   - [x] 6.5 Extend `lib/cache.ts` with séance helpers
-    - Add `SEANCE_TTL_SECONDS = 86_400`, `seanceCacheKey` (lower-cased owner and repo, `pushedAt ?? createdAt`, `seance:v1:` prefix), `seanceCacheGet` (schema-validated, error, timeout and invalid payload are misses) and `seanceCacheSet` (best effort, swallows failures)
+    - Add `SEANCE_TTL_SECONDS = 86_400`, `seanceCacheKey` (lower-cased owner and repo, `pushedAt ?? createdAt`, `seance:v6:` prefix, `:{state}` suffix when a state is given, then `:d{decayLevel}` for a ghost only), `seanceCacheGet` (schema-validated, error, timeout and invalid payload are misses) and `seanceCacheSet` (best effort, swallows failures)
     - A `null` client is a guaranteed miss and a no-op write; reuse `REDIS_TIMEOUT_MS` and the existing `CacheClient`; do not change the graveyard helpers
-    - _Requirements: 7.1, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.10, 7.11, 7.12_
+    - _Requirements: 7.1, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.10, 7.11, 7.12, 7.13, 7.14, 7.15_
 
   - [x] 6.6 Write unit tests for the séance cache
     - Create `tests/unit/seance-cache.test.ts`
@@ -176,13 +196,15 @@ Ground rules for every task:
 
 - [x] 7. Service and route
   - [x] 7.1 Create `lib/seance-service.ts`
-    - Export `SeanceOutcome`, `SeanceDeps` and `runSeance(req, deps)` with this exact order: (body already validated by the route) → `loadGraveyard` and find repo (case-insensitive; error and missing both give `silent`, reason `repo-not-found`) → cache lookup (a hit returns `ok` with no limiter check) → `limiter.check(ip)` (`veil` or `weak` returns immediately) → no-LLM check (`deps.llm === null` gives `silent`, reason `no-llm`) → `fetchEvidence` raced against 5000 ms (failure means facts only) → attempts → cache set
-    - Attempts: at most 2; each calls `limiter.consume(ip)` first (consumed per call, never refunded), then `llm.complete` raced against 8000 ms, then `JSON.parse`, `seanceResultSchema.safeParse` and `validateGrounding`; first fully valid result wins; failure of both gives `silent` with no partial fields
+    - Export `SeanceOutcome`, `SeanceDeps` and `runSeance(req, deps)` with this exact order: (body already validated by the route) → `loadGraveyard` and find repo (case-insensitive; error and missing both give `silent`, reason `repo-not-found`) → classify the state and decay level with `classify(facts, undefined, now)` (never a client state) → cache lookup (key carries the `:{state}` suffix, plus `:d{decayLevel}` for a ghost; the decay level is also passed to `buildSeancePrompt` and `deriveEvidence` receives the owner) (a hit returns `ok` with no limiter check) → `limiter.check(ip)` (`veil` or `weak` returns immediately) → no-LLM check (`deps.llm === null` gives `silent`, reason `no-llm`) → `fetchEvidence` raced against 5000 ms (failure means facts only) → attempts → cache set
+    - Attempts: at most 2; each calls `limiter.consume(ip)` first (consumed per call, never refunded), then `llm.complete` raced against 8000 ms, then `JSON.parse`, `repairSeance` (task 3.9), `seanceResultSchema.safeParse` and `validateGrounding`; first fully valid result wins; an attempt is rejected only when repair leaves 0 ledger items (then the drop codes and paths are its `ruleCodes` and the attempt 2 feedback note); failure of both gives `silent` with no partial fields
+    - After a parse, schema or grounding failure on attempt 1, attempt 2 uses the same user message and the system prompt plus `buildFeedbackNote` built from `ruleFailuresFromIssues` (`lib/seance-schema.ts`) and `groundingFailures` (`lib/seance.ts`); after a thrown error or timeout, no note is sent. `validateGrounding` also rejects a `causeOfDeath` of exactly "My memory of that has faded." unless the README and commits are both missing
+    - Each attempt's dev diag entry carries `ruleCodes` (unique rule codes of a failed attempt: parse, repair, schema or grounding) and `repairedCodes` (unique codes of items or voice sentences repair dropped or trimmed, such as `evidence-not-grounded`, `completed-work`, `date-rule`, `length`, `memory-faded`, `voice-trimmed`); an attempt accepted after repair emits diag category `repaired`; diag never contains model text
     - Cache only validated results via `seanceCacheSet` (best effort); never cache `silent`
     - Whole request raced against 25000 ms with a shared `cancelled` flag so nothing runs or is cached after the deadline
     - `log({ repo, reason })` only, using the fixed reason codes; never log README, commits, model output, body or key
     - Import `server-only`
-    - _Requirements: 3.1, 3.2, 3.10, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13, 4.14, 4.18, 6.7, 6.9, 7.1, 7.2, 7.9, 8.3, 8.4, 8.10, 19.4, 19.5, 19.6, 19.8_
+    - _Requirements: 3.1, 3.2, 3.10, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13, 4.14, 4.18, 4.23, 4.24, 4.25, 4.26, 4.27, 4.28, 4.29, 4.30, 4.31, 4.32, 4.33, 6.7, 6.13, 6.9, 7.1, 7.2, 7.9, 8.3, 8.4, 8.10, 19.4, 19.5, 19.6, 19.8_
 
   - [x] 7.2 Create `app/api/seance/route.ts`
     - `import "server-only"`, `export const maxDuration = 30`, `POST` handler
@@ -192,8 +214,9 @@ Ground rules for every task:
 
   - [x] 7.3 Write property test for the retry loop
     - Create `tests/property/seance-service.property.test.ts` using injected fakes; model a hang as a never-resolving promise advanced with fake timers
+    - Also assert: when attempt 1 fails a rule, the attempt 2 system prompt ends with the note (codes and paths, at most 8, deduplicated, no attempt 1 text) and the user message equals attempt 1's; an error or timeout on attempt 1 sends no note; failed-attempt diag entries carry `ruleCodes` and no model text; a ledger with one ungrounded item among three is accepted in one call with `repairedCodes` and category `repaired`, and one with every item ungrounded is rejected with the drop reasons as the attempt 2 note
     - **Property 19: The retry loop makes at most two calls and never returns partial output**
-    - **Validates: Requirements 4.8, 4.9, 4.10, 4.11, 4.12, 5.7, 6.7, 8.10, 20.3, 20.4**
+    - **Validates: Requirements 4.8, 4.9, 4.10, 4.11, 4.12, 4.23, 4.24, 4.26, 4.27, 4.28, 5.7, 6.7, 8.10, 20.3, 20.4, 20.35**
 
   - [x] 7.4 Write property test for no leaked model text
     - Add to `tests/property/seance-service.property.test.ts`
@@ -298,6 +321,7 @@ Ground rules for every task:
   - [x] 10.1 Add a `seanceResult` per repo to the sample estate
     - Add `seanceResult: z.unknown().optional()` to the repo schema in `lib/estate-schema.ts` (loose on purpose so one bad fixture only silences that one séance)
     - Add exactly one `seanceResult` to every repo in `data/estate.json`; leave the existing `seance` string field untouched
+    - Rewrite each fixture so its voice and `causeOfDeath` match its state (see 5.13 and 5.14)
     - Cover all three verdicts and all five creature types; invented names only; no dates or day counts; follow `voice.md`
     - Each `evidence` equals a non-dated Fact_Line text derived by `deriveEvidence` from the resolved facts (for example `open issues: 3`, `language: Rust`)
     - _Requirements: 2.3, 2.4, 2.5, 2.6_
@@ -335,7 +359,7 @@ Ground rules for every task:
 
   - [x] 11.5 Create `SpiritTranscript`, `CauseOfDeath` and `LedgerList`
     - `SpiritTranscript.tsx`: Smoke_Field, one `[data-sentence-index]` span per sentence (zero-based) with `aria-hidden` per-word spans, full text in the DOM from first render, 60 ms stagger and 300 ms fade, settle timer, click settles, `data-decay-profile`, seeded single-letter flicker, decay label text; not rendered when `voice` is empty; settled state inserts one visually hidden `<p data-seance-announce>` outside `[data-seance-transcript]`
-    - `CauseOfDeath.tsx`: engraved Cinzel capitals line
+    - `CauseOfDeath.tsx`: engraved Cinzel capitals line under the `causeHeading(state)` heading (the copy-transcript text does not include the heading)
     - `LedgerList.tsx`: real `<ol>` with one `li` per item showing `title`, `detail`, `evidence` (`font-fact`) in that order; held in the DOM but visually hidden until settled
     - All fields rendered as plain text; no `dangerouslySetInnerHTML`
     - _Requirements: 6.10, 6.11, 11.1, 11.4, 11.5, 11.7, 11.8, 11.9, 11.11, 11.12, 11.13, 11.14, 12.9, 12.10, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.8, 14.9, 16.2, 18.6, 18.7, 18.12_

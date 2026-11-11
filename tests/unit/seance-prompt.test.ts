@@ -53,8 +53,8 @@ const pack = (readme: string | null): EvidencePack => ({
 const count = (haystack: string, needle: string) => haystack.split(needle).length - 1;
 
 describe("request constants (4.15)", () => {
-  it("caps output at 1000 tokens and 8000 ms", () => {
-    expect(MAX_OUTPUT_TOKENS).toBe(1000);
+  it("caps output at 1500 tokens and 8000 ms", () => {
+    expect(MAX_OUTPUT_TOKENS).toBe(1500);
     expect(LLM_TIMEOUT_MS).toBe(8000);
   });
 });
@@ -90,7 +90,7 @@ describe("prompt wording (4.16, 5.1-5.5, 6.5)", () => {
 
   it("states the evidence rule: copy a fact line or quote the README/commit", () => {
     expect(system).toMatch(/exact copy of the text of one fact line or commit line/);
-    expect(system).toMatch(/verbatim quote of at least 8 characters/);
+    expect(system).toMatch(/verbatim quote of at least 12 characters/);
     expect(system).toMatch(/character for character/);
   });
 });

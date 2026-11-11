@@ -4,6 +4,7 @@ import type { RepoFacts } from "@/lib/lifecycle";
 import {
   deriveEvidence,
   isGroundedEvidence,
+  normalizeForMatch,
   neutralizeMarkers,
   truncateUtf8,
   CLOSE_MARKER,
@@ -117,7 +118,8 @@ function sliceByCodePoints(source: string, a: number, b: number): string {
   const cps = Array.from(source);
   if (cps.length === 0) return "";
   const start = Math.floor(a * cps.length);
-  const end = Math.min(cps.length, start + 1 + Math.floor(b * cps.length));
+  // README/commit quotes are capped at 80 characters (MAX_QUOTE_CHARS).
+  const end = Math.min(cps.length, start + 1 + Math.floor(b * Math.min(80, cps.length)), start + 80);
   return cps.slice(start, end).join("");
 }
 
@@ -162,7 +164,7 @@ describe("seance evidence grounding", () => {
 // Property 5 helpers
 // ---------------------------------------------------------------------------
 
-const normLocal = (s: string): string => s.trim().toLowerCase().replace(/\s+/g, " ");
+const normLocal = normalizeForMatch;
 
 /** True when the candidate is derivable by the documented rule (used only to discard accidental hits). */
 function derivable(candidate: string, d: ReturnType<typeof deriveEvidence>): boolean {

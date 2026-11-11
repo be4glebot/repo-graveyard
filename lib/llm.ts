@@ -25,7 +25,43 @@ export interface LlmClient {
 }
 
 /** Why an LLM call failed, in terms safe to log. */
-export type LlmFailureCategory = "timeout" | "http" | "parse" | "no-text" | "abort";
+export type LlmFailureCategory =
+  | "timeout"
+  | "http"
+  | "parse"
+  | "no-text"
+  | "truncated"
+  | "abort";
+
+/**
+ * Structure of a response that had no usable text block. Names, counts and
+ * lengths only: never any text, thinking content or ids.
+ */
+export interface LlmResponseShape {
+  stopReason?: string;
+  /** `type` of every content block, in order (for example ["thinking"]). */
+  blockTypes: string[];
+  /** Length of each text block, in the same order as the text blocks. */
+  textLengths: number[];
+  outputTokens?: number;
+  /** Top-level keys of the response object. */
+  keys: string[];
+}
+
+/**
+ * Structure of a response that had no usable text block. Names, counts and
+ * lengths only: never any text, thinking content or ids.
+ */
+export interface LlmResponseShape {
+  stopReason?: string;
+  /** `type` of every content block, in order (for example ["thinking"]). */
+  blockTypes: string[];
+  /** Length of each text block, in the same order as the text blocks. */
+  textLengths: number[];
+  outputTokens?: number;
+  /** Top-level keys of the response object. */
+  keys: string[];
+}
 
 /** Generic failure; carries only a category and safe, non-secret details. */
 export class LlmError extends Error {
@@ -33,17 +69,24 @@ export class LlmError extends Error {
   readonly httpStatus?: number;
   /** Anthropic's `error.type` (for example `rate_limit_error`), never the message. */
   readonly anthropicErrorType?: string;
+  /** Only set for `no-text` failures. */
+  readonly responseShape?: LlmResponseShape;
 
   constructor(
     category: LlmFailureCategory,
     message: string,
-    details: { httpStatus?: number; anthropicErrorType?: string } = {},
+    details: {
+      httpStatus?: number;
+      anthropicErrorType?: string;
+      responseShape?: LlmResponseShape;
+    } = {},
   ) {
     super(message);
     this.name = "LlmError";
     this.category = category;
     this.httpStatus = details.httpStatus;
     this.anthropicErrorType = details.anthropicErrorType;
+    this.responseShape = details.responseShape;
   }
 }
 
@@ -64,6 +107,36 @@ function anySignal(signals: AbortSignal[]): AbortSignal {
     s.addEventListener("abort", () => controller.abort(s.reason), { once: true });
   }
   return controller.signal;
+}
+
+const SAFE_TOKEN = /^[A-Za-z_][A-Za-z0-9_]{0,31}$/;
+
+/** Describes a Messages response without exposing any of its content. */
+function describeShape(data: unknown): LlmResponseShape {
+  const obj = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const safe = (v: unknown): string | undefined =>
+    typeof v === "string" && SAFE_TOKEN.test(v) ? v : undefined;
+  const blocks = Array.isArray(obj.content) ? obj.content : [];
+  const blockTypes: string[] = [];
+  const textLengths: number[] = [];
+  for (const b of blocks.slice(0, 10)) {
+    const rec = b && typeof b === "object" ? (b as Record<string, unknown>) : {};
+    blockTypes.push(safe(rec.type) ?? "unknown");
+    if (rec.type === "text" && typeof rec.text === "string") {
+      textLengths.push(rec.text.length);
+    }
+  }
+  const usage = obj.usage && typeof obj.usage === "object" ? (obj.usage as Record<string, unknown>) : {};
+  return {
+    stopReason: safe(obj.stop_reason),
+    blockTypes,
+    textLengths,
+    outputTokens:
+      typeof usage.output_tokens === "number" && Number.isFinite(usage.output_tokens)
+        ? usage.output_tokens
+        : undefined,
+    keys: Object.keys(obj).filter((k) => SAFE_TOKEN.test(k)).slice(0, 20),
+  };
 }
 
 /** Only a short snake_case token is ever surfaced from an error body. */
@@ -101,6 +174,9 @@ function createAnthropicClient(apiKey: string, model: string): LlmClient {
           body: JSON.stringify({
             model,
             max_tokens: req.maxOutputTokens,
+            // claude-haiku-5-5 thinks by default; with a long prompt the whole
+            // token budget can go to a thinking block and leave no text.
+            thinking: { type: "disabled" },
             system: req.system,
             messages: [{ role: "user", content: req.user }],
           }),
@@ -152,8 +228,17 @@ function createAnthropicClient(apiKey: string, model: string): LlmClient {
           }
         }
       }
+      const responseShape = describeShape(data);
+      // No text and the reply stopped at the token limit: it was cut off.
+      if (responseShape.stopReason === "max_tokens") {
+        throw new LlmError("truncated", "LLM response was cut off", {
+          httpStatus: res.status,
+          responseShape,
+        });
+      }
       throw new LlmError("no-text", "LLM response had no text content", {
         httpStatus: res.status,
+        responseShape,
       });
     },
   };

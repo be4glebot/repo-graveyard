@@ -1,5 +1,9 @@
 import fc from "fast-check";
-import { VERDICTS, type SeanceResult } from "@/lib/seance-schema";
+import {
+  VERDICTS,
+  hasNextStepLanguage,
+  type SeanceResult,
+} from "@/lib/seance-schema";
 
 // Letters only, so no generated prose can contain a digit, date or day count.
 const word = fc.stringMatching(/^[a-z]{1,10}$/);
@@ -26,15 +30,15 @@ const evidence = fc
 
 const item = fc.record({
   title: fc.array(word, { minLength: 1, maxLength: 8 }).map((w) => w.join(" ")),
-  detail: sentences(1, 3).filter((s) => s.length <= 300),
+  detail: sentence, // one sentence, well under 140 characters
   evidence,
 });
 
 /** Arbitrary for schema-valid SeanceResults. */
 export const validSeanceResult: fc.Arbitrary<SeanceResult> = fc.record({
-  voice: sentences(2, 4),
+  voice: sentences(2, 3),
   causeOfDeath: sentence,
-  unfinishedBusiness: fc.array(item, { minLength: 2, maxLength: 5 }),
+  unfinishedBusiness: fc.array(item, { minLength: 2, maxLength: 4 }),
   verdict: fc.constantFrom(...VERDICTS),
   verdictReason: sentences(1, 3).filter((s) => s.length <= 300),
-});
+}).filter((r) => r.verdict === "revive" || !hasNextStepLanguage(r.verdictReason));

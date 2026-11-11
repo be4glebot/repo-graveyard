@@ -50,6 +50,7 @@ import { SilentFallback, VeilState, WeakGhostState } from "./SeanceStates";
 import Ritual from "./Ritual";
 import SpiritTranscript from "./SpiritTranscript";
 import CauseOfDeath from "./CauseOfDeath";
+import { causeHeading } from "@/lib/seance-schema";
 import LedgerList from "./LedgerList";
 import { VerdictCard } from "./VerdictCard";
 import { KiroSlot } from "./KiroSlot";
@@ -267,7 +268,10 @@ export function SeanceRegion({
               data-cause-wrap=""
               data-hidden={settled ? "false" : "true"}
             >
-              <CauseOfDeath causeOfDeath={result.causeOfDeath} />
+              <CauseOfDeath
+                causeOfDeath={result.causeOfDeath}
+                heading={causeHeading(creatureState)}
+              />
             </div>
             <LedgerList items={result.unfinishedBusiness} settled={settled} />
             <VerdictCard result={result} />

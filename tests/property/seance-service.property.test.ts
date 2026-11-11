@@ -116,7 +116,7 @@ export function runStep(step: LlmStep): Promise<string> {
       );
     case "dated-voice":
       return Promise.resolve(
-        JSON.stringify({ ...r, voice: "I remember you. It was 5 days ago." }),
+        JSON.stringify({ ...r, voice: "It was 5 days ago." }),
       );
     case "throws":
       return Promise.reject(new Error("provider exploded"));

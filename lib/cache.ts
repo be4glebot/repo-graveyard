@@ -166,8 +166,11 @@ export function seanceCacheKey(
   repo: string,
   pushedAt: string | null,
   createdAt: string,
+  state?: string,
+  decayLevel?: number | null,
 ): string {
-  return `seance:v1:${owner.toLowerCase()}/${repo.toLowerCase()}:${pushedAt ?? createdAt}`;
+  const decay = typeof decayLevel === "number" ? `:d${decayLevel}` : "";
+  return `seance:v6:${owner.toLowerCase()}/${repo.toLowerCase()}:${pushedAt ?? createdAt}${state ? `:${state}` : ""}${decay}`;
 }
 
 /**

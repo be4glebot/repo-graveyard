@@ -238,7 +238,7 @@ describe("diagnostic categories", () => {
       ...GOOD,
       unfinishedBusiness: [
         { title: "A", detail: "Made up.", evidence: `commit abc1234 ${MODEL_SECRET}` },
-        { title: "B", detail: "Real.", evidence: "open issues: 1" },
+        { title: "B", detail: "Also made up.", evidence: "also not in the facts at all" },
       ],
     };
     const { deps, out } = run([text(JSON.stringify(bad))]);

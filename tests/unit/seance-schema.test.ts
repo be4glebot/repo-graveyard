@@ -37,6 +37,9 @@ describe("seanceResultSchema", () => {
     it("voice with one sentence", () => {
       expect(ok(withField("voice", "Only one sentence."))).toBe(false);
     });
+    it("voice with four sentences", () => {
+      expect(ok(withField("voice", "A b. C d. E f. G h."))).toBe(false);
+    });
     it("voice with five sentences", () => {
       expect(ok(withField("voice", "A b. C d. E f. G h. I j."))).toBe(false);
     });
@@ -57,9 +60,11 @@ describe("seanceResultSchema", () => {
       expect(ok(withField("verdictReason", "It stalled on 2024-05-01."))).toBe(false);
     });
     it("too few or too many business items", () => {
-      expect(ok(withField("unfinishedBusiness", [item()]))).toBe(false);
-      expect(ok(withField("unfinishedBusiness", Array(6).fill(item())))).toBe(false);
-      expect(ok(withField("unfinishedBusiness", Array(5).fill(item())))).toBe(true);
+      expect(ok(withField("unfinishedBusiness", []))).toBe(false);
+      expect(ok(withField("unfinishedBusiness", [item()]))).toBe(true);
+      expect(ok(withField("unfinishedBusiness", Array(5).fill(item())))).toBe(false);
+      expect(ok(withField("unfinishedBusiness", Array(4).fill(item())))).toBe(true);
+      expect(ok(withField("unfinishedBusiness", Array(2).fill(item())))).toBe(true);
     });
     it("item title empty", () => {
       expect(ok(withItem("title", ""))).toBe(false);
@@ -100,11 +105,11 @@ describe("seanceResultSchema", () => {
   });
 
   describe("length limits", () => {
-    it("voice: 600 accepted, 601 rejected", () => {
+    it("voice: 320 accepted, 321 rejected", () => {
       const mk = (n: number) => `I wait. ${sentence(n - 8)}`;
-      expect(mk(600)).toHaveLength(600);
-      expect(ok(withField("voice", mk(600)))).toBe(true);
-      expect(ok(withField("voice", mk(601)))).toBe(false);
+      expect(mk(320)).toHaveLength(320);
+      expect(ok(withField("voice", mk(320)))).toBe(true);
+      expect(ok(withField("voice", mk(321)))).toBe(false);
     });
     it("causeOfDeath: 200 accepted, 201 rejected", () => {
       expect(ok(withField("causeOfDeath", sentence(200)))).toBe(true);
@@ -118,9 +123,9 @@ describe("seanceResultSchema", () => {
       expect(ok(withItem("title", "x".repeat(80)))).toBe(true);
       expect(ok(withItem("title", "x".repeat(81)))).toBe(false);
     });
-    it("item detail: 300 accepted, 301 rejected", () => {
-      expect(ok(withItem("detail", "x".repeat(300)))).toBe(true);
-      expect(ok(withItem("detail", "x".repeat(301)))).toBe(false);
+    it("item detail: 140 accepted, 141 rejected", () => {
+      expect(ok(withItem("detail", "x".repeat(140)))).toBe(true);
+      expect(ok(withItem("detail", "x".repeat(141)))).toBe(false);
     });
     it("item evidence: 8 and 200 accepted, 7 and 201 rejected", () => {
       expect(ok(withItem("evidence", "x".repeat(8)))).toBe(true);
