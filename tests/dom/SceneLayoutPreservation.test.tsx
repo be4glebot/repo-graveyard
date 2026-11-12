@@ -34,7 +34,7 @@ function ghostRows(count: number): GraveyardRow[] {
   }));
 }
 
-function renderSky(count: number, handlers: Partial<Record<string, () => void>> = {}) {
+function renderSky(count: number) {
   const h = {
     onFilterChange: vi.fn(),
     onPlotChange: vi.fn(),

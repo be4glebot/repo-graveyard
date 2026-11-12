@@ -1,0 +1,278 @@
+{
+  "pbtResults": {
+    "2.3 Write property test for the single brand": {
+      "status": "passed",
+      "lastRunTimestamp": 1794453962633
+    },
+    "3.2 Write property tests for compact centring": {
+      "status": "passed",
+      "lastRunTimestamp": 1794454053152
+    },
+    "4.3 Write whisper lane unit and property tests": {
+      "status": "passed",
+      "lastRunTimestamp": 1794454301378
+    },
+    "5.2 Write Moon art DOM tests": {
+      "status": "passed",
+      "lastRunTimestamp": 1794454413237
+    }
+  },
+  "executionHistory": {
+    "1.1 Remove the unused imports and parameter": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453845793
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453865693
+      }
+    ],
+    "1.2 Verify lint and the touched test": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453869085
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453891614
+      }
+    ],
+    "1. Clean lint warnings": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453891715
+      }
+    ],
+    "2.1 Use absolute titles and add the resolver helper": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453893800
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453914492
+      }
+    ],
+    "2.2 Extend metadata tests": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453916662
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453941887
+      }
+    ],
+    "2.3 Write property test for the single brand": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453944300
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453969541
+      }
+    ],
+    "2. Single-brand page titles": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453969616
+      }
+    ],
+    "3.1 Centre the single row in `compactStackLayout`": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453971632
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794453997688
+      }
+    ],
+    "3.2 Write property tests for compact centring": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454000199
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454059331
+      }
+    ],
+    "3.3 Extend existing compact layout tests and check regressions": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454061546
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454103082
+      }
+    ],
+    "3. Centre sparse compact rows": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454103170
+      }
+    ],
+    "4.1 Add whisper lane helpers": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454105420
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454201513
+      }
+    ],
+    "4.2 Wire the lane into `EstateMap`": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454203837
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454272141
+      }
+    ],
+    "4.3 Write whisper lane unit and property tests": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454274378
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454318089
+      }
+    ],
+    "4. Whisper clears place cards": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454318194
+      }
+    ],
+    "5.1 Render the Moon_Image with a Drawn_Moon fallback": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454320440
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454374725
+      }
+    ],
+    "5.2 Write Moon art DOM tests": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454376787
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454420400
+      }
+    ],
+    "5. Painted moon art": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454420477
+      }
+    ],
+    "6.1 Add the gradient layer and `FadeArt`": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454422827
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454481548
+      }
+    ],
+    "6.2 Write first-paint DOM tests": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454483799
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454546367
+      }
+    ],
+    "6.3 Re-encode the fog image or report the limitation": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454550879
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454717904
+      }
+    ],
+    "6. Instant night sky on first load": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454718018
+      }
+    ],
+    "7. Final checkpoint - Run the full suite once": [
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454720403
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454882213
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454884516
+      },
+      {
+        "executionId": "78bf02da-decf-48c2-b70d-0f2a788eea05",
+        "chatSessionId": "sess_4ad86a87-f280-4317-9465-a69c21565ce8",
+        "timestamp": 1794454930977
+      }
+    ]
+  }
+}

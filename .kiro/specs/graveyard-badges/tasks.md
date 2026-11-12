@@ -203,3 +203,4 @@ Build the badge feature bottom-up in TypeScript: first the pure core (`lib/badge
   ]
 }
 ```
+git log -p --all | Select-String -Pattern "sk-ant-[A-Za-z0-9_-]{30,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}" | Select-Object -First 5

@@ -21,6 +21,22 @@ const SITE_NAME = "Repo Graveyard";
 const SITE_DESCRIPTION =
   "See a GitHub user's public repositories as a haunted graveyard of ghosts, zombies, tombstones, and chained coffins.";
 
+/**
+ * Pure mirror of Next's title resolution: `absolute` wins, a plain string is
+ * wrapped in the parent template, and a `{ default, template }` object uses its
+ * own default with no template applied.
+ */
+export function resolveTitle(
+  title: string | { absolute: string } | { default: string; template: string },
+  template: string | null,
+): string {
+  if (typeof title === "string") {
+    return template ? template.replace("%s", title) : title;
+  }
+  if ("absolute" in title) return title.absolute;
+  return title.default;
+}
+
 /** Origin of an absolute http(s) URL, otherwise the localhost fallback. Never throws. */
 export function resolveSiteUrl(raw: string | undefined): URL {
   try {

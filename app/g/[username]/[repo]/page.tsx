@@ -45,7 +45,7 @@ export async function generateMetadata({
   params,
 }: GraveyardRepoPageProps): Promise<Metadata> {
   const { username } = await params;
-  return { title: `Repo Graveyard — ${username}` };
+  return { title: { absolute: `Repo Graveyard — ${username}` } };
 }
 
 interface GraveyardRepoPageProps {

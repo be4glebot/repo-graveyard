@@ -43,7 +43,7 @@ import type { Metadata } from "next";
 
 /** The estate has no owner, so it reads as the sample graveyard (visual fix 2C). */
 export const metadata: Metadata = {
-  title: "Repo Graveyard — Sample Estate",
+  title: { absolute: "Repo Graveyard — Sample Estate" },
 };
 
 /**

@@ -26,6 +26,8 @@
  * Requirements: 2.3, 2.5
  */
 
+import FadeArt from "@/components/scene/FadeArt";
+
 /** Base path for the backdrop art plates under `public/art`. */
 const ART_BASE = "/art";
 
@@ -45,19 +47,33 @@ export default function Backdrop({ className }: BackdropProps) {
         className ? ` ${className}` : ""
       }`}
     >
-      {/* bg-far: opaque sky/castle/hills plate, farthest back, least motion. */}
+      {/* First-paint night sky: pure CSS, in the server HTML, so the map never
+          reads as black while the painted plates download. Painted art fades in
+          over it; a failed plate leaves it visible. */}
+      <div
+        data-testid="backdrop-night-gradient"
+        className="backdrop-night-gradient absolute inset-0"
+      />
+
+      {/* bg-far: opaque sky/castle/hills plate, farthest back, least motion.
+          The largest above-the-fold image: `priority`, and `sizes` of 106vw
+          because the plate is `-inset-[3%]` (106% of the viewport width). */}
       <div className="layer-idle-drift absolute inset-0">
         <div
-          className="layer-bg-far absolute -inset-[3%] bg-cover bg-top bg-no-repeat"
+          data-testid="backdrop-bg-far"
+          className="layer-bg-far absolute -inset-[3%]"
           style={{
-            backgroundImage: `url(${ART_BASE}/bg-far.webp)`,
-            // Token-based gradient fallback keeps the plate readable (and never
-            // shows a broken-image box) if the asset fails to load (Req 2.2).
-            backgroundColor: "var(--color-night-sky-top)",
             // Keep the backdrop darker than the creatures (Req 2.5).
             filter: "brightness(0.6)",
           }}
-        />
+        >
+          <FadeArt
+            src={`${ART_BASE}/bg-far.webp`}
+            sizes="106vw"
+            priority
+            className="object-cover object-top"
+          />
+        </div>
       </div>
 
       {/* mg-fence: the gate centerpiece with mg-fence-tile repeated across the

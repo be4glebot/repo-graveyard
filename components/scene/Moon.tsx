@@ -23,6 +23,10 @@
  * Requirements: 3.1, 3.2
  */
 
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
 import { moonTreatment, summaryCounts } from "@/lib/scene-view";
 import type { GraveyardRow } from "@/lib/graveyard-view";
 
@@ -81,6 +85,7 @@ export default function Moon({
   fillParent = false,
   glowScale = 1,
 }: MoonProps) {
+  const [imageFailed, setImageFailed] = useState(false);
   const treatment = moonTreatment(rows);
   const isBlood = treatment === "blood-red";
 
@@ -122,33 +127,55 @@ export default function Moon({
       }
     : undefined;
 
+  const showImage = !imageFailed;
+  const imageSizes = placement
+    ? `${Math.max(1, Math.round(placement.diameter))}px`
+    : fillParent
+      ? "256px"
+      : "130px";
+
   return (
     <div
       aria-hidden="true"
+      data-moon-source={showImage ? "image" : "drawn"}
+      data-moon-treatment={treatment}
       className={`pointer-events-none ${positionClass} rounded-full${
         className ? ` ${className}` : ""
       }`}
       style={{
         ...positionStyle,
-        // Health-encoding fill + glow stay identical in both placements, so the
-        // disc remains visually distinct from the painted moon beneath it.
-        backgroundColor: fill,
+        // Health-encoding glow stays identical in both sources. The solid fill
+        // only shows for the Drawn_Moon; the painted image is transparent.
+        ...(showImage ? {} : { backgroundColor: fill }),
         boxShadow: `0 0 ${Math.round(blur * glowScale)}px ${Math.round(spread * glowScale)}px ${glowColor}`,
       }}
     >
-      {/* Craters: a few token-tinted dimples so the disc reads as a moon. */}
-      <span
-        className="absolute left-[28%] top-[32%] h-[23%] w-[23%] rounded-full"
-        style={{ backgroundColor: "var(--color-moon-crater)" }}
-      />
-      <span
-        className="absolute left-[75%] top-[66%] h-[15%] w-[15%] rounded-full"
-        style={{ backgroundColor: "var(--color-moon-crater)" }}
-      />
-      <span
-        className="absolute left-[48%] top-[89%] h-[11%] w-[11%] rounded-full"
-        style={{ backgroundColor: "var(--color-moon-crater)" }}
-      />
+      {showImage ? (
+        <Image
+          src="/art/moon.webp"
+          alt=""
+          fill
+          sizes={imageSizes}
+          className={`object-contain${isBlood ? " moon-blood" : ""}`}
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <>
+          {/* Craters: a few token-tinted dimples so the disc reads as a moon. */}
+          <span
+            className="absolute left-[28%] top-[32%] h-[23%] w-[23%] rounded-full"
+            style={{ backgroundColor: "var(--color-moon-crater)" }}
+          />
+          <span
+            className="absolute left-[75%] top-[66%] h-[15%] w-[15%] rounded-full"
+            style={{ backgroundColor: "var(--color-moon-crater)" }}
+          />
+          <span
+            className="absolute left-[48%] top-[89%] h-[11%] w-[11%] rounded-full"
+            style={{ backgroundColor: "var(--color-moon-crater)" }}
+          />
+        </>
+      )}
     </div>
   );
 }

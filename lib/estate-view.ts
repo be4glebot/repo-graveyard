@@ -1242,7 +1242,16 @@ export function compactStackLayout(
       }
     }
   } else {
-    feet[0] = Math.max(feet[0], bottom - Math.max(0, down[0]));
+    // A single row is centred on the band's vertical midpoint: the row extent
+    // is [feet - extUp, feet + extDown], so its midpoint sits at the band
+    // midpoint when feet = mid + (extUp - extDown) / 2. Then clamp so the
+    // extent stays inside the band (the top bound wins in a too-short band).
+    const extUp = Math.max(tall[0], up[0]);
+    const extDown = Math.max(0, down[0]);
+    const centred = (top + bottom) / 2 + (extUp - extDown) / 2;
+    const lo = top + extUp;
+    const hi = bottom - extDown;
+    feet[0] = Math.max(lo, Math.min(hi, centred));
   }
 
   return placements.map((_, i) => {
@@ -1299,7 +1308,7 @@ export interface SceneRect {
 }
 
 /** True iff two axis-aligned rects share interior area (edge-touch = clear). */
-export function rectsIntersect(a: SceneRect, b: SceneRect): boolean {
+export function rectsIntersect(a: ChromeRect, b: ChromeRect): boolean {
   return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 }
 
@@ -1610,4 +1619,108 @@ export function resolveInitialView(
   // 3. Neither a valid `?at=` nor a matching deep link: the estate map, with
   //    nothing pre-selected (Req 11.4).
   return { view: "map", selected: null };
+}
+
+// ---------------------------------------------------------------------------
+// Whisper lane (polish pass 2e)
+// ---------------------------------------------------------------------------
+
+/** An axis-aligned rectangle in viewport px. */
+export interface ChromeRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+/** Place link width (px): the plaque's `max-w-[260px]`. */
+export const PLACE_CARD_W_PX = 260;
+
+/**
+ * Place link height (px) on the board: 140px representatives + 12px gap + a
+ * plaque of up to ~116px (padding, name, a count line that may wrap, CTA).
+ */
+export const PLACE_CARD_H_PX = 140 + 12 + 116;
+
+/** Header band height (px): `--site-header-h` (7rem) in `app/globals.css`. */
+export const HEADER_H_PX = 112;
+
+/** Footer legend: tallest wrapped height (px) incl. footer padding. */
+export const LEGEND_H_PX = 80;
+
+/** Footer legend: widest extent (px), right-aligned with a 16px edge margin. */
+export const LEGEND_MAX_W_PX = 640;
+
+/** Clear gap (px) kept between the whisper lane and the nearest place card. */
+export const WHISPER_GAP_PX = 8;
+
+/** Whisper lane height (px): two clamped lines of text. */
+export const WHISPER_H_PX = 56;
+
+/**
+ * Whisper lane top, as a percentage of the map height. It sits in the central
+ * column between the sky card (bottom edge 0.20h + half card) and the gate
+ * card (top edge 0.78h - half card), which stays clear for every height from
+ * 600px up.
+ */
+export const WHISPER_TOP_PCT = 44;
+
+/** Whisper lane horizontal centre, as a percentage of the map width: midway
+ *  between the ground (0.20) and crypt (0.78) card centres. */
+export const WHISPER_CENTER_PCT = 49;
+
+/** Whisper lane width as a CSS `calc()` (percent of map width minus the two
+ *  card half-widths plus 2 x 16px margin): fits between ground and crypt. */
+export const WHISPER_WIDTH_CSS = `calc(58% - ${PLACE_CARD_W_PX + 32}px)`;
+
+/**
+ * Rectangles for the four place cards (display order sky, gate, ground, crypt),
+ * the header band and the footer legend at the given viewport size. Non-finite
+ * inputs are coerced to 0.
+ */
+export function estateChromeRects(
+  vw: number,
+  vh: number,
+): { placeCards: ChromeRect[]; header: ChromeRect; legend: ChromeRect } {
+  const w = Math.max(0, finiteOrZero(vw));
+  const h = Math.max(0, finiteOrZero(vh));
+  const placeCards = PLACE_ORDER.map((id): ChromeRect => {
+    const c = PLACE_CENTERS[id];
+    return {
+      left: c.x * w - PLACE_CARD_W_PX / 2,
+      right: c.x * w + PLACE_CARD_W_PX / 2,
+      top: c.y * h - PLACE_CARD_H_PX / 2,
+      bottom: c.y * h + PLACE_CARD_H_PX / 2,
+    };
+  });
+  const legendW = Math.min(LEGEND_MAX_W_PX, Math.max(0, w - 32));
+  return {
+    placeCards,
+    header: { left: 0, top: 0, right: w, bottom: HEADER_H_PX },
+    legend: {
+      left: w - 16 - legendW,
+      right: w - 16,
+      top: h - LEGEND_H_PX,
+      bottom: h,
+    },
+  };
+}
+
+/**
+ * The whisper's bounding rectangle at the given viewport size, mirroring the
+ * CSS in `EstateMap` (`WHISPER_TOP_PCT`, `WHISPER_CENTER_PCT`,
+ * `WHISPER_WIDTH_CSS`, `WHISPER_H_PX`). Non-finite inputs are coerced to 0.
+ */
+export function whisperLane(vw: number, vh: number): ChromeRect {
+  const w = Math.max(0, finiteOrZero(vw));
+  const h = Math.max(0, finiteOrZero(vh));
+  const width = Math.max(0, 0.58 * w - (PLACE_CARD_W_PX + 32));
+  const centre = (WHISPER_CENTER_PCT / 100) * w;
+  const top = (WHISPER_TOP_PCT / 100) * h;
+  return {
+    left: centre - width / 2,
+    right: centre + width / 2,
+    top,
+    bottom: top + WHISPER_H_PX,
+  };
 }

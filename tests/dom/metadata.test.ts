@@ -17,7 +17,7 @@ vi.mock("next/server", () => ({ connection: async () => {} }));
 vi.mock("@/lib/graveyard-loader", () => ({ loadGraveyard: vi.fn() }));
 vi.mock("@/lib/estate-loader", () => ({ loadEstate: vi.fn() }));
 
-import { buildRootMetadata } from "@/lib/site-meta";
+import { buildRootMetadata, resolveTitle } from "@/lib/site-meta";
 import { generateMetadata as userMetadata } from "@/app/g/[username]/page";
 import { generateMetadata as repoMetadata } from "@/app/g/[username]/[repo]/page";
 import { metadata as estateMetadata } from "@/app/estate/page";
@@ -54,10 +54,34 @@ describe("page metadata titles (visual fix 2C)", () => {
       params: Promise.resolve({ username: "torvalds", repo: "linux" }),
       searchParams: Promise.resolve({}),
     });
-    expect(meta.title).toBe("Repo Graveyard \u2014 torvalds");
+    expect(meta.title).toEqual({
+      absolute: "Repo Graveyard \u2014 torvalds",
+    });
   });
 
   it("the /estate route reads as the sample estate", () => {
-    expect(estateMetadata.title).toBe("Repo Graveyard \u2014 Sample Estate");
+    expect(estateMetadata.title).toEqual({
+      absolute: "Repo Graveyard \u2014 Sample Estate",
+    });
+  });
+
+  it("the brand appears exactly once in the resolved estate and repo titles", async () => {
+    const template = "%s \u00b7 Repo Graveyard";
+    const repo = await repoMetadata({
+      params: Promise.resolve({ username: "torvalds", repo: "linux" }),
+      searchParams: Promise.resolve({}),
+    });
+    const titles = [
+      resolveTitle(
+        estateMetadata.title as { absolute: string },
+        template,
+      ),
+      resolveTitle(repo.title as { absolute: string }, template),
+    ];
+    expect(titles).toEqual([
+      "Repo Graveyard \u2014 Sample Estate",
+      "Repo Graveyard \u2014 torvalds",
+    ]);
+    for (const t of titles) expect(t.split("Repo Graveyard")).toHaveLength(2);
   });
 });

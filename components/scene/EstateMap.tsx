@@ -64,7 +64,15 @@ import Whisper from "@/components/scene/Whisper";
 import Place from "@/components/scene/Place";
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
-import { placeOf, PLACE_ORDER, type PlaceId } from "@/lib/estate-view";
+import {
+  placeOf,
+  PLACE_ORDER,
+  WHISPER_CENTER_PCT,
+  WHISPER_H_PX,
+  WHISPER_TOP_PCT,
+  WHISPER_WIDTH_CSS,
+  type PlaceId,
+} from "@/lib/estate-view";
 import {
   ancientZombieCount,
   summaryCounts,
@@ -312,8 +320,15 @@ export default function EstateMap({
           region matching the old scene (role=status, so it never collides with
           the interactive chrome). Renders nothing when `whispers` is empty. --- */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-[16%] z-40 flex justify-center px-6 text-center"
-        style={decorFadeStyle}
+        className="pointer-events-none absolute z-40 flex items-start justify-center overflow-hidden text-center [&>*]:line-clamp-2"
+        style={{
+          ...decorFadeStyle,
+          top: `${WHISPER_TOP_PCT}%`,
+          left: `${WHISPER_CENTER_PCT}%`,
+          width: WHISPER_WIDTH_CSS,
+          maxHeight: WHISPER_H_PX,
+          transform: "translateX(-50%)",
+        }}
       >
         <Whisper whispers={whispers} />
       </div>

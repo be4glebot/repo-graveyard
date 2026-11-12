@@ -1642,3 +1642,32 @@ body {
     0 0 12px var(--color-crimson-glow),
     0 0 32px var(--color-crimson-glow);
 }
+
+/* Painted moon (Moon_Image) blood-red treatment: tints the transparent webp toward the bloodmoon-100 token (--color-moon-blood) when the undead outnumber the living. */
+.moon-blood {
+  filter: sepia(0.85) saturate(2.4) hue-rotate(-18deg) brightness(0.95);
+}
+
+/* Instant night sky (polish-pass-2e 6.1): pure-CSS first-paint layer under the
+   painted plates. Night-sky top to a bruised crimson horizon, a moon glow
+   radial and a faint fog band. Token colors only; renders in the server HTML so
+   the map never reads as black while art downloads. */
+.backdrop-night-gradient {
+  background-image:
+    radial-gradient(
+      ellipse 18% 14% at 75% 14%,
+      var(--color-moon-glow-pale) 0%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-moon-pale) 6%, transparent) 0%,
+      transparent 22%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-night-sky-top) 0%,
+      var(--color-night-sky-mid) 45%,
+      color-mix(in srgb, var(--color-crimson-900) 55%, var(--color-night-sky-bottom)) 100%
+    );
+}

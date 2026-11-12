@@ -193,3 +193,39 @@ describe("DepthScatter compact path at 700 px", () => {
     }
   });
 });
+
+describe("compact single row is centred in the stage band (polish-pass-2e)", () => {
+  // Requirements: 4.1, 4.3
+  for (const place of PLACES) {
+    for (const [width, height] of [
+      [375, 812],
+      [430, 932],
+      [700, 1024],
+    ] as const) {
+      it(`${place} @ ${width}x${height}: one row's extent is centred on the band midpoint`, () => {
+        const n = Math.min(2, compactColumns(width));
+        const { band, out } = layoutFor(place, width, height, n);
+        expect(out).toHaveLength(n);
+        // All creatures share one feet line, so they form a single Slot_Row.
+        expect(new Set(out.map((r) => r.y)).size).toBe(1);
+
+        const rowTop = Math.min(...out.flatMap((r) => [r.creature.top, r.plaque.top]));
+        const rowBottom = Math.max(
+          ...out.flatMap((r) => [r.creature.bottom, r.plaque.bottom]),
+        );
+        expect(rowTop).toBeGreaterThanOrEqual(band.top - EPS);
+        expect(rowBottom).toBeLessThanOrEqual(band.bottom + EPS);
+        const rowMid = (rowTop + rowBottom) / 2;
+        const bandMid = (band.top + band.bottom) / 2;
+        expect(Math.abs(rowMid - bandMid)).toBeLessThanOrEqual(1);
+      });
+    }
+  }
+
+  it("returns an empty layout for zero creatures without throwing", () => {
+    const chrome = layoutCompactChrome(375, 812, COMPACT_CHROME_FALLBACK_PX);
+    const band = stageBand(812, chrome.chips.bottom, chrome.bottomBar.top);
+    expect(() => compactStackLayout([], 375, band, 812)).not.toThrow();
+    expect(compactStackLayout([], 375, band, 812)).toEqual([]);
+  });
+});
