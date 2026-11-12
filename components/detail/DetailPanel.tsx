@@ -11,6 +11,7 @@ import { explanationLine } from "@/lib/repoDetails/explanationLine";
 import { buildGitHubUrl } from "@/lib/repoDetails/githubUrl";
 import { homepageDomain, isValidHttpsHomepage } from "@/lib/repoDetails/homepage";
 import { useIsCompact } from "@/components/ui/useIsCompact";
+import { RepoBadgeDialog } from "@/components/badge/RepoBadgeDialog";
 import ExternalLink from "./ExternalLink";
 import Portrait from "./Portrait";
 import {
@@ -331,6 +332,8 @@ function PanelContent({
   onRitualChange: (active: boolean) => void;
   escapeClaimRef: MutableRefObject<(() => boolean) | null>;
 }) {
+  const [badgeOpen, setBadgeOpen] = useState(false);
+  const badgeOpenerRef = useRef<HTMLButtonElement>(null);
   const description =
     row.description !== null && row.description.trim() !== ""
       ? row.description
@@ -445,6 +448,26 @@ function PanelContent({
           className="mt-6 flex flex-col gap-2"
         >
           <SeanceButton />
+          {!isFixture && (
+            <>
+              <button
+                ref={badgeOpenerRef}
+                type="button"
+                onClick={() => setBadgeOpen(true)}
+                className="seance-focus h-9 cursor-pointer self-start rounded-sm border border-candle-400 px-2 text-xs text-candle-400 hover:bg-night-900 motion-safe:transition-colors"
+              >
+                Badge for this repo
+              </button>
+              {badgeOpen && (
+                <RepoBadgeDialog
+                  owner={owner}
+                  repo={row.name}
+                  onClose={() => setBadgeOpen(false)}
+                  openerRef={badgeOpenerRef}
+                />
+              )}
+            </>
+          )}
         </section>
       </div>
 

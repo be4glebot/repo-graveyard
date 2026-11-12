@@ -74,9 +74,8 @@ describe("route payload / client contract", () => {
         const { body } = formatList(parsed.data, Date.parse(nowIso));
         expect(body).toHaveLength(payload.repos.length);
         payload.repos.forEach((entry, i) => {
-          const fields = body[i].split(" | ");
-          expect(fields[0]).toBe(sanitiseInline(entry.name));
-          expect(fields[1]).toBe(entry.state);
+          // Names may themselves contain " | ", so assert on the line prefix.
+          expect(body[i].startsWith(`${sanitiseInline(entry.name)} | ${entry.state} | `)).toBe(true);
           expect(body[i].endsWith(` | ${entry.stars} stars`)).toBe(true);
         });
       }),

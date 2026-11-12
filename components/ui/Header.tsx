@@ -36,6 +36,7 @@
 
 import { useRouter } from "next/navigation";
 import {
+  useEffect,
   useId,
   useLayoutEffect,
   useRef,
@@ -44,6 +45,7 @@ import {
   type KeyboardEvent,
 } from "react";
 
+import { GetBadgeDialog } from "@/components/badge/GetBadgeDialog";
 import { useHeaderHeightVar } from "@/components/scene/useHeaderHeightVar";
 import { SceneLegend } from "@/components/scene/Footer";
 import SummaryLine from "@/components/ui/SummaryLine";
@@ -89,6 +91,11 @@ export default function Header({
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [badgeOpen, setBadgeOpen] = useState(false);
+  const badgeAvailable = mode !== "estate" && username !== "";
+  const badgeButtonRef = useRef<HTMLButtonElement>(null);
+  const badgeMenuItemRef = useRef<HTMLButtonElement>(null);
+  const badgeOpenerRef = useRef<HTMLElement | null>(null);
 
   const inputId = useId();
   const errorId = useId();
@@ -117,6 +124,28 @@ export default function Header({
     rootRef.current = el?.closest<HTMLElement>("#scene-root") ?? null;
   }, []);
   useHeaderHeightVar(wrapperRef, compact, rootRef);
+
+  // If the layout flips while the dialog is open, the original opener is gone;
+  // re-point the opener at whichever control exists now (fallback: Menu button).
+  useEffect(() => {
+    if (!badgeOpen) return;
+    const current = badgeOpenerRef.current;
+    if (current && current.isConnected) return;
+    badgeOpenerRef.current =
+      (compact ? badgeMenuItemRef.current : badgeButtonRef.current) ??
+      menuButtonRef.current;
+  }, [badgeOpen, compact]);
+
+  const badgeClasses =
+    "pointer-events-auto min-h-11 rounded-md border border-candle-400 px-3 py-2 font-ui text-sm text-scene-fg " +
+    "transition-colors hover:bg-candle-400/20 " +
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
+    "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky";
+
+  function openBadge(opener: HTMLElement | null) {
+    badgeOpenerRef.current = opener ?? menuButtonRef.current;
+    setBadgeOpen(true);
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -269,7 +298,30 @@ export default function Header({
             onChange={onLightsOnChange}
           />
           <Toggle label="Sound" pressed={soundOn} onChange={onSoundChange} />
+          {badgeAvailable && !compact ? (
+            <button
+              ref={badgeButtonRef}
+              type="button"
+              data-testid="get-badge-button"
+              onClick={(e) => openBadge(e.currentTarget)}
+              className={badgeClasses}
+            >
+              Get a badge
+            </button>
+          ) : null}
         </div>
+
+        {badgeAvailable && compact ? (
+          <button
+            ref={badgeMenuItemRef}
+            type="button"
+            data-testid="get-badge-menu-item"
+            onClick={(e) => openBadge(e.currentTarget)}
+            className={badgeClasses + " mt-1 w-full"}
+          >
+            Get a badge
+          </button>
+        ) : null}
 
         {hasError ? (
           <p id={errorId} role="alert" className="font-ui text-sm text-crimson-200">
@@ -284,6 +336,13 @@ export default function Header({
           className="pointer-events-auto mt-1 min-[768px]:hidden"
         />
       </div>
+      {badgeOpen ? (
+        <GetBadgeDialog
+          owner={username}
+          openerRef={badgeOpenerRef}
+          onClose={() => setBadgeOpen(false)}
+        />
+      ) : null}
     </header>
   );
 }

@@ -492,9 +492,25 @@ describe("DetailPanel content (6.1-6.14)", () => {
     },
   );
 
-  it("renders an Actions landmark with exactly one control, Hold a séance (6.14)", () => {
-    // Spec 3 -> Spec 4: the Actions slot now holds the séance control and nothing else.
+  it("renders an Actions landmark with Hold a séance and Badge for this repo for a real repo (6.14)", () => {
     renderPanel();
+    const actions = dialog()!.querySelector<HTMLElement>(
+      'section[aria-label="Actions"][data-slot="actions"]',
+    )!;
+    expect(actions).not.toBeNull();
+    const controls = actions.querySelectorAll("button, a, input, select, textarea, [tabindex]");
+    expect(controls.length).toBe(2);
+    const texts = Array.from(controls).map((c) =>
+      (c.textContent ?? "").replace(/\s+/g, " ").trim(),
+    );
+    for (const c of controls) expect(c.tagName).toBe("BUTTON");
+    expect(texts[0]).toContain("Hold a séance");
+    expect(texts[1]).toBe("Badge for this repo");
+    expect((actions.textContent ?? "").replace(/\s+/g, " ").trim()).toBe(texts.join(""));
+  });
+
+  it("renders an Actions landmark with exactly one control, Hold a séance, for a fixture (6.14)", () => {
+    renderPanel({ isFixture: true });
     const actions = dialog()!.querySelector<HTMLElement>(
       'section[aria-label="Actions"][data-slot="actions"]',
     )!;
@@ -502,8 +518,9 @@ describe("DetailPanel content (6.1-6.14)", () => {
     const controls = actions.querySelectorAll("button, a, input, select, textarea, [tabindex]");
     expect(controls.length).toBe(1);
     expect(controls[0].tagName).toBe("BUTTON");
-    expect((controls[0].textContent ?? "").replace(/\s+/g," ").trim()).toContain("Hold a séance");
-    expect((actions.textContent ?? "").replace(/\s+/g," ").trim()).toBe((controls[0].textContent ?? "").replace(/\s+/g," ").trim());
+    const text = (controls[0].textContent ?? "").replace(/\s+/g, " ").trim();
+    expect(text).toContain("Hold a séance");
+    expect((actions.textContent ?? "").replace(/\s+/g, " ").trim()).toBe(text);
   });
 
   it("renders HTML in the description literally (9.5)", () => {
