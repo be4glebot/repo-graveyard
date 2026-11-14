@@ -12,7 +12,7 @@ You are the design critic for Repo Graveyard. We are competing in the Costume Co
    - `/estate` with a ghost, a zombie, a tombstone and a coffin detail panel open
    - the séance screen
    - each empty/error state in design.md (no repos, only ghosts, unknown user, rate limited)
-   - lights-on mode
+   - lights-on mode (day theme)
 2. Critique each screenshot against design.md. For each issue give: screen, what's wrong, which design.md rule it breaks, severity (high/medium/low), and a concrete fix.
 3. Check specifically:
    - Does every visible effect encode data (The one rule)? Flag any decoration-only effect.

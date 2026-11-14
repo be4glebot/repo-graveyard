@@ -1,5 +1,5 @@
 /**
- * DOM tests for the "Badge for this repo" action in the detail panel.
+ * DOM tests for the "Share this repo" action in the detail panel.
  * Plain DOM assertions only (no jest-dom).
  *
  * Requirements: 8.1, 8.2, 8.5, 8.7, 10.5, 10.8
@@ -94,11 +94,11 @@ function renderPanel(overrides: Partial<DetailPanelProps> = {}) {
 }
 
 const badgeButton = () =>
-  screen.queryByRole("button", { name: "Badge for this repo" }) as HTMLButtonElement | null;
+  screen.queryByRole("button", { name: "Share this repo" }) as HTMLButtonElement | null;
 
 const badgeDialog = () =>
   Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"]')).find(
-    (d) => d.querySelector("h2")?.textContent === "Badge for this repo",
+    (d) => d.querySelector("h2")?.textContent === "Share this repo",
   ) ?? null;
 
 const panelHeading = () =>
@@ -117,7 +117,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("DetailPanel 'Badge for this repo' action", () => {
+describe("DetailPanel 'Share this repo' action", () => {
   it("is present for a real repo (8.1)", () => {
     renderPanel();
     expect(badgeButton()).not.toBeNull();
@@ -126,10 +126,10 @@ describe("DetailPanel 'Badge for this repo' action", () => {
   it("is absent for a Haunted Estate sample repo (8.7)", () => {
     renderPanel({ isFixture: true });
     expect(badgeButton()).toBeNull();
-    expect(document.body.textContent).not.toContain("Badge for this repo");
+    expect(document.body.textContent).not.toContain("Share this repo");
   });
 
-  it("is smaller than the header 'Get a badge' button (8.1)", () => {
+  it("is smaller than the header 'Share your graveyard' button (8.1)", () => {
     renderPanel();
     const cls = badgeButton()!.className.split(/\s+/);
     expect(cls).toContain("h-9");
@@ -189,7 +189,7 @@ describe("DetailPanel 'Badge for this repo' action", () => {
     const img = () => d.querySelector<HTMLImageElement>("img")!.getAttribute("src")!;
     expect(img()).not.toContain("style=flat");
 
-    await user.click(screen.getByRole("radio", { name: "Flat" }));
+    await user.click(screen.getByRole("radio", { name: /Flat/ }));
     expect(img()).toContain("style=flat");
     for (const t of Array.from(d.querySelectorAll("textarea"))) {
       expect(t.value).toContain("?style=flat");

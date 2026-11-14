@@ -1,0 +1,9 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL be4glebot/hub 768x500: header x plate:sky 260x5.6
+FAIL be4glebot/hub 820x500: header x plate:sky 260x5.6
+FAIL be4glebot/hub 768x720: header x plate:sky 260x1.6; turning-notice x plate:sky 260x41.6
+done be4glebot/hub
+
+69 case(s) measured, 4 finding(s), 2 distinct pair(s)
+  be4glebot/hub: plate:sky x turning-notice x1 worst 260x41.6 at 768x720
+  be4glebot/hub: header x plate:sky x3 worst 260x5.6 at 768x500

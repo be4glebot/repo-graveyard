@@ -4,6 +4,7 @@ import {
   IM_Fell_English,
   Inter,
   JetBrains_Mono,
+  Fraunces,
 } from "next/font/google";
 
 /**
@@ -55,8 +56,19 @@ export const fontFact = JetBrains_Mono({
   display: "swap",
 });
 
-/** All five font CSS-variable classes, space-joined for the <html> className. */
+/**
+ * Day display face: a soft storybook serif that replaces the blackletter
+ * wordmark when Lights on is active (--font-day-display).
+ */
+export const fontDayDisplay = Fraunces({
+  variable: "--font-day-display",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+/** All scene font CSS-variable classes, space-joined for the <html> className. */
 export const sceneFontVariables = [
+  fontDayDisplay.variable,
   fontWordmark.variable,
   fontHeading.variable,
   fontNarrative.variable,

@@ -23,8 +23,9 @@
  *       lightning).
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
+import WorldPlaceView from "@/components/world/WorldPlaceView";
 import EstateMap from "@/components/scene/EstateMap";
 import PlaceView from "@/components/scene/PlaceView";
 import type { GraveyardRow } from "@/lib/graveyard-view";
@@ -278,6 +279,7 @@ describe("PlaceView pointer-events (click-through regression)", () => {
 
     const view = screen.getByTestId("place-view");
     // Confirm the fog + lightning layers actually rendered (the whole point).
+    // (World cases are appended below, in "WorldPlaceView pointer-events".)
     expect(screen.queryByTestId("scene-fog")).not.toBeNull();
     expect(screen.queryByTestId("scene-lightning")).not.toBeNull();
 
@@ -300,4 +302,59 @@ describe("PlaceView pointer-events (click-through regression)", () => {
       ).toBe(true);
     }
   });
+});
+
+describe("WorldPlaceView pointer-events (explorable worlds, Req 15.2 / 17.7)", () => {
+  it.each(["sky", "ground", "crypt"] as const)(
+    "(e) %s: every full-cover layer is pointer-events-none and a Creature button is clickable",
+    (place) => {
+      const rows: GraveyardRow[] = Array.from({ length: 4 }, (_, i) => {
+        const name = `${place}-w${i}`;
+        const url = `https://github.com/octocat/${name}`;
+        return place === "sky"
+          ? makeRow({ name, url, state: "ghost", decayLevel: i % 4, daysQuiet: 10 + i })
+          : makeRow({
+              name,
+              url,
+              state: place === "ground" ? "tombstone" : "coffin",
+              decayLevel: null,
+              daysQuiet: 400 + i,
+            });
+      });
+      const onSelect = vi.fn();
+      render(
+        <WorldPlaceView
+          place={place}
+          rows={rows}
+          activeFilter="all"
+          plotIndex={0}
+          selectedName={null}
+          onFilterChange={() => {}}
+          onPlotChange={() => {}}
+          onSelect={onSelect}
+          onReturn={() => {}}
+        />,
+      );
+
+      const view = screen.getByTestId("place-view");
+      const layers = fullCoverLayers(view);
+      expect(layers.length).toBeGreaterThan(0);
+      for (const layer of layers) {
+        if (containsFocusable(layer)) {
+          continue;
+        }
+        if (hasPointerEventsNoneAncestor(layer, view)) {
+          continue;
+        }
+        expect(
+          hasPointerEventsNone(layer),
+          `full-cover world layer missing pointer-events-none: "${layer.className}"`,
+        ).toBe(true);
+      }
+
+      const button = screen.getAllByTestId("scatter-creature")[0].querySelector("button")!;
+      fireEvent.click(button);
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    },
+  );
 });

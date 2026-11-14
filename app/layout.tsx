@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/scene/ThemeProvider";
 import { buildRootMetadata, resolveSiteUrl } from "@/lib/site-meta";
 import { sceneFontVariables } from "./fonts";
 import "./globals.css";
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${sceneFontVariables} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col"><ThemeProvider>{children}</ThemeProvider></body>
     </html>
   );
 }

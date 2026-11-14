@@ -38,6 +38,8 @@ export interface ToggleProps {
   /** Optional text shown for the on/off state; defaults to "On"/"Off". */
   onLabel?: string;
   offLabel?: string;
+  /** Plain-words explanation, exposed as a tooltip and an accessible description. */
+  hint?: string;
 }
 
 export default function Toggle({
@@ -47,8 +49,10 @@ export default function Toggle({
   id,
   onLabel = "On",
   offLabel = "Off",
+  hint,
 }: ToggleProps) {
   const generatedId = useId();
+  const hintId = `${generatedId}-hint`;
   const controlId = id ?? generatedId;
 
   function toggle() {
@@ -78,11 +82,13 @@ export default function Toggle({
       role="switch"
       aria-checked={pressed}
       aria-label={label}
+      aria-describedby={hint ? hintId : undefined}
+      title={hint}
       onClick={toggle}
       onKeyDown={handleKeyDown}
       data-testid="styled-toggle"
       className={
-        "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm " +
+        "day-chrome-btn inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm " +
         "text-scene-fg transition-colors " +
         (pressed
           ? "border-candle-400 bg-candle-400/15"
@@ -119,6 +125,11 @@ export default function Toggle({
           {pressed ? onLabel : offLabel}
         </span>
       </span>
+      {hint ? (
+        <span id={hintId} className="sr-only">
+          {hint}
+        </span>
+      ) : null}
     </button>
   );
 }

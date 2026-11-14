@@ -13,7 +13,7 @@
  *
  * How it works:
  *
- *   - **Lights-on → nothing.** When `lightsOn` is true the component renders
+ *   - **Lights-on → nothing.** When `theme` is "day" the component renders
  *     `null`: no lantern, no vignette (Req 3.7).
  *   - **Lantern vs static vignette** is chosen by the SAME media query the
  *     parallax hook uses, `(hover: hover) and (pointer: fine)`. A fine pointer
@@ -58,13 +58,14 @@ import {
   useState,
   type CSSProperties,
 } from "react";
+import type { Theme } from "@/lib/theme-art";
 
 export interface LanternCursorProps {
   /**
-   * Mirror of `SceneView`'s lights state. When `true` the scene is fully lit
-   * and the overlay renders nothing — no lantern, no vignette (Req 3.7).
+   * The scene theme. In `"day"` the overlay renders nothing — no lantern, no
+   * vignette (Req 3.7).
    */
-  lightsOn: boolean;
+  theme: Theme;
   /**
    * Mirror of `SceneView`'s reduced-motion state. When `true` the lantern holds
    * steady (no flicker, Req 3.5); when `false` the `.lantern-flicker` loop runs
@@ -87,9 +88,10 @@ const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
 const LANTERN_RADIUS_PX = 300;
 
 export default function LanternCursor({
-  lightsOn,
+  theme,
   reducedMotion,
 }: LanternCursorProps) {
+  const isDay = theme === "day";
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   // Pointer capability is read on the client only (after mount) so the first
@@ -116,7 +118,7 @@ export default function LanternCursor({
   useEffect(() => {
     // Nothing to track when the overlay is absent (lights-on) or when we're in
     // static-vignette mode (coarse / no-hover).
-    if (lightsOn || !isFinePointer) {
+    if (isDay || !isFinePointer) {
       return;
     }
     if (
@@ -212,10 +214,10 @@ export default function LanternCursor({
       }
       pending = null;
     };
-  }, [lightsOn, isFinePointer]);
+  }, [isDay, isFinePointer]);
 
-  // Lights-on: no lantern, no vignette (Req 3.7).
-  if (lightsOn) {
+  // Day: no lantern, no vignette (Req 3.7).
+  if (isDay) {
     return null;
   }
 

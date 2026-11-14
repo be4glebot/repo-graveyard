@@ -48,6 +48,7 @@ import {
 import { GetBadgeDialog } from "@/components/badge/GetBadgeDialog";
 import { useHeaderHeightVar } from "@/components/scene/useHeaderHeightVar";
 import { SceneLegend } from "@/components/scene/Footer";
+import ListDialog from "@/components/scene/ListDialog";
 import SummaryLine from "@/components/ui/SummaryLine";
 import Toggle from "@/components/ui/Toggle";
 import { useIsCompact } from "@/components/ui/useIsCompact";
@@ -97,6 +98,12 @@ export default function Header({
   const badgeMenuItemRef = useRef<HTMLButtonElement>(null);
   const badgeOpenerRef = useRef<HTMLElement | null>(null);
 
+  const [listOpen, setListOpen] = useState(false);
+  const listAvailable = rows !== undefined;
+  const listButtonRef = useRef<HTMLButtonElement>(null);
+  const listMenuItemRef = useRef<HTMLButtonElement>(null);
+  const listOpenerRef = useRef<HTMLElement | null>(null);
+
   const inputId = useId();
   const errorId = useId();
   const panelId = useId();
@@ -123,7 +130,7 @@ export default function Header({
     wrapperRef.current = el?.parentElement ?? el;
     rootRef.current = el?.closest<HTMLElement>("#scene-root") ?? null;
   }, []);
-  useHeaderHeightVar(wrapperRef, compact, rootRef);
+  useHeaderHeightVar(wrapperRef, compact, rootRef, { always: true });
 
   // If the layout flips while the dialog is open, the original opener is gone;
   // re-point the opener at whichever control exists now (fallback: Menu button).
@@ -136,8 +143,32 @@ export default function Header({
       menuButtonRef.current;
   }, [badgeOpen, compact]);
 
+  useEffect(() => {
+    if (!listOpen) return;
+    const current = listOpenerRef.current;
+    if (current && current.isConnected) return;
+    listOpenerRef.current =
+      (compact ? listMenuItemRef.current : listButtonRef.current) ??
+      menuButtonRef.current;
+  }, [listOpen, compact]);
+
+  // Return focus to the opener once the list dialog has closed (Req 5.7).
+  const wasListOpenRef = useRef(false);
+  useEffect(() => {
+    if (wasListOpenRef.current && !listOpen) {
+      const opener = listOpenerRef.current;
+      (opener && opener.isConnected ? opener : menuButtonRef.current)?.focus();
+    }
+    wasListOpenRef.current = listOpen;
+  }, [listOpen]);
+
+  function openList(opener: HTMLElement | null) {
+    listOpenerRef.current = opener ?? menuButtonRef.current;
+    setListOpen(true);
+  }
+
   const badgeClasses =
-    "pointer-events-auto min-h-11 rounded-md border border-candle-400 px-3 py-2 font-ui text-sm text-scene-fg " +
+    "day-chrome-btn pointer-events-auto min-h-11 rounded-md border border-candle-400 px-3 py-2 font-ui text-sm text-scene-fg " +
     "transition-colors hover:bg-candle-400/20 " +
     "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
     "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky";
@@ -197,9 +228,9 @@ export default function Header({
       <div className="flex min-w-0 items-start gap-2 max-[767px]:w-full max-[767px]:flex-nowrap min-[768px]:contents">
         {/* LEFT cluster: wordmark + username badge on one row, summary beneath. */}
         <div className="flex min-w-0 flex-col gap-2 max-[767px]:flex-1">
-          <div className="flex flex-wrap items-center gap-3 max-[767px]:flex-nowrap max-[767px]:gap-2">
+          <div className="flex flex-wrap items-center gap-3 max-[767px]:gap-x-2 max-[767px]:gap-y-1">
             <h1
-              className="shrink-0 whitespace-nowrap font-wordmark text-3xl leading-none text-crimson-400"
+              className="site-wordmark shrink-0 whitespace-nowrap font-wordmark text-3xl leading-none text-crimson-400"
               style={{ textShadow: "0 0 12px var(--color-crimson-glow)" }}
             >
               Repo Graveyard
@@ -212,7 +243,7 @@ export default function Header({
             {username ? (
               <span
                 data-testid="header-username-badge"
-                className="min-w-0 truncate rounded-full border border-scene-fg-faint bg-night-sky/60 px-3 py-0.5 font-heading text-xs font-bold uppercase tracking-[2px] text-scene-fg"
+                className="day-chrome-btn min-w-0 truncate rounded-full border border-scene-fg-faint bg-night-sky/60 px-3 py-0.5 font-heading text-xs font-bold uppercase tracking-[2px] text-scene-fg"
               >
                 {username}
               </span>
@@ -229,7 +260,7 @@ export default function Header({
           aria-controls={panelId}
           onClick={() => setMenuOpen((open) => !open)}
           className={
-            "pointer-events-auto min-h-11 min-w-11 shrink-0 rounded-md border border-candle-400 px-3 " +
+            "day-chrome-btn pointer-events-auto min-h-11 min-w-11 shrink-0 rounded-md border border-candle-400 px-3 " +
             "font-ui text-sm text-scene-fg transition-colors hover:bg-candle-400/20 min-[768px]:hidden " +
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
             "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
@@ -246,7 +277,7 @@ export default function Header({
       <div
         id={panelId}
         className={[
-          "flex-col items-end gap-1 [@media(max-height:899px)]:items-start",
+          "day-chrome-menu flex-col items-end gap-1 [@media(max-height:899px)]:items-start",
           "max-[767px]:items-stretch max-[767px]:rounded-md max-[767px]:bg-night-sky/90 max-[767px]:p-3",
           menuOpen ? "flex" : "max-[767px]:hidden min-[768px]:flex",
         ].join(" ")}
@@ -272,8 +303,9 @@ export default function Header({
               aria-invalid={hasError}
               aria-describedby={hasError ? errorId : undefined}
               placeholder="Visit another graveyard"
+              title="Type any GitHub username to see their graveyard"
               className={
-                "w-44 rounded-md border border-scene-fg-faint bg-night-sky/60 px-3 py-2 " +
+                "day-chrome-btn w-44 md:w-24 lg:w-44 rounded-md border border-scene-fg-faint bg-night-sky/60 px-3 py-2 " +
                 "font-fact text-sm text-scene-fg placeholder:text-scene-fg-faint " +
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-candle-400 " +
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-night-sky"
@@ -296,30 +328,61 @@ export default function Header({
             label="Lights on"
             pressed={lightsOn}
             onChange={onLightsOnChange}
+            hint="Lights on shows the same world in daylight. Lights off brings the night back."
           />
-          <Toggle label="Sound" pressed={soundOn} onChange={onSoundChange} />
+          <Toggle
+            label="Sound"
+            pressed={soundOn}
+            onChange={onSoundChange}
+            hint="Ambient sound and effects. Off by default."
+          />
+          {listAvailable && !compact ? (
+            <button
+              ref={listButtonRef}
+              type="button"
+              data-testid="view-list-button"
+              onClick={(e) => openList(e.currentTarget)}
+              className={badgeClasses}
+            >
+              View as list
+            </button>
+          ) : null}
           {badgeAvailable && !compact ? (
             <button
               ref={badgeButtonRef}
               type="button"
               data-testid="get-badge-button"
+              title="Put a small live picture of your graveyard in your GitHub README"
               onClick={(e) => openBadge(e.currentTarget)}
               className={badgeClasses}
             >
-              Get a badge
+              Share your graveyard
             </button>
           ) : null}
         </div>
+
+        {listAvailable && compact ? (
+          <button
+            ref={listMenuItemRef}
+            type="button"
+            data-testid="view-list-menu-item"
+            onClick={(e) => openList(e.currentTarget)}
+            className={badgeClasses + " mt-1 w-full"}
+          >
+            View as list
+          </button>
+        ) : null}
 
         {badgeAvailable && compact ? (
           <button
             ref={badgeMenuItemRef}
             type="button"
             data-testid="get-badge-menu-item"
+            title="Put a small live picture of your graveyard in your GitHub README"
             onClick={(e) => openBadge(e.currentTarget)}
             className={badgeClasses + " mt-1 w-full"}
           >
-            Get a badge
+            Share your graveyard
           </button>
         ) : null}
 
@@ -336,6 +399,14 @@ export default function Header({
           className="pointer-events-auto mt-1 min-[768px]:hidden"
         />
       </div>
+      {listAvailable ? (
+        <ListDialog
+          open={listOpen}
+          onClose={() => setListOpen(false)}
+          rows={rows}
+          username={username}
+        />
+      ) : null}
       {badgeOpen ? (
         <GetBadgeDialog
           owner={username}

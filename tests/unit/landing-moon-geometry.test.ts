@@ -55,7 +55,7 @@ describe("landing moon geometry", () => {
 
 describe("place title clears the Return link (non-compact layout)", () => {
   it("PlaceView title block carries place-title-clear, defined in globals.css", () => {
-    expect(css("components/scene/PlaceView.tsx")).toContain("place-title-clear");
+    expect(css("components/scene/GatePlaceView.tsx")).toContain("place-title-clear");
     const g = css("app/globals.css");
     expect(g).toMatch(/\.place-title-clear\s*\{\s*padding-top:\s*4\.5rem/);
     expect(g).toContain("@media (min-width: 1100px)");

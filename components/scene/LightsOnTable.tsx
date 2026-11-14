@@ -10,15 +10,16 @@
  * loader / `buildRows`), which is the default "Last push descending" ordering.
  *
  * This is a purely presentational component: it fetches no data, holds no
- * client state, and needs no client-only APIs, so it carries no "use client"
- * and can render on the server. Interactivity (the Lights-on toggle,
+ * client state, and needs no client-only APIs (it reads the theme through
+ * context, so it renders under client parents). Interactivity (the Lights-on toggle,
  * column-header re-sorting) lives in the owning client component.
  *
  * The register carries a **Place** column (`PLACES[placeOf(row)].name`)
  * alongside the existing Repository, State, Quiet-for, and Decay columns, so
  * the full list reads clearly across all four places (estate-map Req 14.2,
  * 14.3). `placeOf` is the frozen, pure state→place mapping, so the column stays
- * presentational and server-renderable — no client state or clock is needed.
+ * presentational. The only context it reads is the theme (`useTheme`, which
+ * returns night outside a provider), so it is rendered from client components.
  *
  * Styling uses the warm-paper register tokens from `app/globals.css`
  * (`--color-paper-*`, `--color-ink-*`, `--color-candle-tan`) and the scene
@@ -33,7 +34,9 @@
 import type { CSSProperties } from "react";
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
-import { PLACES, placeOf } from "@/lib/estate-view";
+import { placeOf } from "@/lib/estate-view";
+import { dayCopy, placeNameKey } from "@/lib/day-copy";
+import { useTheme } from "@/components/scene/ThemeProvider";
 import type { LifecycleState } from "@/lib/lifecycle";
 
 export interface LightsOnTableProps {
@@ -107,6 +110,7 @@ const pillStyle: CSSProperties = {
  * where applicable (ghost and zombie rows only; otherwise an em dash).
  */
 export default function LightsOnTable({ rows, username }: LightsOnTableProps) {
+  const { theme } = useTheme();
   const owner = username?.trim();
   const caption = owner
     ? `The estate register for ${owner} — ${rows.length} ${
@@ -158,7 +162,7 @@ export default function LightsOnTable({ rows, username }: LightsOnTableProps) {
                   className="border-b px-6 py-4 font-[family-name:var(--font-fact)] text-[11px] font-medium uppercase tracking-[1.5px]"
                   style={headCellStyle}
                 >
-                  Place
+                  {dayCopy(theme, "table.place")}
                 </th>
                 <th
                   scope="col"
@@ -214,7 +218,7 @@ export default function LightsOnTable({ rows, username }: LightsOnTableProps) {
                       className="border-b px-6 py-3 font-[family-name:var(--font-fact)] text-sm"
                       style={bodyCellStyle}
                     >
-                      {PLACES[placeOf(row)].name}
+                      {dayCopy(theme, placeNameKey(placeOf(row)))}
                     </td>
                     <td
                       className="border-b px-6 py-3"

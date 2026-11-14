@@ -4,11 +4,11 @@
  * Pins the boards' bevelled-iron treatment onto the restyled chips, buttons,
  * and the new creature plaque:
  *
- *   - filter chips carry the inactive `.chip2` class; the active filter chip
- *     adds the `.chip2.on` modifier so it is visually distinct from every
- *     inactive chip, which never carries `.on` (Req 7.2, 7.3);
- *   - the iron buttons (`ReturnToGate`, both `Pager` controls) carry `.btn2`
- *     (Req 7.1);
+ *   - filter chips carry the shared `.fixture-ledge` class; the active filter
+ *     chip adds the `border-crimson-400!` modifier so it is visually distinct
+ *     from every inactive chip, which never carries it (Req 7.2, 7.3);
+ *   - the iron buttons (`ReturnToGate`, both `Pager` controls) carry the
+ *     `.fixture-rail` class (Req 7.1);
  *   - the plaque renders exactly one Cinzel name line (`.plq b`) and exactly
  *     one monospace sub-line (`.plq i`), caps its width at the fixed `PLAQUE_W`,
  *     ellipsizes a long name instead of widening, and exposes the full name via
@@ -69,7 +69,7 @@ describe("FilterChips iron/crimson treatment (7.2, 7.3)", () => {
     expect(chips.length).toBeGreaterThan(0);
     // Every chip is a .chip2 bevelled plaque (Req 7.2).
     for (const chip of chips) {
-      expect(chip.classList.contains("chip2")).toBe(true);
+      expect(chip.classList.contains("fixture-ledge")).toBe(true);
     }
   });
 
@@ -89,9 +89,9 @@ describe("FilterChips iron/crimson treatment (7.2, 7.3)", () => {
     const activeChip = screen.getByTestId(`filter-chip-${active}`);
     // The active chip carries both .chip2 and the .on crimson modifier, so
     // `.chip2.on` matches it — it is visually distinguishable from the rest.
-    expect(activeChip.classList.contains("chip2")).toBe(true);
-    expect(activeChip.classList.contains("on")).toBe(true);
-    expect(activeChip.matches(".chip2.on")).toBe(true);
+    expect(activeChip.classList.contains("fixture-ledge")).toBe(true);
+    expect(activeChip.classList.contains("border-crimson-400!")).toBe(true);
+    expect(activeChip.matches('.fixture-ledge[class~="border-crimson-400!"]')).toBe(true);
 
     // Every other (inactive) chip is a plain .chip2 with no .on modifier.
     const inactiveChips = Array.from(
@@ -99,9 +99,9 @@ describe("FilterChips iron/crimson treatment (7.2, 7.3)", () => {
     ).filter((chip) => chip !== activeChip);
     expect(inactiveChips.length).toBeGreaterThan(0);
     for (const chip of inactiveChips) {
-      expect(chip.classList.contains("chip2")).toBe(true);
-      expect(chip.classList.contains("on")).toBe(false);
-      expect(chip.matches(".chip2.on")).toBe(false);
+      expect(chip.classList.contains("fixture-ledge")).toBe(true);
+      expect(chip.classList.contains("border-crimson-400!")).toBe(false);
+      expect(chip.matches('.fixture-ledge[class~="border-crimson-400!"]')).toBe(false);
     }
   });
 
@@ -117,10 +117,10 @@ describe("FilterChips iron/crimson treatment (7.2, 7.3)", () => {
         onFilterChange={noop}
       />,
     );
-    expect(screen.getByTestId("filter-chip-all").matches(".chip2.on")).toBe(
+    expect(screen.getByTestId("filter-chip-all").matches('.fixture-ledge[class~="border-crimson-400!"]')).toBe(
       true,
     );
-    expect(screen.getByTestId("filter-chip-fresh").matches(".chip2.on")).toBe(
+    expect(screen.getByTestId("filter-chip-fresh").matches('.fixture-ledge[class~="border-crimson-400!"]')).toBe(
       false,
     );
 
@@ -132,16 +132,16 @@ describe("FilterChips iron/crimson treatment (7.2, 7.3)", () => {
         onFilterChange={noop}
       />,
     );
-    expect(screen.getByTestId("filter-chip-all").matches(".chip2.on")).toBe(
+    expect(screen.getByTestId("filter-chip-all").matches('.fixture-ledge[class~="border-crimson-400!"]')).toBe(
       false,
     );
-    expect(screen.getByTestId("filter-chip-fresh").matches(".chip2.on")).toBe(
+    expect(screen.getByTestId("filter-chip-fresh").matches('.fixture-ledge[class~="border-crimson-400!"]')).toBe(
       true,
     );
 
     // Exactly one chip is the active crimson chip at a time.
     const onChips = Array.from(
-      screen.getByTestId("filter-chips").querySelectorAll("button.chip2.on"),
+      screen.getByTestId("filter-chips").querySelectorAll('button.fixture-ledge[class~="border-crimson-400!"]'),
     );
     expect(onChips).toHaveLength(1);
   });
@@ -153,7 +153,7 @@ describe("Iron buttons carry .btn2 (7.1)", () => {
 
     const ret = screen.getByTestId("return-to-gate");
     expect(ret.tagName).toBe("BUTTON");
-    expect(ret.classList.contains("btn2")).toBe(true);
+    expect(ret.classList.contains("fixture-rail")).toBe(true);
   });
 
   it("renders both pager controls as .btn2 iron plaques", () => {
@@ -162,8 +162,8 @@ describe("Iron buttons carry .btn2 (7.1)", () => {
 
     const nearer = screen.getByTestId("pager-nearer");
     const deeper = screen.getByTestId("pager-deeper");
-    expect(nearer.classList.contains("btn2")).toBe(true);
-    expect(deeper.classList.contains("btn2")).toBe(true);
+    expect(nearer.classList.contains("fixture-rail")).toBe(true);
+    expect(deeper.classList.contains("fixture-rail")).toBe(true);
   });
 });
 

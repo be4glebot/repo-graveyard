@@ -26,7 +26,10 @@
  * Requirements: 2.3, 2.5
  */
 
+"use client";
+
 import FadeArt from "@/components/scene/FadeArt";
+import { useTheme } from "@/components/scene/ThemeProvider";
 
 /** Base path for the backdrop art plates under `public/art`. */
 const ART_BASE = "/art";
@@ -40,6 +43,9 @@ export interface BackdropProps {
 }
 
 export default function Backdrop({ className }: BackdropProps) {
+  const { theme } = useTheme();
+  // Day: no gothic plates. `Sky` already draws the day palette behind this.
+  if (theme === "day") return null;
   return (
     <div
       aria-hidden="true"

@@ -1,0 +1,116 @@
+[
+ {
+  "place": "gate",
+  "w": 1440,
+  "h": 900,
+  "creatures": 6,
+  "pairsTested": 30,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "sky",
+  "w": 1440,
+  "h": 900,
+  "creatures": 4,
+  "pairsTested": 12,
+  "covered": 2,
+  "examples": [
+   {
+    "hover": "cobweb-cli",
+    "coveredCreature": "fenwick-timer",
+    "card": {
+     "x": 1128,
+     "y": 471,
+     "r": 1416,
+     "b": 625.5
+    }
+   },
+   {
+    "hover": "fenwick-timer",
+    "coveredCreature": "cobweb-cli",
+    "card": {
+     "x": 1125,
+     "y": 562,
+     "r": 1413,
+     "b": 716.5
+    }
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "w": 1440,
+  "h": 900,
+  "creatures": 3,
+  "pairsTested": 6,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "crypt",
+  "w": 1440,
+  "h": 900,
+  "creatures": 2,
+  "pairsTested": 2,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "gate",
+  "w": 1280,
+  "h": 720,
+  "creatures": 6,
+  "pairsTested": 30,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "sky",
+  "w": 1280,
+  "h": 720,
+  "creatures": 4,
+  "pairsTested": 12,
+  "covered": 2,
+  "examples": [
+   {
+    "hover": "cobweb-cli",
+    "coveredCreature": "fenwick-timer",
+    "card": {
+     "x": 984,
+     "y": 342,
+     "r": 1272,
+     "b": 496.5
+    }
+   },
+   {
+    "hover": "fenwick-timer",
+    "coveredCreature": "cobweb-cli",
+    "card": {
+     "x": 982,
+     "y": 440,
+     "r": 1270,
+     "b": 594.5
+    }
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "w": 1280,
+  "h": 720,
+  "creatures": 3,
+  "pairsTested": 6,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "crypt",
+  "w": 1280,
+  "h": 720,
+  "creatures": 2,
+  "pairsTested": 2,
+  "covered": 0,
+  "examples": []
+ }
+]

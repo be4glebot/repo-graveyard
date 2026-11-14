@@ -6,6 +6,10 @@
  *
  * Requirements: 1.8, 7.10
  */
+"use client";
+
+import { useTheme } from "@/components/scene/ThemeProvider";
+import { themeArt, type Theme } from "@/lib/theme-art";
 
 /** Fixed opacities for the far and near layers. */
 const FAR_OPACITY = 0.3;
@@ -18,12 +22,14 @@ export interface ShellFogProps {
 }
 
 function Layer({
+  theme,
   testId,
   art,
   height,
   opacity,
   driftClass,
 }: {
+  theme: Theme;
   testId: string;
   art: string;
   height: string;
@@ -46,7 +52,7 @@ function Layer({
       <div
         className={`absolute inset-y-0 left-0 w-[200%] ${driftClass}`}
         style={{
-          backgroundImage: `url(/art/${art}.webp)`,
+          backgroundImage: `url(${themeArt(theme, `/art/${art}.webp`)})`,
           backgroundSize: "auto 100%",
           backgroundRepeat: "repeat-x",
         }}
@@ -56,9 +62,15 @@ function Layer({
 }
 
 export default function ShellFog({ reducedMotion = false }: ShellFogProps) {
+  const { theme } = useTheme();
+  // Daytime has no fog.
+  if (theme === "day") {
+    return null;
+  }
   return (
     <>
       <Layer
+        theme={theme}
         testId="shell-fog-far"
         art="fog-wisps"
         height="55%"
@@ -66,6 +78,7 @@ export default function ShellFog({ reducedMotion = false }: ShellFogProps) {
         driftClass={reducedMotion ? "" : "fog-wisps"}
       />
       <Layer
+        theme={theme}
         testId="shell-fog-near"
         art="fog-wisps-thin"
         height="30%"

@@ -7,7 +7,7 @@
  */
 import { useRef, useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
 import { GetBadgeDialog } from "@/components/badge/GetBadgeDialog";
 import { RepoBadgeDialog } from "@/components/badge/RepoBadgeDialog";
@@ -50,10 +50,11 @@ function Harness({ kind }: { kind: Kind }) {
 const opener = () => screen.getByRole("button", { name: "Open badge" });
 const dialog = () => screen.queryByRole("dialog");
 const active = () => document.activeElement as HTMLElement | null;
-const radio = (name: string) => screen.getByRole("radio", { name }) as HTMLInputElement;
-const markdown = () => (screen.getByLabelText("Markdown") as HTMLTextAreaElement).value;
-const html = () => (screen.getByLabelText("HTML") as HTMLTextAreaElement).value;
-const preview = () => screen.getByRole("img") as HTMLImageElement;
+const radio = (name: RegExp) => screen.getByRole("radio", { name }) as HTMLInputElement;
+const markdown = () => (screen.getByLabelText(/Markdown/) as HTMLTextAreaElement).value;
+const html = () => (screen.getByLabelText(/HTML/) as HTMLTextAreaElement).value;
+const preview = () =>
+  within(screen.getByTestId("badge-preview")).getByRole("img") as HTMLImageElement;
 const status = () => screen.getByRole("status");
 const FOCUSABLE =
   'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
@@ -97,7 +98,7 @@ describe.each([
     expect(html()).toBe(`<a href="${link}"><img src="${img}" alt="Repo Graveyard"></a>`);
     expect(preview().getAttribute("src")).toBe(path);
 
-    fireEvent.click(radio("Flat"));
+    fireEvent.click(radio(/Flat/));
     expect(markdown()).toBe(`[![Repo Graveyard](${img}?style=flat)](${link})`);
     expect(html()).toBe(
       `<a href="${link}"><img src="${img}?style=flat" alt="Repo Graveyard"></a>`,
@@ -108,11 +109,11 @@ describe.each([
 
   it("toggles style in one act and resets to haunted after close and reopen", () => {
     openDialog(kind);
-    expect(radio("Haunted").checked).toBe(true);
+    expect(radio(/Haunted/).checked).toBe(true);
     act(() => {
-      fireEvent.click(radio("Flat"));
+      fireEvent.click(radio(/Flat/));
     });
-    expect(radio("Flat").checked).toBe(true);
+    expect(radio(/Flat/).checked).toBe(true);
     expect(preview().getAttribute("src")).toContain("?style=flat");
     expect(markdown()).toContain("?style=flat");
     expect(html()).toContain("?style=flat");
@@ -120,8 +121,49 @@ describe.each([
     fireEvent.keyDown(window, { key: "Escape" });
     expect(dialog()).toBeNull();
     fireEvent.click(opener());
-    expect(radio("Haunted").checked).toBe(true);
+    expect(radio(/Haunted/).checked).toBe(true);
     expect(preview().getAttribute("src")).not.toContain("style=");
+  });
+
+  it("style picker: radiogroup of two cards with plain names, explanations and live thumbnails", () => {
+    openDialog(kind);
+    const group = screen.getByRole("radiogroup");
+    expect(within(group).getAllByRole("radio").length).toBe(2);
+    expect(radio(/Haunted/).getAttribute("name")).toBe(radio(/Flat/).getAttribute("name"));
+    expect(radio(/Haunted/).classList.contains("seance-focus")).toBe(true);
+    expect(group.textContent).toContain("Spooky");
+    expect(group.textContent).toContain("Plain");
+    expect(group.textContent).toMatch(/matches this site/);
+    expect(group.textContent).toMatch(/blends with other README badges/);
+
+    const thumbs = within(group).getAllByTestId("style-thumb") as HTMLImageElement[];
+    expect(thumbs.map((t) => t.getAttribute("src"))).toEqual([path, `${path}?style=flat`]);
+  });
+
+  it("selecting a card highlights it and updates snippets and the main preview", () => {
+    openDialog(kind);
+    const card = (s: string) => screen.getByTestId(`style-card-${s}`);
+    expect(card("haunted").getAttribute("data-selected")).toBe("true");
+    expect(card("flat").getAttribute("data-selected")).toBe("false");
+    fireEvent.click(radio(/Flat/));
+    expect(card("flat").getAttribute("data-selected")).toBe("true");
+    expect(card("haunted").getAttribute("data-selected")).toBe("false");
+    expect(markdown()).toContain("?style=flat");
+    expect(preview().getAttribute("src")).toBe(`${path}?style=flat`);
+  });
+
+  it("thumbnails show a loading skeleton, then the image, and plain text on error", () => {
+    openDialog(kind);
+    const [haunted, flat] = screen.getAllByTestId("style-thumb");
+    expect(screen.getAllByTestId("style-thumb-loading").length).toBe(2);
+    fireEvent.load(haunted);
+    expect(screen.getAllByTestId("style-thumb-loading").length).toBe(1);
+    fireEvent.error(flat);
+    expect(screen.queryAllByTestId("style-thumb-loading").length).toBe(0);
+    expect(screen.getByTestId("style-thumb-failed").textContent).toMatch(/unavailable/i);
+    // The other style and the controls are unaffected.
+    expect(screen.getAllByTestId("style-thumb").length).toBe(1);
+    expect(radio(/Flat/)).toBeTruthy();
   });
 
   it("copies the exact snippet and announces Copied, clearing after 2000 ms", async () => {
@@ -156,7 +198,7 @@ describe.each([
     await flush();
     expect(status().textContent).toMatch(/could not copy/i);
     expect(dialog()).not.toBeNull();
-    const area = screen.getByLabelText("Markdown") as HTMLTextAreaElement;
+    const area = screen.getByLabelText(/Markdown/) as HTMLTextAreaElement;
     expect(area.readOnly).toBe(true);
     expect(area.disabled).toBe(false);
     expect(area.value).toContain("[![Repo Graveyard]");
@@ -171,21 +213,21 @@ describe.each([
     await flush();
     expect(status().textContent).toMatch(/could not copy/i);
     expect(dialog()).not.toBeNull();
-    expect((screen.getByLabelText("HTML") as HTMLTextAreaElement).value).toContain("<a href");
+    expect((screen.getByLabelText(/HTML/) as HTMLTextAreaElement).value).toContain("<a href");
   });
 
   it("falls back to text naming the subject when the preview errors, keeping controls operable", () => {
     openDialog(kind);
     const mdBefore = markdown();
     fireEvent.error(preview());
-    expect(screen.queryByRole("img")).toBeNull();
+    expect(within(screen.getByTestId("badge-preview")).queryByRole("img")).toBeNull();
     const text = screen.getByTestId("badge-preview").textContent ?? "";
     expect(text).toContain(subject);
     expect(markdown()).toBe(mdBefore);
     expect(screen.getByRole("button", { name: "Copy Markdown" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Copy HTML" })).toBeTruthy();
-    fireEvent.click(radio("Flat"));
-    expect(radio("Flat").checked).toBe(true);
+    fireEvent.click(radio(/Flat/));
+    expect(radio(/Flat/).checked).toBe(true);
     expect(markdown()).toContain("?style=flat");
   });
 
@@ -235,9 +277,9 @@ describe.each([
     expect(d.getAttribute("aria-modal")).toBe("true");
     const labelledBy = d.getAttribute("aria-labelledby")!;
     expect(document.getElementById(labelledBy)?.textContent).toBe(
-      kind === "owner" ? "Get a badge" : "Badge for this repo",
+      kind === "owner" ? "Share your graveyard" : "Share this repo",
     );
-    expect(screen.getByRole("dialog", { name: /badge/i })).toBe(d);
+    expect(screen.getByRole("dialog", { name: /share/i })).toBe(d);
     expect(container.hasAttribute("inert")).toBe(true);
 
     fireEvent.keyDown(window, { key: "Escape" });

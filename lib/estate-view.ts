@@ -17,6 +17,8 @@
 import { type LifecycleState } from "./lifecycle";
 import { type GraveyardRow } from "./graveyard-view";
 import { selectInitialCreature } from "./scene-view";
+import { dayCopy, dayCopyN } from "./day-copy";
+import type { Theme } from "./theme-art";
 
 // ---------------------------------------------------------------------------
 // Place model (single source of truth for the four places)
@@ -528,27 +530,33 @@ export function plaqueCopy(
   place: PlaceId,
   count: number,
   risenCount?: number,
+  theme: Theme = "night",
 ): string {
   const c = toCount(count);
   const r = toCount(risenCount ?? 0);
+  const one = c === 1;
 
   switch (place) {
     case "sky":
       return c === 0
-        ? "No ghosts linger"
-        : `${c} ghost${plural(c)} still ${verb(c, "wanders", "wander")}`;
+        ? dayCopy(theme, "plaque.sky.empty")
+        : dayCopyN(theme, one ? "plaque.sky.one" : "plaque.sky.many", c);
 
     case "gate": {
       // Base clause describes the zombies ("the undead") at the gate.
       const base =
         c === 0
-          ? "The gate stands empty"
-          : `${c} undead ${verb(c, "shambles", "shamble")} here, waiting for a verdict`;
+          ? dayCopy(theme, "plaque.gate.empty")
+          : dayCopyN(theme, one ? "plaque.gate.one" : "plaque.gate.many", c);
       // The risen are reported as a separate clause, only when any are present.
       if (r === 0) {
         return base;
       }
-      const risenClause = `${r} ${verb(r, "has", "have")} risen`;
+      const risenClause = dayCopyN(
+        theme,
+        r === 1 ? "plaque.gate.risen.one" : "plaque.gate.risen.many",
+        r,
+      );
       // Only risen present: the standalone risen clause is the whole line.
       // Both present: append the risen clause after the zombie base clause.
       return c === 0 ? risenClause : `${base} · ${risenClause}`;
@@ -556,11 +564,13 @@ export function plaqueCopy(
 
     case "ground":
       return c === 0
-        ? "No finished works at rest"
-        : `${c} finished work${plural(c)} at rest`;
+        ? dayCopy(theme, "plaque.ground.empty")
+        : dayCopyN(theme, one ? "plaque.ground.one" : "plaque.ground.many", c);
 
     case "crypt":
-      return c === 0 ? "No one sealed away yet" : `${c} sealed away`;
+      return c === 0
+        ? dayCopy(theme, "plaque.crypt.empty")
+        : dayCopyN(theme, "plaque.crypt.many", c);
 
     default: {
       // Exhaustiveness guard: a new `PlaceId` member fails to compile here,
@@ -615,7 +625,7 @@ export interface ScatterPlacement {
  * values of the classic `xmur3` construction. Only the first value is consumed
  * here (as the PRNG seed), but the closure form matches the canonical snippet.
  */
-function xmur3(str: string): () => number {
+export function xmur3(str: string): () => number {
   let h = 1779033703 ^ str.length;
   for (let i = 0; i < str.length; i++) {
     h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
@@ -634,7 +644,7 @@ function xmur3(str: string): () => number {
  * integer. Returns a closure producing successive floats in `[0, 1)`. Pure and
  * deterministic: a given seed always yields the same stream.
  */
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a |= 0;
@@ -747,7 +757,7 @@ function stageRowCentre(
 
 /** Brightness assigned to the front row; each row behind steps down by a band. */
 const SCATTER_FRONT_BRIGHTNESS = 1;
-const SCATTER_BRIGHTNESS_STEP = 0.18;
+export const SCATTER_BRIGHTNESS_STEP = 0.18;
 
 /**
  * Draws a float in `[min, max)` from a per-name stream, mapping a `[0, 1)` draw
@@ -1641,6 +1651,28 @@ export const PLACE_CARD_W_PX = 260;
  * plaque of up to ~116px (padding, name, a count line that may wrap, CTA).
  */
 export const PLACE_CARD_H_PX = 140 + 12 + 116;
+
+/**
+ * Minimum Hub board height (px) on desktop. Below this viewport height the map
+ * keeps this height and the page scrolls. Mirrored by the static Tailwind class
+ * `md:[@media(max-height:699px)]:min-h-[700px]` in `EstateMap` (keep in sync).
+ */
+export const HUB_MIN_BOARD_H_PX = 700;
+
+/**
+ * Hub footer width limits (CSS `calc()` strings, percent of the footer width) that
+ * keep the sample-estate notice (left) and the legend (right) clear of the gate
+ * card in the middle: the gate card is centred at `PLACE_CENTERS.gate.x` and is
+ * `PLACE_CARD_W_PX` wide; `margin` px is kept on each side. They wrap instead.
+ */
+export function hubFooterLimits(margin = 16): { noticeMaxWidth: string; legendMaxWidth: string } {
+  const gx = Math.round(PLACE_CENTERS.gate.x * 1000) / 10;
+  const half = PLACE_CARD_W_PX / 2 + margin;
+  return {
+    noticeMaxWidth: `calc(${gx}% - ${half + margin}px)`,
+    legendMaxWidth: `calc(${100 - gx}% - ${half + margin}px)`,
+  };
+}
 
 /** Header band height (px): `--site-header-h` (7rem) in `app/globals.css`. */
 export const HEADER_H_PX = 112;

@@ -1,0 +1,334 @@
+[
+ {
+  "w": 737,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 287.3984375,
+    "y": 612.578125,
+    "r": 405.4453125,
+    "b": 660.578125,
+    "w": 118.046875,
+    "h": 48
+   }
+  ],
+  "overlaps": [
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate",
+    "overlapW": 118,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:Beyond the Gate",
+    "overlapW": 118,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:5 undead shamble here, waiting",
+    "overlapW": 118,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque",
+    "overlapW": 118,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:Beyond the Gate",
+    "overlapW": 118,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:5 undead shamble here, waiting",
+    "overlapW": 118,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-name",
+    "overlapW": 118,
+    "overlapH": 28
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-count",
+    "overlapW": 118,
+    "overlapH": 14.3
+   }
+  ]
+ },
+ {
+  "w": 737,
+  "h": 800,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 287.3984375,
+    "y": 612.578125,
+    "r": 405.4453125,
+    "b": 660.578125,
+    "w": 118.046875,
+    "h": 48
+   }
+  ],
+  "overlaps": [
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate",
+    "overlapW": 118,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:Beyond the Gate",
+    "overlapW": 118,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:5 undead shamble here, waiting",
+    "overlapW": 118,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque",
+    "overlapW": 118,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:Beyond the Gate",
+    "overlapW": 118,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:5 undead shamble here, waiting",
+    "overlapW": 118,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-name",
+    "overlapW": 118,
+    "overlapH": 28
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-count",
+    "overlapW": 118,
+    "overlapH": 14.3
+   }
+  ]
+ },
+ {
+  "w": 737,
+  "h": 900,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 287.3984375,
+    "y": 612.578125,
+    "r": 405.4453125,
+    "b": 660.578125,
+    "w": 118.046875,
+    "h": 48
+   }
+  ],
+  "overlaps": [
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate",
+    "overlapW": 118,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:Beyond the Gate",
+    "overlapW": 118,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:5 undead shamble here, waiting",
+    "overlapW": 118,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque",
+    "overlapW": 118,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:Beyond the Gate",
+    "overlapW": 118,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:5 undead shamble here, waiting",
+    "overlapW": 118,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-name",
+    "overlapW": 118,
+    "overlapH": 28
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-count",
+    "overlapW": 118,
+    "overlapH": 14.3
+   }
+  ]
+ },
+ {
+  "w": 700,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 280,
+    "y": 612.578125,
+    "r": 376.59375,
+    "b": 660.578125,
+    "w": 96.59375,
+    "h": 48
+   }
+  ],
+  "overlaps": [
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate",
+    "overlapW": 96.6,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:Beyond the Gate",
+    "overlapW": 96.6,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate text:5 undead shamble here, waiting",
+    "overlapW": 96.6,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque",
+    "overlapW": 96.6,
+    "overlapH": 48
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:Beyond the Gate",
+    "overlapW": 96.6,
+    "overlapH": 25
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-plaque text:5 undead shamble here, waiting",
+    "overlapW": 96.6,
+    "overlapH": 14.3
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-name",
+    "overlapW": 96.6,
+    "overlapH": 28
+   },
+   {
+    "whisper": "whisper:dusk-scheduler is still waiting for you…",
+    "with": "estate-place-gate-count",
+    "overlapW": 96.6,
+    "overlapH": 14.3
+   }
+  ]
+ },
+ {
+  "w": 768,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 296.6015625,
+    "y": 316.796875,
+    "r": 441.3359375,
+    "b": 364.796875,
+    "w": 144.734375,
+    "h": 48
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 800,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 302.9921875,
+    "y": 316.796875,
+    "r": 466.2890625,
+    "b": 364.796875,
+    "w": 163.296875,
+    "h": 48
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 1280,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 507.421875,
+    "y": 316.796875,
+    "r": 732.265625,
+    "b": 340.796875,
+    "w": 224.84375,
+    "h": 24
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 1440,
+  "h": 900,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 585.828125,
+    "y": 396,
+    "r": 810.671875,
+    "b": 420,
+    "w": 224.84375,
+    "h": 24
+   }
+  ],
+  "overlaps": []
+ }
+]

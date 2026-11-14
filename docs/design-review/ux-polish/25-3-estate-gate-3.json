@@ -1,0 +1,759 @@
+{
+  "sizes": [
+    [
+      320,
+      500
+    ],
+    [
+      360,
+      500
+    ],
+    [
+      390,
+      500
+    ],
+    [
+      414,
+      500
+    ],
+    [
+      600,
+      500
+    ],
+    [
+      700,
+      500
+    ],
+    [
+      737,
+      500
+    ],
+    [
+      768,
+      500
+    ],
+    [
+      820,
+      500
+    ],
+    [
+      1024,
+      500
+    ],
+    [
+      1180,
+      500
+    ],
+    [
+      1280,
+      500
+    ],
+    [
+      1366,
+      500
+    ],
+    [
+      1440,
+      500
+    ],
+    [
+      1536,
+      500
+    ],
+    [
+      1920,
+      500
+    ],
+    [
+      2560,
+      500
+    ],
+    [
+      320,
+      720
+    ],
+    [
+      360,
+      720
+    ],
+    [
+      390,
+      720
+    ],
+    [
+      414,
+      720
+    ],
+    [
+      600,
+      720
+    ],
+    [
+      700,
+      720
+    ],
+    [
+      737,
+      720
+    ],
+    [
+      768,
+      720
+    ],
+    [
+      820,
+      720
+    ],
+    [
+      1024,
+      720
+    ],
+    [
+      1180,
+      720
+    ],
+    [
+      1280,
+      720
+    ],
+    [
+      1366,
+      720
+    ],
+    [
+      1440,
+      720
+    ],
+    [
+      1536,
+      720
+    ],
+    [
+      1920,
+      720
+    ],
+    [
+      2560,
+      720
+    ],
+    [
+      320,
+      900
+    ],
+    [
+      360,
+      900
+    ],
+    [
+      390,
+      900
+    ],
+    [
+      414,
+      900
+    ],
+    [
+      600,
+      900
+    ],
+    [
+      700,
+      900
+    ],
+    [
+      737,
+      900
+    ],
+    [
+      768,
+      900
+    ],
+    [
+      820,
+      900
+    ],
+    [
+      1024,
+      900
+    ],
+    [
+      1180,
+      900
+    ],
+    [
+      1280,
+      900
+    ],
+    [
+      1366,
+      900
+    ],
+    [
+      1440,
+      900
+    ],
+    [
+      1536,
+      900
+    ],
+    [
+      1920,
+      900
+    ],
+    [
+      2560,
+      900
+    ],
+    [
+      390,
+      480
+    ],
+    [
+      390,
+      550
+    ],
+    [
+      390,
+      600
+    ],
+    [
+      390,
+      768
+    ],
+    [
+      390,
+      800
+    ],
+    [
+      390,
+      1080
+    ],
+    [
+      1024,
+      480
+    ],
+    [
+      1024,
+      550
+    ],
+    [
+      1024,
+      600
+    ],
+    [
+      1024,
+      768
+    ],
+    [
+      1024,
+      800
+    ],
+    [
+      1024,
+      1080
+    ],
+    [
+      1440,
+      480
+    ],
+    [
+      1440,
+      550
+    ],
+    [
+      1440,
+      600
+    ],
+    [
+      1440,
+      768
+    ],
+    [
+      1440,
+      800
+    ],
+    [
+      1440,
+      1080
+    ]
+  ],
+  "pages": [
+    "estate"
+  ],
+  "places": [
+    "gate"
+  ],
+  "cases": 69,
+  "findings": [
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "320x500",
+      "kind": "overlap",
+      "a": "chips",
+      "b": "pager",
+      "w": 273,
+      "h": 20
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "320x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:phoenix-draft",
+      "w": 110.5,
+      "h": 19.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "320x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:dusk-scheduler",
+      "w": 110.5,
+      "h": 19.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "360x500",
+      "kind": "overlap",
+      "a": "chips",
+      "b": "pager",
+      "w": 313,
+      "h": 4
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "360x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:phoenix-draft",
+      "w": 130.5,
+      "h": 19.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "360x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:dusk-scheduler",
+      "w": 130.5,
+      "h": 19.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:phoenix-draft",
+      "w": 145.5,
+      "h": 20.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:dusk-scheduler",
+      "w": 145.5,
+      "h": 20.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "414x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:phoenix-draft",
+      "w": 157.5,
+      "h": 24.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "414x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:dusk-scheduler",
+      "w": 157.5,
+      "h": 24.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "414x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gravel-parser",
+      "w": 151.6,
+      "h": 24.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "414x500",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:moth-metrics",
+      "w": 152.2,
+      "h": 24.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "414x500",
+      "kind": "overlap",
+      "a": "tag:gravel-parser",
+      "b": "tag:barrow-sync",
+      "w": 123.5,
+      "h": 3.1
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "414x500",
+      "kind": "overlap",
+      "a": "tag:moth-metrics",
+      "b": "tag:crypt-keeper",
+      "w": 130.8,
+      "h": 3.1
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x480",
+      "kind": "overlap",
+      "a": "chips",
+      "b": "pager",
+      "w": 343,
+      "h": 7
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x550",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:phoenix-draft",
+      "w": 145.5,
+      "h": 22.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x550",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:dusk-scheduler",
+      "w": 145.5,
+      "h": 22.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x550",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gravel-parser",
+      "w": 145.5,
+      "h": 26.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x550",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:moth-metrics",
+      "w": 145.5,
+      "h": 26.3
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x550",
+      "kind": "overlap",
+      "a": "tag:gravel-parser",
+      "b": "tag:barrow-sync",
+      "w": 123.5,
+      "h": 3.1
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x550",
+      "kind": "overlap",
+      "a": "tag:moth-metrics",
+      "b": "tag:crypt-keeper",
+      "w": 130.8,
+      "h": 3.1
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x600",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gravel-parser",
+      "w": 145.5,
+      "h": 16.2
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x600",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:moth-metrics",
+      "w": 145.5,
+      "h": 16.2
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x600",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:barrow-sync",
+      "w": 123.5,
+      "h": 36.9
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x600",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:crypt-keeper",
+      "w": 130.8,
+      "h": 36.9
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x600",
+      "kind": "overlap",
+      "a": "tag:gravel-parser",
+      "b": "tag:barrow-sync",
+      "w": 123.5,
+      "h": 3.1
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "size": "390x600",
+      "kind": "overlap",
+      "a": "tag:moth-metrics",
+      "b": "tag:crypt-keeper",
+      "w": 130.8,
+      "h": 3.1
+    }
+  ],
+  "summary": [
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "chips x pager",
+      "count": 3,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "320x500",
+        "kind": "overlap",
+        "a": "chips",
+        "b": "pager",
+        "w": 273,
+        "h": 20
+      },
+      "worstArea": 5460,
+      "sizes": [
+        "320x500",
+        "360x500",
+        "390x480"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "pager x tag:crypt-keeper",
+      "count": 1,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "390x600",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:crypt-keeper",
+        "w": 130.8,
+        "h": 36.9
+      },
+      "worstArea": 4826.52,
+      "sizes": [
+        "390x600"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "pager x tag:barrow-sync",
+      "count": 1,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "390x600",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:barrow-sync",
+        "w": 123.5,
+        "h": 36.9
+      },
+      "worstArea": 4557.15,
+      "sizes": [
+        "390x600"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "pager x tag:phoenix-draft",
+      "count": 5,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "414x500",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:phoenix-draft",
+        "w": 157.5,
+        "h": 24.3
+      },
+      "worstArea": 3827.25,
+      "sizes": [
+        "320x500",
+        "360x500",
+        "390x500",
+        "414x500",
+        "390x550"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "pager x tag:dusk-scheduler",
+      "count": 5,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "414x500",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:dusk-scheduler",
+        "w": 157.5,
+        "h": 24.3
+      },
+      "worstArea": 3827.25,
+      "sizes": [
+        "320x500",
+        "360x500",
+        "390x500",
+        "414x500",
+        "390x550"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "pager x tag:gravel-parser",
+      "count": 3,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "390x550",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:gravel-parser",
+        "w": 145.5,
+        "h": 26.3
+      },
+      "worstArea": 3826.65,
+      "sizes": [
+        "414x500",
+        "390x550",
+        "390x600"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "pager x tag:moth-metrics",
+      "count": 3,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "390x550",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:moth-metrics",
+        "w": 145.5,
+        "h": 26.3
+      },
+      "worstArea": 3826.65,
+      "sizes": [
+        "414x500",
+        "390x550",
+        "390x600"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "tag:crypt-keeper x tag:moth-metrics",
+      "count": 3,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "414x500",
+        "kind": "overlap",
+        "a": "tag:moth-metrics",
+        "b": "tag:crypt-keeper",
+        "w": 130.8,
+        "h": 3.1
+      },
+      "worstArea": 405.4800000000001,
+      "sizes": [
+        "414x500",
+        "390x550",
+        "390x600"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "gate",
+      "pair": "tag:barrow-sync x tag:gravel-parser",
+      "count": 3,
+      "worst": {
+        "page": "estate",
+        "place": "gate",
+        "size": "414x500",
+        "kind": "overlap",
+        "a": "tag:gravel-parser",
+        "b": "tag:barrow-sync",
+        "w": 123.5,
+        "h": 3.1
+      },
+      "worstArea": 382.85,
+      "sizes": [
+        "414x500",
+        "390x550",
+        "390x600"
+      ]
+    }
+  ]
+}

@@ -84,8 +84,8 @@ import {
 
 import EstateMap from "@/components/scene/EstateMap";
 import Footer from "@/components/scene/Footer";
-import LightsOnTable from "@/components/scene/LightsOnTable";
-import PlaceView from "@/components/scene/PlaceView";
+import { useTheme } from "@/components/scene/ThemeProvider";
+import PlaceView, { type RevealRequest } from "@/components/scene/PlaceView";
 import { TravelRunner } from "@/components/scene/TravelTransition";
 import HoverCardLayer from "@/components/detail/HoverCardLayer";
 import DetailPanel from "@/components/detail/DetailPanel";
@@ -96,7 +96,6 @@ import {
   type HoverCardActions,
 } from "@/components/detail/HoverCardProvider";
 import Header from "@/components/ui/Header";
-import Toggle from "@/components/ui/Toggle";
 
 import {
   type PlaceFilter,
@@ -281,11 +280,25 @@ export default function SceneView({
     setPanelOpen(false);
   }, []);
 
+  // One-shot request to scroll a creature into view in a world place. Set only
+  // by the non-pointer open paths (turning-soon jump, `?repo=` open); cleared by
+  // `id` once the place reports it handled.
+  const [revealRequest, setRevealRequest] = useState<RevealRequest | null>(null);
+  const revealIdRef = useRef(0);
+  const requestReveal = useCallback((name: string): void => {
+    revealIdRef.current += 1;
+    setRevealRequest({ name, id: revealIdRef.current });
+  }, []);
+  const onRevealHandled = useCallback((id: number): void => {
+    setRevealRequest((current) => (current?.id === id ? null : current));
+  }, []);
+
   const deepLink = useRepoDeepLink({
     rows: repoRows,
     panelOpen,
     onOpenState: openPanelState,
     onCloseState: closePanelState,
+    onReveal: requestReveal,
   });
   const { handlePopState: handleRepoPopState } = deepLink;
 
@@ -496,13 +509,20 @@ export default function SceneView({
       setSelected(name);
       setPlotIndex(plotIndex >= 0 ? plotIndex : 0);
       setActiveFilter("all");
+      requestReveal(name);
       onEnterPlace("sky");
     },
-    [rows, onEnterPlace],
+    [rows, onEnterPlace, requestReveal],
   );
 
   // --- Toggles -------------------------------------------------------------
-  const [lightsOn, setLightsOn] = useState<boolean>(false);
+  // Lights on === the day theme (shared via ThemeProvider).
+  const { theme, setTheme } = useTheme();
+  const lightsOn = theme === "day";
+  const onLightsOnChange = useCallback(
+    (on: boolean): void => setTheme(on ? "day" : "night"),
+    [setTheme],
+  );
   // Display-only; flipping it loads/plays no audio (Req 13.1/13.2/13.3).
   const [soundOn, setSoundOn] = useState<boolean>(false);
 
@@ -535,50 +555,6 @@ export default function SceneView({
   const plotCount = plots.length;
   const clampedPlotIndex = Math.min(Math.max(0, plotIndex), plotCount - 1);
 
-  // --- Lights-on readable register -----------------------------------------
-  // When the lights are on we show the paper-register table INSTEAD of the
-  // scene (Req 10.1): no parallax, atmosphere, motion, or whispers. The table
-  // is fed the FULL `rows` — one row per repository across all four places —
-  // so it reads the same whether the lights were turned on from the estate map
-  // or from inside a place (estate-map Req 14.1, 14.2). The table carries no
-  // toggle of its own, so a thin control bar above it holds the same Lights-on
-  // toggle (so the reader can return to the scene with the same data, Req 10.6)
-  // plus the display-only sound toggle for parity.
-  //
-  // `lightsOn` is an independent boolean: flipping it touches none of
-  // `view`/`plotIndex`/`activeFilter`/`selected`, so those survive untouched
-  // while the lights are on (estate-map Req 14.4). This early return also sits
-  // BEFORE the map/place render path, so turning the lights back off restores
-  // the exact prior view instantly — a plain state swap with no travel
-  // transition (estate-map Req 14.5, 14.6).
-  if (lightsOn) {
-    return (
-      <div
-        data-testid="scene-view"
-        data-lights-on="true"
-        className="relative min-h-dvh w-full"
-        style={{ backgroundColor: "var(--color-paper-200)" }}
-      >
-        <div
-          className="flex items-center justify-end gap-4 px-6 py-3 sm:px-12"
-          style={{ borderBottom: "1px solid var(--color-paper-border)" }}
-        >
-          <Toggle
-            pressed={lightsOn}
-            onChange={setLightsOn}
-            label="Lights on"
-          />
-          <Toggle
-            pressed={soundOn}
-            onChange={setSoundOn}
-            label="Sound"
-          />
-        </div>
-        <LightsOnTable rows={rows} username={username ?? undefined} />
-      </div>
-    );
-  }
-
   // --- Map / place render switch (Req 1.1, 10.1, 10.2, 11.1) ---------------
   //
   // `renderSceneView` builds the REAL map or place view for a view identity,
@@ -602,7 +578,7 @@ export default function SceneView({
           onEnterPlace={onEnterPlace}
           onGoToTurningSoon={onGoToTurningSoon}
           reducedMotion={reducedMotion}
-          lightsOn={lightsOn}
+          theme={theme}
           travel={travelHint}
         />
       );
@@ -620,8 +596,11 @@ export default function SceneView({
         onReturn={onReturn}
         filterHeroes={filterHeroes}
         reducedMotion={reducedMotion}
-        lightsOn={lightsOn}
+        theme={theme}
         travel={travelHint ? { active: travelHint.active } : undefined}
+        panelOpen={panelOpen}
+        revealRequest={revealRequest}
+        onRevealHandled={onRevealHandled}
       />
     );
   };
@@ -666,7 +645,7 @@ export default function SceneView({
     <div
       id="scene-root"
       data-testid="scene-view"
-      data-lights-on="false"
+      data-theme={theme}
       data-view={view}
       className="relative min-h-dvh w-full"
     >
@@ -683,7 +662,7 @@ export default function SceneView({
           username={username ?? ""}
           mode={mode}
           lightsOn={lightsOn}
-          onLightsOnChange={setLightsOn}
+          onLightsOnChange={onLightsOnChange}
           soundOn={soundOn}
           onSoundChange={setSoundOn}
         />
@@ -697,6 +676,7 @@ export default function SceneView({
           place={travel.place}
           direction={travel.direction}
           reducedMotion={reducedMotion}
+          theme={theme}
           from={renderSceneView(travel.from, {
             active: true,
             targetPlace: travel.place,
@@ -714,7 +694,7 @@ export default function SceneView({
           OUTSIDE the travel stage so it — like the site header / toggles — stays
           fixed and unzoomed during a travel transition. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40">
-        <Footer mode={mode} />
+        <Footer mode={mode} hub={view === "map"} />
       </div>
     </div>
     <HoverCardLayer

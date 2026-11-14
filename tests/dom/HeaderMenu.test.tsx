@@ -51,9 +51,10 @@ function stubCompactMedia(initialCompact: boolean) {
   };
 }
 
-function renderHeader() {
+function renderHeader(extra: { rows?: [] } = {}) {
   return render(
     <Header
+      {...extra}
       counts={{ souls: 1, ghost: 1, risen: 0, zombie: 0, tombstone: 0, coffin: 0 }}
       username="octocat"
       lightsOn={false}
@@ -78,6 +79,23 @@ afterEach(() => {
   push.mockReset();
   vi.unstubAllGlobals();
   document.documentElement.style.removeProperty(HEADER_HEIGHT_VAR);
+});
+
+describe("View as list link (5.1, 5.2)", () => {
+  it("renders inside the Menu panel when compact and rows are provided", () => {
+    renderHeader({ rows: [] });
+    const item = screen.getByTestId("view-list-menu-item");
+    expect(item.textContent).toBe("View as list");
+    expect(panel().contains(item)).toBe(true);
+    expect(screen.queryByTestId("view-list-button")).toBeNull();
+  });
+
+  it("renders as the desktop header link when not compact", () => {
+    stubCompactMedia(false);
+    renderHeader({ rows: [] });
+    expect(screen.getByTestId("view-list-button").textContent).toBe("View as list");
+    expect(screen.queryByTestId("view-list-menu-item")).toBeNull();
+  });
 });
 
 describe("Menu_Disclosure (4.2-4.10)", () => {
@@ -232,6 +250,28 @@ describe("useHeaderHeightVar (4.12, 9.6)", () => {
     unmount();
     expect(root.style.getPropertyValue(HEADER_HEIGHT_VAR)).toBe("");
     expect(observers.at(-1)!.disconnect).toHaveBeenCalled();
+  });
+
+  it("with `always`, keeps publishing on wide layouts (content height, 7rem floor)", () => {
+    const root = document.createElement("div");
+    const wrapper = document.createElement("div");
+    const inner = document.createElement("header");
+    wrapper.appendChild(inner);
+    inner.getBoundingClientRect = () => ({ height: 105 }) as DOMRect;
+    wrapper.getBoundingClientRect = () => ({ height: 112 }) as DOMRect;
+    wrapper.style.paddingTop = "16px";
+    wrapper.style.paddingBottom = "16px";
+    document.body.appendChild(wrapper);
+    renderHook(() =>
+      useHeaderHeightVar({ current: wrapper }, false, { current: root }, { always: true }),
+    );
+    expect(root.style.getPropertyValue(HEADER_HEIGHT_VAR)).toBe("137px");
+    inner.getBoundingClientRect = () => ({ height: 30 }) as DOMRect;
+    renderHook(() =>
+      useHeaderHeightVar({ current: wrapper }, false, { current: root }, { always: true }),
+    );
+    expect(root.style.getPropertyValue(HEADER_HEIGHT_VAR)).toBe("112px");
+    wrapper.remove();
   });
 
   it("falls back to the document element when no root ref is given", () => {

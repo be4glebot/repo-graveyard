@@ -1,0 +1,197 @@
+[
+ {
+  "place": "sky",
+  "delay": 0,
+  "name": "hollow-atlas",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 187,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "delay": 40,
+  "name": "hollow-atlas",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 191,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "delay": 90,
+  "name": "hollow-atlas",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 237,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "delay": 140,
+  "name": "hollow-atlas",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 284,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "delay": 300,
+  "name": "hollow-atlas",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 456,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "delay": 0,
+  "name": "ember-notes",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 180,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "delay": 40,
+  "name": "ember-notes",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 193,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "delay": 90,
+  "name": "ember-notes",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 235,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "delay": 140,
+  "name": "ember-notes",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 314,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "delay": 300,
+  "name": "ember-notes",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 453,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "delay": 0,
+  "name": "null-pointer-bistro",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 196,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "delay": 40,
+  "name": "null-pointer-bistro",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 192,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "delay": 90,
+  "name": "null-pointer-bistro",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 214,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "delay": 140,
+  "name": "null-pointer-bistro",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 319,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "delay": 300,
+  "name": "null-pointer-bistro",
+  "opened": true,
+  "clicks": [
+   {
+    "dt": 475,
+    "detail": 1,
+    "prevented": false
+   }
+  ]
+ }
+]

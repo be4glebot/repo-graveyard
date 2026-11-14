@@ -45,15 +45,13 @@ export default function ReturnToGate({ onReturn }: ReturnToGateProps) {
     <button
       type="button"
       data-testid="return-to-gate"
+      title="Back to the map of all places"
       onClick={onReturn}
       onKeyDown={handleKeyDown}
       className={[
-        // Bevelled iron plaque button from the boards (.btn2): the base class
-        // owns the box, Cinzel uppercase label, border, and background (Req
-        // 7.1). The utilities below carry only interaction state (cursor,
-        // hover, focus ring, transition).
-        "btn2 pointer-events-auto cursor-pointer transition-colors hover:bg-candle-400/10",
-        "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
+        // Iron rail fixture (`fixture-rail`): square, bevelled, no pill or
+        // soft shadow. Focus ring comes from the fixture class.
+        "fixture-rail pointer-events-auto cursor-pointer px-4 py-2 font-heading text-xs uppercase tracking-[1.5px] transition-colors hover:border-candle-400",
       ].join(" ")}
     >
       ← Return to the gate

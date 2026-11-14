@@ -14,8 +14,8 @@
  * `ground`/`crypt` the newest at rest.
  *
  * An empty place (zero rows) stays visible but quieter: it renders no
- * representatives, shows the place's empty copy on the plaque, and drops to a
- * lower opacity than any populated place (Req 1.6).
+ * representatives, shows the place's empty copy on the plaque, and stays at
+ * opacity 1 with an unlit lantern and desaturated art (Req 1.6, 2.6).
  *
  * The creatures are rendered through the same concrete creature components the
  * scene uses (`Ghost`/`Risen`/`Zombie`/`Tombstone`/`Coffin`), keyed off
@@ -33,6 +33,8 @@
 import { type ComponentType, type CSSProperties, type KeyboardEvent } from "react";
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
+import { useTheme } from "@/components/scene/ThemeProvider";
+import { dayCopy, placeCtaKey, placeNameKey } from "@/lib/day-copy";
 import { type LifecycleState } from "@/lib/lifecycle";
 import {
   orderForPlace,
@@ -78,9 +80,13 @@ const CREATURE_BY_STATE: Record<
 /** Maximum representative creatures shown on a place plaque (Req 2.4). */
 const MAX_REPRESENTATIVES = 3;
 
-/** Opacity for a populated place vs. an empty one (Req 1.6). */
-const POPULATED_OPACITY = 1;
-const EMPTY_OPACITY = 0.45;
+/**
+ * A Landmark is always fully opaque, populated or not (Req 2.6). An empty one
+ * signals itself through an unlit lantern and a `saturate` filter on its art,
+ * never through reduced opacity of the Landmark or its text.
+ */
+const LANDMARK_OPACITY = 1;
+const EMPTY_ART_FILTER = "saturate(0.4)";
 
 export interface PlaceProps {
   /** Which of the four places this link represents. */
@@ -107,6 +113,8 @@ export interface PlaceProps {
 
 export default function Place({ place, rows, onEnter, className, style }: PlaceProps) {
   const meta = PLACES[place];
+  const { theme } = useTheme();
+  const placeName = dayCopy(theme, placeNameKey(place));
   const hasRows = rows.length > 0;
 
   // Representatives are the head of the place's own ordering; the count is
@@ -124,8 +132,10 @@ export default function Place({ place, rows, onEnter, className, style }: PlaceP
           "gate",
           rows.filter((row) => row.state === "zombie").length,
           rows.filter((row) => row.state === "risen").length,
+          theme,
         )
-      : plaqueCopy(place, rows.length);
+      : plaqueCopy(place, rows.length, undefined, theme);
+  const ctaText = dayCopy(theme, placeCtaKey(place));
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
     // A native button fires click on Enter already, but handle it explicitly so
@@ -153,14 +163,18 @@ export default function Place({ place, rows, onEnter, className, style }: PlaceP
       data-testid={`estate-place-${place}`}
       data-place={place}
       data-empty={hasRows ? undefined : "true"}
-      aria-label={`${meta.name}. ${countLine}. ${meta.cta}`}
+      aria-label={`${placeName}. ${countLine}. ${ctaText}`}
       onClick={() => onEnter(place)}
       onKeyDown={handleKeyDown}
-      style={{ opacity: hasRows ? POPULATED_OPACITY : EMPTY_OPACITY, ...style }}
+      style={{ opacity: LANDMARK_OPACITY, ...style }}
       className={[
         "group relative flex cursor-pointer flex-col items-center gap-3",
         "border-0 bg-transparent p-0 text-center",
-        "transition-[transform,filter] duration-200 ease-out",
+        // Environment cue (glow / mist lift / torch flicker) comes from the
+        // `place-cue-*` classes in globals.css: in <=200 ms, out <=400 ms,
+        // static under reduced motion. Pure CSS :hover / :focus-visible, so no
+        // pointer listener is attached (Req 2.1, 2.2, 2.5, 2.8).
+        `place-cue place-cue-${place}`,
         "motion-safe:hover:scale-[1.02] motion-safe:focus-visible:scale-[1.02]",
         "outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-candle-400)] focus-visible:ring-offset-0",
         className ?? "",
@@ -172,7 +186,20 @@ export default function Place({ place, rows, onEnter, className, style }: PlaceP
         aria-hidden
         data-testid={`estate-place-${place}-representatives`}
         className="pointer-events-none flex min-h-[140px] items-end justify-center gap-2"
+        style={hasRows ? undefined : { filter: EMPTY_ART_FILTER }}
       >
+        {!hasRows && (
+          // Unlit lantern: the empty-state mark (Req 2.6). Decorative, no glow.
+          <span
+            data-testid={`estate-place-${place}-lantern`}
+            data-lit="false"
+            className="mb-4 block h-10 w-7 rounded-t-full border"
+            style={{
+              borderColor: "var(--color-iron-500)",
+              backgroundColor: "var(--color-night-sky-mid)",
+            }}
+          />
+        )}
         {representatives.map((row) => {
           const Creature = CREATURE_BY_STATE[row.state];
           // Decorative: non-interactive and aria-hidden, so the representatives
@@ -196,7 +223,7 @@ export default function Place({ place, rows, onEnter, className, style }: PlaceP
           className="font-[family-name:var(--font-heading)] text-lg uppercase tracking-[2px]"
           style={{ color: "var(--color-scene-fg)" }}
         >
-          {meta.name}
+          {placeName}
         </span>
         <span
           data-testid={`estate-place-${place}-count`}
@@ -210,7 +237,7 @@ export default function Place({ place, rows, onEnter, className, style }: PlaceP
           className="font-[family-name:var(--font-heading)] text-xs uppercase tracking-[1.5px]"
           style={{ color: accentColor }}
         >
-          {meta.cta}
+          {ctaText}
         </span>
       </span>
     </button>

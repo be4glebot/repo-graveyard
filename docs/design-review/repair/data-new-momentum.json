@@ -1,0 +1,194 @@
+[
+ {
+  "place": "sky",
+  "idle": 0
+ },
+ {
+  "place": "sky",
+  "gap": 0,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 79
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "gap": 30,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 70
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "gap": 60,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 106
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "gap": 100,
+  "opened": true,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 133
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "gap": 150,
+  "opened": true,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 197
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "idle": 0
+ },
+ {
+  "place": "ground",
+  "gap": 0,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 39
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "gap": 30,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 72
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "gap": 60,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 100
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "gap": 100,
+  "opened": true,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 130
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "gap": 150,
+  "opened": true,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 178
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "idle": 0
+ },
+ {
+  "place": "crypt",
+  "gap": 0,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 42
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "gap": 30,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 66
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "gap": 60,
+  "opened": false,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 100
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "gap": 100,
+  "opened": true,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 135
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "gap": 150,
+  "opened": true,
+  "ev": [
+   {
+    "detail": 1,
+    "prevented": false,
+    "t": 178
+   }
+  ]
+ }
+]

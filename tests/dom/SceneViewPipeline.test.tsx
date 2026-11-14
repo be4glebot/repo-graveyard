@@ -115,13 +115,11 @@ describe("SceneView pipeline — validation precedes classification (1.8)", () =
     ).toBe(true);
   });
 
-  it("the invalid repo has no row in the Lights-on register", async () => {
+  it("the invalid repo has no row in the View as list register", async () => {
     const user = userEvent.setup();
     renderScene("gate");
 
-    await user.click(
-      screen.getAllByRole("switch", { name: /lights on/i })[0] as HTMLButtonElement,
-    );
+    await user.click(screen.getByTestId("view-list-button"));
 
     const register = screen.getByTestId("lights-on-view");
     const text = register.textContent ?? "";

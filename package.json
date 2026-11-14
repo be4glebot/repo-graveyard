@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
+    "check:day-art": "node scripts/check-day-art.mjs",
     "scan:secrets": "node scripts/secret-scan.mjs",
     "mcp:install": "npm ci --prefix mcp/graveyard-mcp",
     "mcp:build": "npm run build --prefix mcp/graveyard-mcp",

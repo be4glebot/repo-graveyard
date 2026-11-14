@@ -19,6 +19,11 @@
  * Requirements: 3.1
  */
 
+"use client";
+
+import DayPalette from "@/components/scene/DayPalette";
+import { useTheme } from "@/components/scene/ThemeProvider";
+
 /** How many stars to scatter across the sky band. */
 const STAR_COUNT = 60;
 
@@ -71,6 +76,11 @@ export interface SkyProps {
 }
 
 export default function Sky({ className }: SkyProps) {
+  const { theme } = useTheme();
+  // Day: warm sky and soft meadow from day tokens, no night gradient or stars.
+  if (theme === "day") {
+    return <DayPalette variant="full" className={className} />;
+  }
   return (
     <div
       aria-hidden="true"

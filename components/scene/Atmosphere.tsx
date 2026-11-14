@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Atmosphere set dressing (presentational).
  *
@@ -28,6 +30,9 @@
  */
 
 import type { CSSProperties } from "react";
+
+import { useTheme } from "@/components/scene/ThemeProvider";
+import { effectProps } from "@/lib/world-effects";
 
 /** Film-grain overlay opacity, inside the required 7–8% band (Req 3.7). */
 const GRAIN_OPACITY = 0.075;
@@ -78,6 +83,7 @@ function Bat({
 }) {
   return (
     <span
+      {...effectProps("bats")}
       className="bat-flap absolute block"
       style={
         {
@@ -111,6 +117,10 @@ export type AtmosphereProps = Record<string, never>;
 
 export default function Atmosphere(_props: AtmosphereProps) {
   void _props;
+  const { theme } = useTheme();
+
+  // Daytime: no vignette haze, grain, cobwebs or bats over the bright art.
+  if (theme === "day") return null;
 
   return (
     <div
@@ -123,6 +133,7 @@ export default function Atmosphere(_props: AtmosphereProps) {
           token so the corners sink into shadow. */}
       <div
         data-testid="scene-vignette"
+        {...effectProps("vignette")}
         className="absolute inset-0"
         style={{
           background:
@@ -133,6 +144,7 @@ export default function Atmosphere(_props: AtmosphereProps) {
       {/* Film grain: tiled SVG noise at 7–8% opacity (Req 3.7). */}
       <div
         data-testid="scene-grain"
+        {...effectProps("grain")}
         className="absolute inset-0"
         style={{
           backgroundImage: `url("${GRAIN_DATA_URI}")`,
@@ -163,6 +175,7 @@ function CobwebCorner({ corner }: { corner: "left" | "right" }) {
   return (
     <svg
       data-testid={`scene-cobweb-${corner}`}
+      {...effectProps("cobwebs")}
       width="140"
       height="140"
       viewBox="0 0 140 140"

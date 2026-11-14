@@ -20,6 +20,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import SceneView from "@/components/scene/SceneView";
+import { ThemeProvider } from "@/components/scene/ThemeProvider";
 import { hoverCardId } from "@/components/detail/HoverCardLayer";
 import { buildRows } from "@/lib/graveyard-view";
 import { placeOf, type PlaceId } from "@/lib/estate-view";
@@ -98,15 +99,17 @@ function creature(name: string): HTMLButtonElement {
 
 function renderScene(at: PlaceId) {
   return render(
-    <SceneView
-      rows={allRows()}
-      repos={REPOS}
-      truncated={false}
-      username="octocat"
-      renderedAt={NOW}
-      mode="live"
-      at={at}
-    />,
+    <ThemeProvider>
+      <SceneView
+        rows={allRows()}
+        repos={REPOS}
+        truncated={false}
+        username="octocat"
+        renderedAt={NOW}
+        mode="live"
+        at={at}
+      />
+    </ThemeProvider>,
   );
 }
 
@@ -213,7 +216,7 @@ describe("interactions are identical across places (lights off) — 10.1", () =>
 
 describe("lights on vs off — 10.2", () => {
   it.each(FIXTURES)(
-    "lights on removes the card in $place; lights off restores working creatures",
+    "lights on keeps creatures mounted in $place; lights off restores night with working creatures",
     ({ place, repo }) => {
       renderScene(place);
 
@@ -223,43 +226,43 @@ describe("lights on vs off — 10.2", () => {
       act(() => {
         fireEvent.click(lightsSwitch());
       });
-      expect(screen.getByTestId("lights-on-view")).not.toBeNull();
-      expect(anyCard()).toBeNull();
-      expect(dialog()).toBeNull();
+      // Lights on is the same scene in daylight: creatures stay mounted.
+      expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("day");
       expect(
         screen.queryByRole("button", { name: creatureAccessibleName(rowFor(repo.name)) }),
-      ).toBeNull();
+      ).not.toBeNull();
 
       act(() => {
         fireEvent.click(lightsSwitch());
       });
-      expect(screen.queryByTestId("lights-on-view")).toBeNull();
+      expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("night");
       if (dialog()) fireEvent.keyDown(document.body, { key: "Escape" });
       advance(500);
-      expect(anyCard()).toBeNull();
 
-      // Interactions work again on the restored creature.
+      // The scene never unmounted, so interactions keep working on the creature.
       act(() => creature(repo.name).focus());
       expect(document.getElementById(hoverCardId(repo.name))).not.toBeNull();
     },
   );
 
   it.each(FIXTURES)(
-    "lights on leaves no detail panel open in $place; click works after restore",
+    "detail panel opens in $place under day and night; click works after toggling",
     ({ place, repo }) => {
       renderScene(place);
+
+      act(() => {
+        fireEvent.click(lightsSwitch());
+      });
+      expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("day");
 
       act(() => {
         fireEvent.click(creature(repo.name));
       });
       expect(dialog()).not.toBeNull();
-
       act(() => {
-        fireEvent.click(lightsSwitch());
+        fireEvent.click(screen.getByRole("button", { name: "Close record" }));
       });
-      expect(screen.getByTestId("lights-on-view")).not.toBeNull();
       expect(dialog()).toBeNull();
-      expect(anyCard()).toBeNull();
 
       act(() => {
         fireEvent.click(lightsSwitch());

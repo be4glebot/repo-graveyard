@@ -1,0 +1,6 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL estate/hub 820x500: turning-notice x plate:sky 203.9x4.3
+done estate/hub
+
+69 case(s) measured, 1 finding(s), 1 distinct pair(s)
+  estate/hub: plate:sky x turning-notice x1 worst 203.9x4.3 at 820x500

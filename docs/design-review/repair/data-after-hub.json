@@ -1,0 +1,138 @@
+[
+ {
+  "w": 737,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:hollow-atlas grows cold…",
+    "opacity": 1,
+    "x": 0,
+    "y": 0,
+    "r": 0,
+    "b": 0,
+    "w": 0,
+    "h": 0
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 737,
+  "h": 800,
+  "whisper": [
+   {
+    "name": "whisper:hollow-atlas grows cold…",
+    "opacity": 1,
+    "x": 0,
+    "y": 0,
+    "r": 0,
+    "b": 0,
+    "w": 0,
+    "h": 0
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 737,
+  "h": 900,
+  "whisper": [
+   {
+    "name": "whisper:hollow-atlas grows cold…",
+    "opacity": 1,
+    "x": 0,
+    "y": 0,
+    "r": 0,
+    "b": 0,
+    "w": 0,
+    "h": 0
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 700,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:hollow-atlas grows cold…",
+    "opacity": 1,
+    "x": 0,
+    "y": 0,
+    "r": 0,
+    "b": 0,
+    "w": 0,
+    "h": 0
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 768,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 296.6015625,
+    "y": 316.796875,
+    "r": 441.3359375,
+    "b": 364.796875,
+    "w": 144.734375,
+    "h": 48
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 800,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 302.9921875,
+    "y": 316.796875,
+    "r": 466.2890625,
+    "b": 364.796875,
+    "w": 163.296875,
+    "h": 48
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 1280,
+  "h": 720,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 507.421875,
+    "y": 316.796875,
+    "r": 732.265625,
+    "b": 340.796875,
+    "w": 224.84375,
+    "h": 24
+   }
+  ],
+  "overlaps": []
+ },
+ {
+  "w": 1440,
+  "h": 900,
+  "whisper": [
+   {
+    "name": "whisper:dusk-scheduler is still waiting for you…",
+    "opacity": 1,
+    "x": 585.828125,
+    "y": 396,
+    "r": 810.671875,
+    "b": 420,
+    "w": 224.84375,
+    "h": 24
+   }
+  ],
+  "overlaps": []
+ }
+]

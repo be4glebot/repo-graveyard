@@ -1,0 +1,1801 @@
+[
+ {
+  "place": "sky",
+  "size": "1280x720",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 4,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "pager",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 10
+     },
+     {
+      "chrome": "pager",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 22
+     },
+     {
+      "chrome": "notice",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 31
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 144,
+    "violations": [
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 76
+     },
+     {
+      "chrome": "legend",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 38
+     },
+     {
+      "chrome": "legend",
+      "creature": "lantern-notes",
+      "part": "plaque",
+      "points": 31
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 288,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 152
+     },
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 34
+     },
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 30
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 64
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 392,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 177
+     },
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 70
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 56
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 16
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 48
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "size": "1280x720",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 3,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "pager",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 12
+     },
+     {
+      "chrome": "legend",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 11
+     },
+     {
+      "chrome": "legend",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 33
+     },
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 37
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 144,
+    "violations": [
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 41
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 288,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 115
+     },
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 32
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 425,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 208
+     },
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 2
+     },
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "plaque",
+      "points": 6
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "size": "1280x720",
+  "steps": 4,
+  "badSteps": 3,
+  "creatures": 2,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "legend",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 36
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 144,
+    "violations": [],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 288,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 114
+     },
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 38
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 403,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 38
+     },
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 76
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "size": "1440x900",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 4,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "notice",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 31
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 180,
+    "violations": [
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 5
+     },
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 76
+     },
+     {
+      "chrome": "legend",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 65
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 360,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 126
+     },
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 9
+     },
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 6
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 491,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 8
+     },
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 28
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 20
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 57
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 11
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "size": "1440x900",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 3,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 14
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 180,
+    "violations": [
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 41
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 360,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 96
+     },
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 8
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 531,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 112
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "size": "1440x900",
+  "steps": 4,
+  "badSteps": 2,
+  "creatures": 2,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "legend",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 17
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 180,
+    "violations": [],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 360,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 114
+     },
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 19
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 504,
+    "violations": [],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "size": "737x720",
+  "steps": 4,
+  "badSteps": 3,
+  "creatures": 4,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 144,
+    "violations": [
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 76
+     },
+     {
+      "chrome": "chips",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 64
+     },
+     {
+      "chrome": "pager",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 24
+     },
+     {
+      "chrome": "pager",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 32
+     },
+     {
+      "chrome": "notice",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 12
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 288,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 19
+     },
+     {
+      "chrome": "return",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 77
+     },
+     {
+      "chrome": "heading",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 28
+     },
+     {
+      "chrome": "heading",
+      "creature": "fenwick-timer",
+      "part": "plaque",
+      "points": 84
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 392,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 133
+     },
+     {
+      "chrome": "header",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 112
+     },
+     {
+      "chrome": "return",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 20
+     },
+     {
+      "chrome": "return",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 57
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "size": "737x720",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 3,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "pager",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 56
+     },
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 40
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 144,
+    "violations": [
+     {
+      "chrome": "pager",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 56
+     },
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 41
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 288,
+    "violations": [
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 52
+     },
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 104
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 425,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 112
+     },
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 52
+     },
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 19
+     },
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "plaque",
+      "points": 33
+     },
+     {
+      "chrome": "heading",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 78
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "size": "737x720",
+  "steps": 4,
+  "badSteps": 2,
+  "creatures": 2,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 144,
+    "violations": [],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 288,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 38
+     },
+     {
+      "chrome": "return",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 8
+     },
+     {
+      "chrome": "return",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 24
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 403,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 61
+     },
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 72
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "size": "390x844",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 4,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "pager",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 46
+     },
+     {
+      "chrome": "notice",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 31
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 169,
+    "violations": [
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 233
+     },
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 14
+     },
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 20
+     },
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 56
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 121
+     },
+     {
+      "chrome": "notice",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 12
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 338,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 233
+     },
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 14
+     },
+     {
+      "chrome": "return",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 10
+     },
+     {
+      "chrome": "return",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 28
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 128
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 40
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 24
+     },
+     {
+      "chrome": "pager",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 6
+     },
+     {
+      "chrome": "pager",
+      "creature": "lantern-notes",
+      "part": "plaque",
+      "points": 42
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 460,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 30
+     },
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 84
+     },
+     {
+      "chrome": "return",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 12
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 84
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 60
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "size": "390x844",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 3,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "pager",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 9
+     },
+     {
+      "chrome": "pager",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 26
+     },
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 36
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 169,
+    "violations": [
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 221
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 56
+     },
+     {
+      "chrome": "pager",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 118
+     },
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 39
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 338,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 207
+     },
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 69
+     },
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 14
+     },
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "plaque",
+      "points": 50
+     },
+     {
+      "chrome": "heading",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 48
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 84
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 33
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 498,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 165
+     },
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "plaque",
+      "points": 39
+     },
+     {
+      "chrome": "return",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 6
+     },
+     {
+      "chrome": "heading",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 182
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "size": "390x844",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 2,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "notice",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 10
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 169,
+    "violations": [
+     {
+      "chrome": "heading",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 84
+     },
+     {
+      "chrome": "heading",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 45
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 338,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 114
+     },
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 58
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 473,
+    "violations": [
+     {
+      "chrome": "depth-marker",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 61
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "tin-can-chat",
+      "part": "plaque",
+      "points": 21
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ },
+ {
+  "place": "sky",
+  "size": "360x740",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 4,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 19
+     },
+     {
+      "chrome": "pager",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 12
+     },
+     {
+      "chrome": "pager",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 22
+     },
+     {
+      "chrome": "pager",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 45
+     },
+     {
+      "chrome": "notice",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 30
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 114.7,
+      "h": 3.5
+     },
+     {
+      "a": "chips",
+      "b": "depth-marker",
+      "w": 122.7,
+      "h": 30
+     }
+    ]
+   },
+   {
+    "k": 1,
+    "scrollTop": 148,
+    "violations": [
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 234
+     },
+     {
+      "chrome": "heading",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 14
+     },
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 20
+     },
+     {
+      "chrome": "chips",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 56
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 105
+     },
+     {
+      "chrome": "pager",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 4
+     },
+     {
+      "chrome": "pager",
+      "creature": "fenwick-timer",
+      "part": "plaque",
+      "points": 28
+     },
+     {
+      "chrome": "pager",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 34
+     },
+     {
+      "chrome": "notice",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 18
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 114.7,
+      "h": 3.5
+     },
+     {
+      "a": "chips",
+      "b": "depth-marker",
+      "w": 122.7,
+      "h": 30
+     }
+    ]
+   },
+   {
+    "k": 2,
+    "scrollTop": 296,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 209
+     },
+     {
+      "chrome": "return",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 20
+     },
+     {
+      "chrome": "return",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 57
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 193
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 11
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 25
+     },
+     {
+      "chrome": "chips",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 44
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 40
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 15
+     },
+     {
+      "chrome": "pager",
+      "creature": "lantern-notes",
+      "part": "sprite",
+      "points": 12
+     },
+     {
+      "chrome": "pager",
+      "creature": "lantern-notes",
+      "part": "plaque",
+      "points": 56
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 97,
+      "h": 3.5
+     },
+     {
+      "a": "chips",
+      "b": "depth-marker",
+      "w": 105,
+      "h": 30
+     }
+    ]
+   },
+   {
+    "k": 3,
+    "scrollTop": 403,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "sprite",
+      "points": 163
+     },
+     {
+      "chrome": "header",
+      "creature": "hollow-atlas",
+      "part": "plaque",
+      "points": 84
+     },
+     {
+      "chrome": "header",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 17
+     },
+     {
+      "chrome": "return",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 24
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "sprite",
+      "points": 53
+     },
+     {
+      "chrome": "heading",
+      "creature": "cobweb-cli",
+      "part": "plaque",
+      "points": 66
+     },
+     {
+      "chrome": "heading",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 48
+     },
+     {
+      "chrome": "chips",
+      "creature": "fenwick-timer",
+      "part": "sprite",
+      "points": 64
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 97,
+      "h": 3.5
+     },
+     {
+      "a": "chips",
+      "b": "depth-marker",
+      "w": 105,
+      "h": 30
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "place": "ground",
+  "size": "360x740",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 3,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "pager",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 105
+     },
+     {
+      "chrome": "pager",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 7
+     },
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 37
+     },
+     {
+      "chrome": "notice",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 2
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 110.4,
+      "h": 3.5
+     }
+    ]
+   },
+   {
+    "k": 1,
+    "scrollTop": 148,
+    "violations": [
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 222
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 35
+     },
+     {
+      "chrome": "pager",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 157
+     },
+     {
+      "chrome": "notice",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 37
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 110.4,
+      "h": 3.5
+     }
+    ]
+   },
+   {
+    "k": 2,
+    "scrollTop": 296,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 170
+     },
+     {
+      "chrome": "return",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 69
+     },
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 63
+     },
+     {
+      "chrome": "heading",
+      "creature": "ember-notes",
+      "part": "plaque",
+      "points": 39
+     },
+     {
+      "chrome": "heading",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 107
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 143
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 32
+     },
+     {
+      "chrome": "pager",
+      "creature": "harvest-engine",
+      "part": "sprite",
+      "points": 11
+     },
+     {
+      "chrome": "pager",
+      "creature": "harvest-engine",
+      "part": "plaque",
+      "points": 29
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 136,
+      "h": 11
+     }
+    ]
+   },
+   {
+    "k": 3,
+    "scrollTop": 437,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "sprite",
+      "points": 270
+     },
+     {
+      "chrome": "header",
+      "creature": "ember-notes",
+      "part": "plaque",
+      "points": 2
+     },
+     {
+      "chrome": "return",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 24
+     },
+     {
+      "chrome": "heading",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 165
+     },
+     {
+      "chrome": "heading",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 17
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "plaque",
+      "points": 30
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "willow-ui",
+      "part": "sprite",
+      "points": 5
+     }
+    ],
+    "chromeOverlaps": [
+     {
+      "a": "heading",
+      "b": "depth-marker",
+      "w": 136,
+      "h": 11
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "place": "crypt",
+  "size": "360x740",
+  "steps": 4,
+  "badSteps": 4,
+  "creatures": 2,
+  "stepLog": [
+   {
+    "k": 0,
+    "scrollTop": 0,
+    "violations": [
+     {
+      "chrome": "notice",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 24
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 1,
+    "scrollTop": 148,
+    "violations": [
+     {
+      "chrome": "heading",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 81
+     },
+     {
+      "chrome": "heading",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 48
+     },
+     {
+      "chrome": "pager",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 5
+     },
+     {
+      "chrome": "pager",
+      "creature": "tin-can-chat",
+      "part": "plaque",
+      "points": 13
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 2,
+    "scrollTop": 296,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 134
+     },
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 76
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 22
+     }
+    ],
+    "chromeOverlaps": []
+   },
+   {
+    "k": 3,
+    "scrollTop": 414,
+    "violations": [
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "sprite",
+      "points": 38
+     },
+     {
+      "chrome": "header",
+      "creature": "null-pointer-bistro",
+      "part": "plaque",
+      "points": 57
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "tin-can-chat",
+      "part": "sprite",
+      "points": 79
+     },
+     {
+      "chrome": "depth-marker",
+      "creature": "tin-can-chat",
+      "part": "plaque",
+      "points": 32
+     }
+    ],
+    "chromeOverlaps": []
+   }
+  ]
+ }
+]

@@ -1,0 +1,47 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL estate/gate 320x500: chips x pager 288x20; pager x tag:phoenix-draft 118x19.3; pager x tag:dusk-scheduler 118x19.3; estate-notice x tag:phoenix-draft 118x7.3; estate-notice x tag:dusk-scheduler 95x7.3; estate-notice x tag:gravel-parser 118x11.3; estate-notice x tag:moth-metrics 95x11.3
+FAIL estate/gate 360x500: pager x tag:phoenix-draft 138x19.3; pager x tag:dusk-scheduler 138x19.3; estate-notice x tag:phoenix-draft 138x7.3; estate-notice x tag:dusk-scheduler 75x7.3; estate-notice x tag:gravel-parser 138x11.3; estate-notice x tag:moth-metrics 75x11.3
+FAIL estate/gate 390x500: pager x tag:phoenix-draft 153x40.3; pager x tag:dusk-scheduler 153x40.3; estate-notice x tag:gravel-parser 151.6x20; estate-notice x tag:moth-metrics 59.6x20
+FAIL estate/gate 414x500: pager x tag:gravel-parser 151.6x32.2; pager x tag:moth-metrics 152.2x32.2; pager x tag:barrow-sync 123.5x20.9; pager x tag:crypt-keeper 130.8x20.9; estate-notice x tag:barrow-sync 123.5x5.6; estate-notice x tag:crypt-keeper 30.9x5.6; tag:gravel-parser x tag:barrow-sync 123.5x3.1; tag:moth-metrics x tag:crypt-keeper 130.8x3.1
+FAIL estate/gate 768x500: pager x tag:phoenix-draft 117.5x23.1; pager x tag:dusk-scheduler 57.5x23.1; pager x tag:gravel-parser 51.2x23.1; pager x tag:moth-metrics 112.8x23.1; pager x tag:barrow-sync 107.2x23.1; pager x tag:crypt-keeper 55.9x23.1; legend x tag:phoenix-draft 103.5x3.4; legend x tag:dusk-scheduler 125.9x3.4; legend x tag:moth-metrics 112.8x3.4; legend x tag:barrow-sync 105.2x3.4; legend x tag:crypt-keeper 106.7x3.4; tag:phoenix-draft x tag:barrow-sync 105.5x42.5; tag:dusk-scheduler x tag:crypt-keeper 106.7x42.5
+FAIL estate/gate 820x500: pager x tag:phoenix-draft 117.5x24; pager x tag:dusk-scheduler 31.5x23.6; pager x tag:gravel-parser 32.3x15.4; pager x tag:moth-metrics 112.8x15.4; pager x tag:barrow-sync 107.2x15.4; pager x tag:crypt-keeper 37.7x15.4; tag:phoenix-draft x tag:barrow-sync 105x34; tag:dusk-scheduler x tag:crypt-keeper 100.5x34.3
+FAIL estate/gate 1024x500: pager x tag:phoenix-draft 117.5x24; pager x tag:moth-metrics 112.8x15.4; pager x tag:barrow-sync 107.2x15.4; tag:phoenix-draft x tag:barrow-sync 103x34; tag:dusk-scheduler x tag:crypt-keeper 70x34.3
+FAIL estate/gate 768x720: pager x tag:phoenix-draft 117.5x23.9; pager x tag:dusk-scheduler 57.5x23.3
+FAIL estate/gate 820x720: pager x tag:phoenix-draft 117.5x23.9; pager x tag:dusk-scheduler 31.5x23.3
+FAIL estate/gate 1024x720: pager x tag:phoenix-draft 117.5x23.9
+FAIL estate/gate 768x900: pager x tag:phoenix-draft 117.5x13.7; pager x tag:dusk-scheduler 57.5x13
+FAIL estate/gate 820x900: pager x tag:phoenix-draft 117.5x13.7; pager x tag:dusk-scheduler 31.5x13
+FAIL estate/gate 1024x900: pager x tag:phoenix-draft 117.5x13.7
+FAIL estate/gate 390x480: pager x tag:phoenix-draft 153x20.3; pager x tag:dusk-scheduler 153x20.3; estate-notice x tag:phoenix-draft 153x6.3; estate-notice x tag:dusk-scheduler 60x6.3; estate-notice x tag:gravel-parser 151.6x12.3; estate-notice x tag:moth-metrics 59.6x12.3
+FAIL estate/gate 390x550: pager x tag:phoenix-draft 153x2.3; pager x tag:dusk-scheduler 153x2.3; pager x tag:gravel-parser 151.6x42.5; pager x tag:moth-metrics 152.2x42.5; pager x tag:barrow-sync 123.5x6.9; pager x tag:crypt-keeper 130.8x6.9; estate-notice x tag:barrow-sync 123.5x19.6; estate-notice x tag:crypt-keeper 48.9x19.6; tag:gravel-parser x tag:barrow-sync 123.5x3.1; tag:moth-metrics x tag:crypt-keeper 130.8x3.1
+FAIL estate/gate 390x600: pager x tag:barrow-sync 123.5x35.6; pager x tag:crypt-keeper 130.8x35.6; tag:gravel-parser x tag:barrow-sync 123.5x3.1; tag:moth-metrics x tag:crypt-keeper 130.8x3.1
+FAIL estate/gate 1024x480: pager x tag:phoenix-draft 117.5x33.2; pager x tag:moth-metrics 112.8x33.2; pager x tag:barrow-sync 107.2x33.2; tag:phoenix-draft x tag:barrow-sync 103x42.5; tag:dusk-scheduler x tag:crypt-keeper 70x42.5
+FAIL estate/gate 1024x550: pager x tag:phoenix-draft 117.5x24
+FAIL estate/gate 1024x600: pager x tag:phoenix-draft 117.5x23.9
+FAIL estate/gate 1024x768: pager x tag:phoenix-draft 117.5x23.9
+FAIL estate/gate 1024x800: pager x tag:phoenix-draft 117.5x23.9
+done estate/gate
+
+69 case(s) measured, 90 finding(s), 22 distinct pair(s)
+  estate/gate: pager x tag:moth-metrics x6 worst 152.2x42.5 at 390x550
+  estate/gate: pager x tag:gravel-parser x4 worst 151.6x42.5 at 390x550
+  estate/gate: pager x tag:phoenix-draft x19 worst 153x40.3 at 390x500
+  estate/gate: pager x tag:dusk-scheduler x11 worst 153x40.3 at 390x500
+  estate/gate: chips x pager x1 worst 288x20 at 320x500
+  estate/gate: pager x tag:crypt-keeper x5 worst 130.8x35.6 at 390x600
+  estate/gate: tag:crypt-keeper x tag:dusk-scheduler x4 worst 106.7x42.5 at 768x500
+  estate/gate: tag:barrow-sync x tag:phoenix-draft x4 worst 105.5x42.5 at 768x500
+  estate/gate: pager x tag:barrow-sync x7 worst 123.5x35.6 at 390x600
+  estate/gate: estate-notice x tag:gravel-parser x4 worst 151.6x20 at 390x500
+  estate/gate: estate-notice x tag:barrow-sync x2 worst 123.5x19.6 at 390x550
+  estate/gate: estate-notice x tag:moth-metrics x4 worst 59.6x20 at 390x500
+  estate/gate: estate-notice x tag:phoenix-draft x3 worst 138x7.3 at 360x500
+  estate/gate: estate-notice x tag:crypt-keeper x2 worst 48.9x19.6 at 390x550
+  estate/gate: estate-notice x tag:dusk-scheduler x3 worst 95x7.3 at 320x500
+  estate/gate: legend x tag:dusk-scheduler x1 worst 125.9x3.4 at 768x500
+  estate/gate: tag:crypt-keeper x tag:moth-metrics x3 worst 130.8x3.1 at 414x500
+  estate/gate: legend x tag:moth-metrics x1 worst 112.8x3.4 at 768x500
+  estate/gate: tag:barrow-sync x tag:gravel-parser x3 worst 123.5x3.1 at 414x500
+  estate/gate: legend x tag:crypt-keeper x1 worst 106.7x3.4 at 768x500
+  estate/gate: legend x tag:barrow-sync x1 worst 105.2x3.4 at 768x500
+  estate/gate: legend x tag:phoenix-draft x1 worst 103.5x3.4 at 768x500

@@ -137,18 +137,21 @@ export default function FilterChips({
             type="button"
             data-testid={`filter-chip-${chip.filter}`}
             data-active={active ? "true" : undefined}
+            title={
+              chip.filter === "all"
+                ? `Show every project here (${chip.count})`
+                : `Show only "${chip.label}" projects (${chip.count}): grouped by how long they have been quiet`
+            }
             aria-pressed={active}
             disabled={disabled}
             onClick={() => onFilterChange(chip.filter)}
             className={[
-              // Bevelled plaque chip from the boards (.chip2); the active
-              // filter adds .chip2.on for the crimson, visually-distinct state
-              // (Req 7.2, 7.3). The base class owns the box, font, border, and
-              // background; the utilities below carry only interaction state
-              // (focus ring, hover, disabled) and the inner count gap.
-              "chip2 pointer-events-auto gap-2 transition-colors",
-              "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
-              active ? "on" : null,
+              // Stone ledge fixture (`fixture-ledge`): square, no pill. The
+              // active filter gets a crimson border/text (important modifier
+              // so it beats the unlayered fixture rule). Focus ring comes
+              // from the fixture class.
+              "fixture-ledge pointer-events-auto inline-flex items-center gap-2 px-3 py-1.5 font-heading text-xs uppercase tracking-[1.5px] transition-colors",
+              active ? "border-crimson-400! text-crimson-200!" : null,
               disabled
                 ? "cursor-not-allowed opacity-40"
                 : "cursor-pointer hover:border-candle-400",

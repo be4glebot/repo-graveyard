@@ -1,0 +1,142 @@
+[
+ {
+  "w": 1440,
+  "h": 900,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 329
+  },
+  "best": {
+   "y": 389,
+   "d": 3,
+   "share": 0.06
+  },
+  "shot": "after-crypt-1440x900-band-chamber-1.png"
+ },
+ {
+  "w": 1440,
+  "h": 900,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 450.5
+  },
+  "best": {
+   "y": 388,
+   "d": 3,
+   "share": 0.07
+  },
+  "shot": "after-crypt-1440x900-zone0-stairs.png"
+ },
+ {
+  "w": 1280,
+  "h": 720,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 263
+  },
+  "best": {
+   "y": 312,
+   "d": 3.1,
+   "share": 0.01
+  },
+  "shot": "after-crypt-1280x720-band-chamber-1.png"
+ },
+ {
+  "w": 1280,
+  "h": 720,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 360
+  },
+  "best": {
+   "y": 312,
+   "d": 3.1,
+   "share": 0.01
+  },
+  "shot": "after-crypt-1280x720-zone0-stairs.png"
+ },
+ {
+  "w": 737,
+  "h": 720,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 263
+  },
+  "best": {
+   "y": 293,
+   "d": 5.1,
+   "share": 0.11
+  },
+  "shot": "after-crypt-737x720-band-chamber-1.png"
+ },
+ {
+  "w": 737,
+  "h": 720,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 360
+  },
+  "best": {
+   "y": 293,
+   "d": 5.1,
+   "share": 0.11
+  },
+  "shot": "after-crypt-737x720-zone0-stairs.png"
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 308
+  },
+  "best": {
+   "y": 352,
+   "d": 6.7,
+   "share": 0.3
+  },
+  "shot": "after-crypt-390x844-band-chamber-1.png"
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 422.5
+  },
+  "best": {
+   "y": 353,
+   "d": 4.6,
+   "share": 0.14
+  },
+  "shot": "after-crypt-390x844-zone0-stairs.png"
+ },
+ {
+  "w": 360,
+  "h": 740,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 270
+  },
+  "best": {
+   "y": 301,
+   "d": 5.8,
+   "share": 0.19
+  },
+  "shot": "after-crypt-360x740-band-chamber-1.png"
+ },
+ {
+  "w": 360,
+  "h": 740,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 370.5
+  },
+  "best": {
+   "y": 300,
+   "d": 5.5,
+   "share": 0.18
+  },
+  "shot": "after-crypt-360x740-zone0-stairs.png"
+ }
+]

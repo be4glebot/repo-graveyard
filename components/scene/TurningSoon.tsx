@@ -35,6 +35,10 @@
  * Requirements: 7.8, 7.9, 12.1, 12.2, 12.6
  */
 
+import type { CSSProperties } from "react";
+import { turningPulseSeconds } from "@/lib/turning-pulse";
+import { useTheme } from "@/components/scene/ThemeProvider";
+import { dayCopy } from "@/lib/day-copy";
 import { type TurningSoon as TurningSoonResult } from "@/lib/scene-view";
 
 export interface TurningSoonProps {
@@ -65,6 +69,7 @@ export default function TurningSoon({
   onSelect,
   onGoTo,
 }: TurningSoonProps) {
+  const { theme } = useTheme();
   // No qualifying ghost → render nothing. `pickTurningSoon` already applied the
   // ≤30-whole-days window, so a non-null value is always inside it (Req 7.8).
   // This single gate is also why the "Go to it" action never renders without a
@@ -74,21 +79,30 @@ export default function TurningSoon({
   }
 
   const { name, daysLeft } = turningSoon;
+  const phrase = dayCopy(theme, "turning.phrase");
   // Whole-day countdown with natural singular/plural. `daysLeft` is a whole-day
   // count from the pure selector, so no rounding happens here.
   const dayLabel = daysLeft === 1 ? "day" : "days";
 
   // Shared crimson treatment for the notice chrome — all tokens, no hex.
+  const isDay = theme === "day";
   const noticeStyle = {
-    backgroundColor: "var(--color-crimson-700)",
-    borderColor: "var(--color-crimson-400)",
-    color: "var(--color-scene-fg)",
-    boxShadow: "0 0 14px var(--color-crimson-glow)",
-  } as const;
+    backgroundColor: isDay
+      ? "var(--color-day-gold-bg)"
+      : "var(--color-crimson-700)",
+    borderColor: isDay
+      ? "var(--color-day-gold-border)"
+      : "var(--color-crimson-400)",
+    color: isDay ? "var(--color-day-gold-ink)" : "var(--color-scene-fg)",
+    "--pulse-period": `${turningPulseSeconds(daysLeft)}s`,
+  } as CSSProperties;
+  const dayClass = isDay ? "turning-soon-day" : "";
 
   const label = (
     <span>
-      {name} turns in {daysLeft} {dayLabel}
+      {name} {phrase}
+      {theme === "day" ? " · " : " "}
+      {daysLeft} {dayLabel}
     </span>
   );
 
@@ -102,7 +116,8 @@ export default function TurningSoon({
         data-testid="scene-turning-soon"
         data-days-left={daysLeft}
         className={[
-          "inline-flex items-center gap-2 rounded-md border px-3 py-1.5",
+          "turning-soon-pulse inline-flex items-center gap-2 rounded-md border px-3 py-1.5",
+          dayClass,
           "font-[family-name:var(--font-narrative)] italic leading-snug",
           "cursor-pointer transition-[transform,filter] duration-200 ease-out",
           "motion-safe:hover:scale-[1.03]",
@@ -127,7 +142,8 @@ export default function TurningSoon({
       data-testid="scene-turning-soon"
       data-days-left={daysLeft}
       className={[
-        "inline-flex items-center gap-3 rounded-md border px-3 py-1.5",
+        "turning-soon-pulse inline-flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-md border px-3 py-1.5",
+        dayClass,
         "font-[family-name:var(--font-narrative)] italic leading-snug",
       ].join(" ")}
       style={noticeStyle}
@@ -145,8 +161,10 @@ export default function TurningSoon({
           "outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-candle-400)]",
         ].join(" ")}
         style={{
-          borderColor: "var(--color-crimson-400)",
-          color: "var(--color-scene-fg)",
+          borderColor: isDay
+            ? "var(--color-day-gold-border)"
+            : "var(--color-crimson-400)",
+          color: isDay ? "var(--color-day-gold-ink)" : "var(--color-scene-fg)",
         }}
       >
         Go to it

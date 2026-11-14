@@ -9,7 +9,9 @@
  * a plaque (Cinzel name, IM Fell italic count line, CTA), and shows the first
  * `min(3, rowCount)` representatives taken from the head of
  * `orderForPlace(place, rows)`. An empty place stays visible but quieter (lower
- * opacity) and renders no representatives. These tests pin that surface:
+ * opacity 1, desaturated, with an unlit lantern; Explorable Worlds Req 2.6
+ * replaced the original 0.45 opacity rule) and renders no representatives.
+ * These tests pin that surface:
  *
  *   - the four place links render in display order and are focusable (Req 1.2,
  *     1.5);
@@ -19,8 +21,8 @@
  *   - the representative count is `min(3, rowCount)` — at least one when rows
  *     exist, none when empty — and is taken from the head of `orderForPlace`
  *     (Req 2.4, 2.5);
- *   - an empty place stays visible, is quieter (lower opacity), and renders no
- *     representatives (Req 1.6);
+ *   - an empty place stays visible at opacity 1, desaturated by filter, and
+ *     renders no representatives (Req 1.6, 2.6);
  *   - the turning-soon notice renders iff a turning-soon ghost exists (Req 1.3,
  *     1.4 — asserted here only as present/absent with `turningSoon`
  *     non-null/null).
@@ -266,11 +268,16 @@ describe("EstateMap", () => {
       expect(link).not.toBeNull();
       expect(link.getAttribute("data-empty")).toBe("true");
 
-      // It is quieter: lower opacity than the populated place, and > 0 so it is
-      // not hidden (Req 1.6 — visible but quieter).
+      // Explorable Worlds Req 2.6 (replaces the original 0.45 opacity rule):
+      // an empty Landmark keeps opacity 1 and is desaturated by `filter`, with
+      // an unlit lantern.
       const opacity = Number(link.style.opacity);
-      expect(opacity).toBeGreaterThan(0);
-      expect(opacity).toBeLessThan(skyOpacity);
+      expect(opacity).toBe(1);
+      const art = screen.getByTestId(`estate-place-${place}-representatives`);
+      expect(art.style.filter).toContain("saturate(0.4)");
+      expect(
+        screen.getByTestId(`estate-place-${place}-lantern`).getAttribute("data-lit"),
+      ).toBe("false");
 
       // No representatives render for an empty place.
       const repGroup = screen.getByTestId(`estate-place-${place}-representatives`);
@@ -281,6 +288,70 @@ describe("EstateMap", () => {
     expect(screen.getByTestId("estate-place-gate-name").textContent).toBe(
       PLACES.gate.name,
     );
+  });
+
+  it("gives each place its environment cue class and keeps plaque wording (2.1, 2.3)", () => {
+    renderMap();
+    for (const place of PLACE_ORDER) {
+      const link = placeLink(place);
+      expect(link.classList.contains("place-cue")).toBe(true);
+      expect(link.classList.contains(`place-cue-${place}`)).toBe(true);
+      expect(screen.getByTestId(`estate-place-${place}-name`).textContent).toBe(
+        PLACES[place].name,
+      );
+      expect(screen.getByTestId(`estate-place-${place}-cta`).textContent).toBe(
+        PLACES[place].cta,
+      );
+    }
+  });
+
+  it("attaches no pointer-driven cue listener to a Place (2.8)", () => {
+    const spy = vi.spyOn(HTMLElement.prototype, "addEventListener");
+    try {
+      renderMap();
+      const pointerCalls = spy.mock.calls.filter(
+        ([type, , ], i) =>
+          /^(pointer|mouse)(enter|over|move|leave|out)$/.test(String(type)) &&
+          (spy.mock.contexts[i] as HTMLElement | undefined)?.dataset?.place !== undefined,
+      );
+      expect(pointerCalls).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("applies camera drift to the Hub background, off under reduced motion, paused on travel (2.4, 2.5)", () => {
+    renderMap();
+    expect(screen.getByTestId("estate-drift-sky").classList.contains("camera-drift")).toBe(true);
+    cleanup();
+
+    render(
+      <EstateMap
+        rows={populatedRows()}
+        username="octocat"
+        mode="live"
+        turningSoon={null}
+        whispers={[]}
+        onEnterPlace={vi.fn()}
+        reducedMotion
+      />,
+    );
+    expect(screen.getByTestId("estate-drift-sky").classList.contains("camera-drift")).toBe(false);
+    cleanup();
+
+    render(
+      <EstateMap
+        rows={populatedRows()}
+        username="octocat"
+        mode="live"
+        turningSoon={null}
+        whispers={[]}
+        onEnterPlace={vi.fn()}
+        reducedMotion={false}
+        travel={{ active: true, targetPlace: "sky" }}
+      />,
+    );
+    expect(screen.getByTestId("estate-map").getAttribute("data-travel-active")).toBe("true");
   });
 
   it("renders the turning-soon notice when a turning-soon ghost exists (1.3)", () => {

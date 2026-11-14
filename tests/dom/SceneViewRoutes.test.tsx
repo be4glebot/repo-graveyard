@@ -53,6 +53,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import SceneView from "@/components/scene/SceneView";
+import { ThemeProvider } from "@/components/scene/ThemeProvider";
 import { buildRows } from "@/lib/graveyard-view";
 import type { RepoFacts } from "@/lib/lifecycle";
 import { LIFECYCLE_CONFIG } from "@/lib/lifecycle";
@@ -140,16 +141,18 @@ function creatureButton(repoName: string): HTMLButtonElement {
  */
 function renderLive(options: { at?: string; initialRepo?: string } = {}) {
   return render(
-    <SceneView
-      rows={initialRows()}
-      repos={REPOS}
-      truncated={false}
-      username="octocat"
-      renderedAt={NOW}
-      mode="live"
-      initialRepo={options.initialRepo}
-      at={options.at}
-    />,
+    <ThemeProvider>
+      <SceneView
+        rows={initialRows()}
+        repos={REPOS}
+        truncated={false}
+        username="octocat"
+        renderedAt={NOW}
+        mode="live"
+        initialRepo={options.initialRepo}
+        at={options.at}
+      />
+    </ThemeProvider>,
   );
 }
 
@@ -161,16 +164,18 @@ function renderLive(options: { at?: string; initialRepo?: string } = {}) {
  */
 function renderEstate(options: { at?: string } = {}) {
   return render(
-    <SceneView
-      rows={initialRows()}
-      repos={REPOS}
-      truncated={false}
-      username={null}
-      renderedAt={NOW}
-      mode="estate"
-      estateOverrides={{}}
-      at={options.at}
-    />,
+    <ThemeProvider>
+      <SceneView
+        rows={initialRows()}
+        repos={REPOS}
+        truncated={false}
+        username={null}
+        renderedAt={NOW}
+        mode="estate"
+        estateOverrides={{}}
+        at={options.at}
+      />
+    </ThemeProvider>,
   );
 }
 
@@ -190,7 +195,7 @@ function settleTravel(): void {
   });
 }
 
-/** Grabs the currently-rendered "Lights on" switch (header or register bar). */
+/** Grabs the currently-rendered "Lights on" switch in the header. */
 function lightsOnSwitch(): HTMLButtonElement {
   return screen.getAllByRole("switch", { name: /lights on/i })[0] as HTMLButtonElement;
 }
@@ -220,7 +225,7 @@ describe("route: /g/[username] (live map)", () => {
     // The scene host reports the map view and the lights-off scene surface.
     const host = screen.getByTestId("scene-view");
     expect(host.getAttribute("data-view")).toBe("map");
-    expect(host.getAttribute("data-lights-on")).toBe("false");
+    expect(host.getAttribute("data-theme")).toBe("night");
   });
 
   it("opens the place named by ?at= on the first paint (10.2)", () => {
@@ -341,36 +346,33 @@ describe("route: /estate (bundled estate)", () => {
   });
 });
 
-describe("lights-on register reachable from map and place (14.1)", () => {
-  it("opens the register from the map and lists every repository across all four places", () => {
+describe("daytime theme and the list view reachable from map and place (14.1)", () => {
+  it("keeps the map in day and opens the list dialog with every repository across all four places", () => {
     renderLive();
 
-    // Map first; no register.
     expect(screen.queryByTestId("estate-map")).not.toBeNull();
-    expect(screen.queryByTestId("lights-on-view")).toBeNull();
+    expect(screen.queryByRole("dialog")).toBeNull();
 
-    // Turn the lights on from the map chrome.
+    // Lights on is the same scene in daylight: the map stays mounted.
     fireEvent.click(lightsOnSwitch());
+    expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("day");
+    expect(screen.queryByTestId("estate-map")).not.toBeNull();
 
-    // The register replaces the map and carries one row per repository across
-    // all four places (Req 14.1) — the full fixture, not just one place's rows.
-    expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
-    expect(screen.queryByTestId("estate-map")).toBeNull();
-
-    const table = screen.getByRole("table");
+    // "View as list" opens the register table over the scene, one row per
+    // repository across all four places (Req 14.1).
+    fireEvent.click(screen.getByTestId("view-list-button"));
+    const table = within(screen.getByRole("dialog")).getByRole("table");
     for (const repo of REPOS) {
       expect(within(table).getByText(repo.name)).not.toBeNull();
     }
 
-    // Turn the lights back off: the map returns.
+    // Lights off: night again, map still there.
     fireEvent.click(lightsOnSwitch());
+    expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("night");
     expect(screen.queryByTestId("estate-map")).not.toBeNull();
-    expect(screen.queryByTestId("lights-on-view")).toBeNull();
   });
 
-  it("opens the register from inside a place and lists every repository", () => {
-    // Start inside a place (the gate) so the register is reached from a place,
-    // not the map.
+  it("opens the list from inside a place and lists every repository", () => {
     renderLive({ at: "gate" });
     expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
       "gate",
@@ -378,28 +380,24 @@ describe("lights-on register reachable from map and place (14.1)", () => {
 
     fireEvent.click(lightsOnSwitch());
 
-    // The register replaces the place and still lists the full cross-place set.
-    expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
-    expect(screen.queryByTestId("place-view")).toBeNull();
-
-    const table = screen.getByRole("table");
-    for (const repo of REPOS) {
-      expect(within(table).getByText(repo.name)).not.toBeNull();
-    }
-
-    // Turning the lights off returns to the same place (an instant swap).
-    fireEvent.click(lightsOnSwitch());
+    // The place stays mounted in day.
     expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
       "gate",
     );
+
+    fireEvent.click(screen.getByTestId("view-list-button"));
+    const table = within(screen.getByRole("dialog")).getByRole("table");
+    for (const repo of REPOS) {
+      expect(within(table).getByText(repo.name)).not.toBeNull();
+    }
   });
 
-  it("reaches the register from the estate route too (14.1)", () => {
+  it("reaches the list from the estate route too (14.1)", () => {
     renderEstate();
 
-    fireEvent.click(lightsOnSwitch());
+    fireEvent.click(screen.getByTestId("view-list-button"));
 
-    const table = screen.getByRole("table");
+    const table = within(screen.getByRole("dialog")).getByRole("table");
     for (const repo of REPOS) {
       expect(within(table).getByText(repo.name)).not.toBeNull();
     }

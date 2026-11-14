@@ -1,0 +1,8 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL defunkt/hub 768x500: header x plate:sky 222.5x5.6
+FAIL defunkt/hub 820x500: header x plate:sky 222.5x5.6
+FAIL defunkt/hub 768x720: header x plate:sky 222.5x1.6
+done defunkt/hub
+
+69 case(s) measured, 3 finding(s), 1 distinct pair(s)
+  defunkt/hub: header x plate:sky x3 worst 222.5x5.6 at 768x500

@@ -1,0 +1,74 @@
+[
+ {
+  "place": "gate",
+  "w": 1440,
+  "h": 900,
+  "creatures": 6,
+  "pairsTested": 30,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "sky",
+  "w": 1440,
+  "h": 900,
+  "creatures": 3,
+  "pairsTested": 6,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "ground",
+  "w": 1440,
+  "h": 900,
+  "creatures": 2,
+  "pairsTested": 2,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "crypt",
+  "w": 1440,
+  "h": 900,
+  "creatures": 1,
+  "pairsTested": 0,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "gate",
+  "w": 1280,
+  "h": 720,
+  "creatures": 6,
+  "pairsTested": 30,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "sky",
+  "w": 1280,
+  "h": 720,
+  "creatures": 3,
+  "pairsTested": 6,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "ground",
+  "w": 1280,
+  "h": 720,
+  "creatures": 2,
+  "pairsTested": 2,
+  "covered": 0,
+  "examples": []
+ },
+ {
+  "place": "crypt",
+  "w": 1280,
+  "h": 720,
+  "creatures": 1,
+  "pairsTested": 0,
+  "covered": 0,
+  "examples": []
+ }
+]

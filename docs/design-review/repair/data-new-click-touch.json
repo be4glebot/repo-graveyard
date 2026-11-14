@@ -1,0 +1,123 @@
+[
+ {
+  "place": "gate",
+  "name": "phoenix-draft",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "phoenix-draft",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=gate&repo=phoenix-draft"
+ },
+ {
+  "place": "gate",
+  "name": "dusk-scheduler",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "dusk-scheduler",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=gate&repo=dusk-scheduler"
+ },
+ {
+  "place": "gate",
+  "name": "gravel-parser",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "gravel-parser",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=gate&repo=gravel-parser"
+ },
+ {
+  "place": "gate",
+  "name": "moth-metrics",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "moth-metrics",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=gate&repo=moth-metrics"
+ },
+ {
+  "place": "gate",
+  "name": "barrow-sync",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "barrow-sync",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=gate&repo=barrow-sync"
+ },
+ {
+  "place": "sky",
+  "name": "hollow-atlas",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "hollow-atlas",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=sky&repo=hollow-atlas"
+ },
+ {
+  "place": "sky",
+  "name": "cobweb-cli",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "cobweb-cli",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=sky&repo=cobweb-cli"
+ },
+ {
+  "place": "sky",
+  "name": "fenwick-timer",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "fenwick-timer",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=sky&repo=fenwick-timer"
+ },
+ {
+  "place": "ground",
+  "name": "ember-notes",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "ember-notes",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=ground&repo=ember-notes"
+ },
+ {
+  "place": "ground",
+  "name": "willow-ui",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "willow-ui",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=ground&repo=willow-ui"
+ },
+ {
+  "place": "crypt",
+  "name": "null-pointer-bistro",
+  "label": "tap",
+  "hitOk": true,
+  "hitName": "null-pointer-bistro",
+  "blocker": null,
+  "opened": true,
+  "card": [],
+  "url": "?at=crypt&repo=null-pointer-bistro"
+ }
+]

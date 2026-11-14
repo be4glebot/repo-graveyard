@@ -65,7 +65,7 @@ export default function EstateErrorState() {
         </p>
         <Link
           href="/"
-          className="inline-flex h-11 items-center gap-2 rounded border border-crimson-500 bg-crimson-700 px-5 font-heading text-[13px] font-bold uppercase tracking-[1.5px] text-crimson-200 shadow-[0_0_22px_var(--color-crimson-glow)]"
+          className="inline-flex h-11 items-center gap-2 fixture-sign px-5"
         >
           Back to the gate
         </Link>

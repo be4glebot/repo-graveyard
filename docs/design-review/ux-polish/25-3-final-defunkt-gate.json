@@ -1,0 +1,918 @@
+{
+  "sizes": [
+    [
+      320,
+      500
+    ],
+    [
+      360,
+      500
+    ],
+    [
+      390,
+      500
+    ],
+    [
+      414,
+      500
+    ],
+    [
+      600,
+      500
+    ],
+    [
+      700,
+      500
+    ],
+    [
+      737,
+      500
+    ],
+    [
+      768,
+      500
+    ],
+    [
+      820,
+      500
+    ],
+    [
+      1024,
+      500
+    ],
+    [
+      1180,
+      500
+    ],
+    [
+      1280,
+      500
+    ],
+    [
+      1366,
+      500
+    ],
+    [
+      1440,
+      500
+    ],
+    [
+      1536,
+      500
+    ],
+    [
+      1920,
+      500
+    ],
+    [
+      2560,
+      500
+    ],
+    [
+      320,
+      720
+    ],
+    [
+      360,
+      720
+    ],
+    [
+      390,
+      720
+    ],
+    [
+      414,
+      720
+    ],
+    [
+      600,
+      720
+    ],
+    [
+      700,
+      720
+    ],
+    [
+      737,
+      720
+    ],
+    [
+      768,
+      720
+    ],
+    [
+      820,
+      720
+    ],
+    [
+      1024,
+      720
+    ],
+    [
+      1180,
+      720
+    ],
+    [
+      1280,
+      720
+    ],
+    [
+      1366,
+      720
+    ],
+    [
+      1440,
+      720
+    ],
+    [
+      1536,
+      720
+    ],
+    [
+      1920,
+      720
+    ],
+    [
+      2560,
+      720
+    ],
+    [
+      320,
+      900
+    ],
+    [
+      360,
+      900
+    ],
+    [
+      390,
+      900
+    ],
+    [
+      414,
+      900
+    ],
+    [
+      600,
+      900
+    ],
+    [
+      700,
+      900
+    ],
+    [
+      737,
+      900
+    ],
+    [
+      768,
+      900
+    ],
+    [
+      820,
+      900
+    ],
+    [
+      1024,
+      900
+    ],
+    [
+      1180,
+      900
+    ],
+    [
+      1280,
+      900
+    ],
+    [
+      1366,
+      900
+    ],
+    [
+      1440,
+      900
+    ],
+    [
+      1536,
+      900
+    ],
+    [
+      1920,
+      900
+    ],
+    [
+      2560,
+      900
+    ],
+    [
+      390,
+      480
+    ],
+    [
+      390,
+      550
+    ],
+    [
+      390,
+      600
+    ],
+    [
+      390,
+      768
+    ],
+    [
+      390,
+      800
+    ],
+    [
+      390,
+      1080
+    ],
+    [
+      1024,
+      480
+    ],
+    [
+      1024,
+      550
+    ],
+    [
+      1024,
+      600
+    ],
+    [
+      1024,
+      768
+    ],
+    [
+      1024,
+      800
+    ],
+    [
+      1024,
+      1080
+    ],
+    [
+      1440,
+      480
+    ],
+    [
+      1440,
+      550
+    ],
+    [
+      1440,
+      600
+    ],
+    [
+      1440,
+      768
+    ],
+    [
+      1440,
+      800
+    ],
+    [
+      1440,
+      1080
+    ]
+  ],
+  "pages": [
+    "defunkt"
+  ],
+  "places": [
+    "gate"
+  ],
+  "cases": 69,
+  "findings": [
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x500",
+      "kind": "overlap",
+      "a": "tag:Mustache.tmbundle",
+      "b": "tag:Markdown-problems",
+      "w": 8.4,
+      "h": 42.5
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x500",
+      "kind": "overlap",
+      "a": "tag:redis-namespace",
+      "b": "tag:Markdown-problems",
+      "w": 92.4,
+      "h": 42.5
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "320x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ambition",
+      "w": 118,
+      "h": 18.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "320x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ike",
+      "w": 118,
+      "h": 18.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "320x720",
+      "kind": "overlap",
+      "a": "tag:choice",
+      "b": "tag:ambition",
+      "w": 118,
+      "h": 3.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "320x720",
+      "kind": "overlap",
+      "a": "tag:exception_logger",
+      "b": "tag:ike",
+      "w": 118,
+      "h": 3.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ircamp",
+      "w": 42.4,
+      "h": 27.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 28.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 15.1
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 83.5,
+      "h": 27
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x720",
+      "kind": "overlap",
+      "a": "tag:ooc-markdown",
+      "b": "tag:gibberish",
+      "w": 27,
+      "h": 30.5
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x720",
+      "kind": "overlap",
+      "a": "tag:Mustache.tmbundle",
+      "b": "tag:Markdown-problems",
+      "w": 8.4,
+      "h": 42.5
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ircamp",
+      "w": 16.4,
+      "h": 27.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 28.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 15.1
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 35.6,
+      "h": 27
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x720",
+      "kind": "overlap",
+      "a": "tag:redis-namespace",
+      "b": "tag:Markdown-problems",
+      "w": 92.4,
+      "h": 42.5
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 28.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 15.1
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 51.3,
+      "h": 27
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ircamp",
+      "w": 34.9,
+      "h": 18.1
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 19.2
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 3.4
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 83.5,
+      "h": 17.4
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "768x900",
+      "kind": "overlap",
+      "a": "tag:ooc-markdown",
+      "b": "tag:gibberish",
+      "w": 18.2,
+      "h": 28.5
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ircamp",
+      "w": 8.9,
+      "h": 18.1
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 19.2
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 3.4
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "820x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 38.7,
+      "h": 17.4
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 19.2
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 3.4
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x900",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 47.5,
+      "h": 17.4
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x768",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 28.6
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x768",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 15.1
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x768",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 51.3,
+      "h": 27
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x800",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:colored",
+      "w": 78.5,
+      "h": 28.8
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x800",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:ooc-markdown",
+      "w": 124.3,
+      "h": 14.8
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "size": "1024x800",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:gibberish",
+      "w": 47.5,
+      "h": 27.1
+    }
+  ],
+  "summary": [
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "tag:Markdown-problems x tag:redis-namespace",
+      "count": 2,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "820x500",
+        "kind": "overlap",
+        "a": "tag:redis-namespace",
+        "b": "tag:Markdown-problems",
+        "w": 92.4,
+        "h": 42.5
+      },
+      "worstArea": 3927.0000000000005,
+      "sizes": [
+        "820x500",
+        "820x720"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "pager x tag:colored",
+      "count": 8,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "1024x800",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:colored",
+        "w": 78.5,
+        "h": 28.8
+      },
+      "worstArea": 2260.8,
+      "sizes": [
+        "768x720",
+        "820x720",
+        "1024x720",
+        "768x900",
+        "820x900",
+        "1024x900",
+        "1024x768",
+        "1024x800"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "pager x tag:gibberish",
+      "count": 8,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "768x720",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:gibberish",
+        "w": 83.5,
+        "h": 27
+      },
+      "worstArea": 2254.5,
+      "sizes": [
+        "768x720",
+        "820x720",
+        "1024x720",
+        "768x900",
+        "820x900",
+        "1024x900",
+        "1024x768",
+        "1024x800"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "pager x tag:ambition",
+      "count": 1,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "320x720",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:ambition",
+        "w": 118,
+        "h": 18.6
+      },
+      "worstArea": 2194.8,
+      "sizes": [
+        "320x720"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "pager x tag:ike",
+      "count": 1,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "320x720",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:ike",
+        "w": 118,
+        "h": 18.6
+      },
+      "worstArea": 2194.8,
+      "sizes": [
+        "320x720"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "pager x tag:ooc-markdown",
+      "count": 8,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "768x720",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:ooc-markdown",
+        "w": 124.3,
+        "h": 15.1
+      },
+      "worstArea": 1876.9299999999998,
+      "sizes": [
+        "768x720",
+        "820x720",
+        "1024x720",
+        "768x900",
+        "820x900",
+        "1024x900",
+        "1024x768",
+        "1024x800"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "pager x tag:ircamp",
+      "count": 4,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "768x720",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:ircamp",
+        "w": 42.4,
+        "h": 27.6
+      },
+      "worstArea": 1170.24,
+      "sizes": [
+        "768x720",
+        "820x720",
+        "768x900",
+        "820x900"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "tag:gibberish x tag:ooc-markdown",
+      "count": 2,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "768x720",
+        "kind": "overlap",
+        "a": "tag:ooc-markdown",
+        "b": "tag:gibberish",
+        "w": 27,
+        "h": 30.5
+      },
+      "worstArea": 823.5,
+      "sizes": [
+        "768x720",
+        "768x900"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "tag:ambition x tag:choice",
+      "count": 1,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "320x720",
+        "kind": "overlap",
+        "a": "tag:choice",
+        "b": "tag:ambition",
+        "w": 118,
+        "h": 3.6
+      },
+      "worstArea": 424.8,
+      "sizes": [
+        "320x720"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "tag:exception_logger x tag:ike",
+      "count": 1,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "320x720",
+        "kind": "overlap",
+        "a": "tag:exception_logger",
+        "b": "tag:ike",
+        "w": 118,
+        "h": 3.6
+      },
+      "worstArea": 424.8,
+      "sizes": [
+        "320x720"
+      ]
+    },
+    {
+      "page": "defunkt",
+      "place": "gate",
+      "pair": "tag:Markdown-problems x tag:Mustache.tmbundle",
+      "count": 2,
+      "worst": {
+        "page": "defunkt",
+        "place": "gate",
+        "size": "768x500",
+        "kind": "overlap",
+        "a": "tag:Mustache.tmbundle",
+        "b": "tag:Markdown-problems",
+        "w": 8.4,
+        "h": 42.5
+      },
+      "worstArea": 357,
+      "sizes": [
+        "768x500",
+        "768x720"
+      ]
+    }
+  ]
+}

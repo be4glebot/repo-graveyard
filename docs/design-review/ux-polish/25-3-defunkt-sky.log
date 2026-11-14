@@ -1,0 +1,6 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL defunkt/sky 768x500: chips x pager 510.1x5
+done defunkt/sky
+
+69 case(s) measured, 1 finding(s), 1 distinct pair(s)
+  defunkt/sky: chips x pager x1 worst 510.1x5 at 768x500

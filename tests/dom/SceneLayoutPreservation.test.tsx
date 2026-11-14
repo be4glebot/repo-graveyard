@@ -105,14 +105,19 @@ describe("Preservation: mobile layout branch", () => {
     stubClientSize(w, 700);
     stubCompactMedia(w);
     renderSky(5);
-    expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBe("two-column");
+    // Req 17.5: sky is a world; the two-column/scatter attribute is replaced by
+    // the world layout (columns by width), so the layer carries no data-layout.
+    expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBeNull();
+    expect(screen.getAllByTestId("scatter-creature")).toHaveLength(5);
   });
 
   it.each([768, 1280, 1440])("width %i renders data-layout=scatter", (w) => {
     stubClientSize(w, 800);
     stubCompactMedia(w);
     renderSky(5);
-    expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBe("scatter");
+    // Req 17.5: see above; the world layout replaces data-layout for sky.
+    expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBeNull();
+    expect(screen.getAllByTestId("scatter-creature")).toHaveLength(5);
   });
 });
 

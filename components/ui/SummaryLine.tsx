@@ -32,6 +32,8 @@
 import type { GraveyardRow } from "@/lib/graveyard-view";
 import { plural } from "@/lib/estate-view";
 import { summaryCounts, type SummaryCounts } from "@/lib/scene-view";
+import { useTheme } from "@/components/scene/ThemeProvider";
+import { countKey, dayCopy } from "@/lib/day-copy";
 
 export interface SummaryLineProps {
   /** Rows to summarize; ignored when `counts` is provided. */
@@ -67,12 +69,13 @@ function nounFor(
 }
 
 export default function SummaryLine({ rows, counts }: SummaryLineProps) {
+  const { theme } = useTheme();
   const resolved: SummaryCounts = counts ?? summaryCounts(rows ?? []);
 
   return (
     <p
       data-testid="scene-summary-line"
-      className="font-heading text-sm uppercase tracking-[2px] text-scene-fg-muted"
+      className="day-chrome-plate font-heading text-sm uppercase tracking-[2px] text-scene-fg-muted"
     >
       <span className="font-fact text-scene-fg">{resolved.souls}</span>{" "}
       <span>{resolved.souls === 1 ? "soul" : "souls"}</span>
@@ -80,7 +83,11 @@ export default function SummaryLine({ rows, counts }: SummaryLineProps) {
         <span key={segment.key}>
           {" · "}
           <span className="font-fact text-scene-fg">{resolved[segment.key]}</span>{" "}
-          <span>{nounFor(resolved[segment.key], segment)}</span>
+          <span>
+            {theme === "day"
+              ? dayCopy(theme, countKey(segment.key, resolved[segment.key]))
+              : nounFor(resolved[segment.key], segment)}
+          </span>
         </span>
       ))}
     </p>

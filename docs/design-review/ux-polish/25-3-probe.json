@@ -1,0 +1,411 @@
+{
+  "sizes": [
+    [
+      1024,
+      500
+    ],
+    [
+      1440,
+      900
+    ],
+    [
+      737,
+      720
+    ]
+  ],
+  "pages": [
+    "estate",
+    "be4glebot"
+  ],
+  "places": [
+    "hub",
+    "sky"
+  ],
+  "cases": 12,
+  "findings": [
+    {
+      "page": "estate",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "header",
+      "b": "plate:sky",
+      "w": 260,
+      "h": 7.6
+    },
+    {
+      "page": "estate",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "header.styled-toggle",
+      "b": "plate:sky",
+      "w": 129.4,
+      "h": 5.6
+    },
+    {
+      "page": "estate",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "header.styled-toggle",
+      "b": "plate:sky",
+      "w": 122.6,
+      "h": 5.6
+    },
+    {
+      "page": "estate",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "legend",
+      "b": "plate:gate",
+      "w": 260,
+      "h": 34
+    },
+    {
+      "page": "estate",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "whisper",
+      "b": "plate:sky",
+      "w": 231,
+      "h": 18.6
+    },
+    {
+      "page": "estate",
+      "place": "sky",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "legend",
+      "b": "tag:0",
+      "w": 77.4,
+      "h": 34
+    },
+    {
+      "page": "estate",
+      "place": "sky",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "estate-notice",
+      "b": "tag:0",
+      "w": 2.1,
+      "h": 20
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "header",
+      "b": "plate:sky",
+      "w": 260,
+      "h": 13.6
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "header.styled-toggle",
+      "b": "plate:sky",
+      "w": 129.4,
+      "h": 8.6
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "header.styled-toggle",
+      "b": "plate:sky",
+      "w": 122.6,
+      "h": 8.6
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "legend",
+      "b": "plate:gate",
+      "w": 260,
+      "h": 34
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "whisper",
+      "b": "plate:sky",
+      "w": 236.2,
+      "h": 18.6
+    },
+    {
+      "page": "be4glebot",
+      "place": "sky",
+      "size": "1024x500",
+      "kind": "overlap",
+      "a": "legend",
+      "b": "tag:0",
+      "w": 108.9,
+      "h": 34
+    },
+    {
+      "page": "be4glebot",
+      "place": "sky",
+      "size": "737x720",
+      "kind": "overlap",
+      "a": "pager",
+      "b": "tag:1",
+      "w": 144.8,
+      "h": 2.4
+    }
+  ],
+  "summary": [
+    {
+      "page": "estate",
+      "place": "hub",
+      "pair": "legend x plate:gate",
+      "count": 1,
+      "worst": {
+        "page": "estate",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "legend",
+        "b": "plate:gate",
+        "w": 260,
+        "h": 34
+      },
+      "worstArea": 8840,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "pair": "legend x plate:gate",
+      "count": 1,
+      "worst": {
+        "page": "be4glebot",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "legend",
+        "b": "plate:gate",
+        "w": 260,
+        "h": 34
+      },
+      "worstArea": 8840,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "pair": "plate:sky x whisper",
+      "count": 1,
+      "worst": {
+        "page": "be4glebot",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "whisper",
+        "b": "plate:sky",
+        "w": 236.2,
+        "h": 18.6
+      },
+      "worstArea": 4393.32,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "hub",
+      "pair": "plate:sky x whisper",
+      "count": 1,
+      "worst": {
+        "page": "estate",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "whisper",
+        "b": "plate:sky",
+        "w": 231,
+        "h": 18.6
+      },
+      "worstArea": 4296.6,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "be4glebot",
+      "place": "sky",
+      "pair": "legend x tag:0",
+      "count": 1,
+      "worst": {
+        "page": "be4glebot",
+        "place": "sky",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "legend",
+        "b": "tag:0",
+        "w": 108.9,
+        "h": 34
+      },
+      "worstArea": 3702.6000000000004,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "pair": "header x plate:sky",
+      "count": 1,
+      "worst": {
+        "page": "be4glebot",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "header",
+        "b": "plate:sky",
+        "w": 260,
+        "h": 13.6
+      },
+      "worstArea": 3536,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "sky",
+      "pair": "legend x tag:0",
+      "count": 1,
+      "worst": {
+        "page": "estate",
+        "place": "sky",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "legend",
+        "b": "tag:0",
+        "w": 77.4,
+        "h": 34
+      },
+      "worstArea": 2631.6000000000004,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "hub",
+      "pair": "header x plate:sky",
+      "count": 1,
+      "worst": {
+        "page": "estate",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "header",
+        "b": "plate:sky",
+        "w": 260,
+        "h": 7.6
+      },
+      "worstArea": 1976,
+      "sizes": [
+        "1024x500"
+      ]
+    },
+    {
+      "page": "be4glebot",
+      "place": "hub",
+      "pair": "header.styled-toggle x plate:sky",
+      "count": 2,
+      "worst": {
+        "page": "be4glebot",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "header.styled-toggle",
+        "b": "plate:sky",
+        "w": 129.4,
+        "h": 8.6
+      },
+      "worstArea": 1112.84,
+      "sizes": [
+        "1024x500",
+        "1024x500"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "hub",
+      "pair": "header.styled-toggle x plate:sky",
+      "count": 2,
+      "worst": {
+        "page": "estate",
+        "place": "hub",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "header.styled-toggle",
+        "b": "plate:sky",
+        "w": 129.4,
+        "h": 5.6
+      },
+      "worstArea": 724.64,
+      "sizes": [
+        "1024x500",
+        "1024x500"
+      ]
+    },
+    {
+      "page": "be4glebot",
+      "place": "sky",
+      "pair": "pager x tag:1",
+      "count": 1,
+      "worst": {
+        "page": "be4glebot",
+        "place": "sky",
+        "size": "737x720",
+        "kind": "overlap",
+        "a": "pager",
+        "b": "tag:1",
+        "w": 144.8,
+        "h": 2.4
+      },
+      "worstArea": 347.52000000000004,
+      "sizes": [
+        "737x720"
+      ]
+    },
+    {
+      "page": "estate",
+      "place": "sky",
+      "pair": "estate-notice x tag:0",
+      "count": 1,
+      "worst": {
+        "page": "estate",
+        "place": "sky",
+        "size": "1024x500",
+        "kind": "overlap",
+        "a": "estate-notice",
+        "b": "tag:0",
+        "w": 2.1,
+        "h": 20
+      },
+      "worstArea": 42,
+      "sizes": [
+        "1024x500"
+      ]
+    }
+  ]
+}

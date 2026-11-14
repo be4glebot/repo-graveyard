@@ -1,0 +1,2002 @@
+[
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1440x900",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  743,
+                          "above":  16.587380069444798,
+                          "below":  16.243554375000297,
+                          "share":  0.0013483360566451013,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1440x900",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  620,
+                          "above":  22.465057986111205,
+                          "below":  22.17711788194458,
+                          "share":  0.001129176879084809,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1440x900",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  501,
+                          "above":  25.678566145832857,
+                          "below":  25.458482256943935,
+                          "share":  0.000863074074074205,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1440x900",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  386,
+                          "above":  26.049812673610763,
+                          "below":  26.092255451388414,
+                          "share":  0.0001664422657947117,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1440x900",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  281,
+                          "above":  23.139066458333264,
+                          "below":  23.33592760416662,
+                          "share":  0.0007720044934641421,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1920x1080",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  891,
+                          "above":  14.923950885417357,
+                          "below":  14.447185390625622,
+                          "share":  0.0018696686070264119,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1920x1080",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  744,
+                          "above":  17.924950807291946,
+                          "below":  17.71390515625033,
+                          "share":  0.0008276300040847672,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1920x1080",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  601,
+                          "above":  21.563370312500023,
+                          "below":  21.32293270833335,
+                          "share":  0.0009428925653594991,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1920x1080",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  463,
+                          "above":  22.788143750000124,
+                          "below":  22.551640859375116,
+                          "share":  0.0009274623161765026,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "1920x1080",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  336,
+                          "above":  20.03896742187458,
+                          "below":  20.07617799479141,
+                          "share":  0.00014592381536011916,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "390x844",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  696,
+                          "above":  14.25197974358966,
+                          "below":  13.665843333333289,
+                          "share":  0.002298574157868121,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "390x844",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  581,
+                          "above":  26.37578756410258,
+                          "below":  25.852198846153907,
+                          "share":  0.0020532890899947966,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "390x844",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  469,
+                          "above":  33.75685423076927,
+                          "below":  33.336765256410416,
+                          "share":  0.001647407742583744,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "390x844",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  361,
+                          "above":  31.78513012820498,
+                          "below":  32.28908538461539,
+                          "share":  0.001976295123178081,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "390x844",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  262,
+                          "above":  25.97611564102567,
+                          "below":  26.350939743589684,
+                          "share":  0.0014698984414275005,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "360x740",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  611,
+                          "above":  17.16616416666652,
+                          "below":  16.183471805555453,
+                          "share":  0.0038536955337688883,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "360x740",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  510,
+                          "above":  28.729378749999853,
+                          "below":  28.39207791666652,
+                          "share":  0.001322748366013074,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "360x740",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  412,
+                          "above":  34.30058805555559,
+                          "below":  33.877058750000145,
+                          "share":  0.0016608992374723447,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "360x740",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  318,
+                          "above":  32.541747638888836,
+                          "below":  33.03618416666657,
+                          "share":  0.0019389667755989666,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3",
+        "viewport":  "360x740",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  231,
+                          "above":  27.778103749999815,
+                          "below":  28.125508055555432,
+                          "share":  0.0013623698257083032,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1440x900",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  743,
+                          "above":  15.600434583333534,
+                          "below":  15.253886180555865,
+                          "share":  0.0013590133442261542,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  630,
+                          "above":  20.4072542013892,
+                          "below":  20.131451354166995,
+                          "share":  0.0010815797930282581,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  518,
+                          "above":  23.739693229166864,
+                          "below":  23.59656579861132,
+                          "share":  0.0005612840413942933,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  405,
+                          "above":  24.070981944444444,
+                          "below":  23.96483506944434,
+                          "share":  0.000416262254902366,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1440x900",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  293,
+                          "above":  21.28284288194465,
+                          "below":  21.324982951389334,
+                          "share":  0.00016525517429288045,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  891,
+                          "above":  14.695937552083778,
+                          "below":  14.542062317708837,
+                          "share":  0.0006034322916664387,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  756,
+                          "above":  17.256568333333814,
+                          "below":  17.311092473958745,
+                          "share":  0.0002138201593134551,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  621,
+                          "above":  20.522884479166557,
+                          "below":  20.618098281249946,
+                          "share":  0.00037338745915054607,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  486,
+                          "above":  20.78603307291665,
+                          "below":  20.962744843750183,
+                          "share":  0.0006929873366020974,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "1920x1080",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  351,
+                          "above":  17.957047083333602,
+                          "below":  18.262973229166583,
+                          "share":  0.0011997103758156107,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "390x844",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  696,
+                          "above":  13.973866666666565,
+                          "below":  13.653602820512743,
+                          "share":  0.0012559366515836135,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "390x844",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  590,
+                          "above":  26.200956538461483,
+                          "below":  25.92935076923067,
+                          "share":  0.0010651206636502484,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "390x844",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  485,
+                          "above":  32.7724776923077,
+                          "below":  32.97736358974361,
+                          "share":  0.0008034741075917953,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "390x844",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  379,
+                          "above":  33.310604615384705,
+                          "below":  33.8029765384615,
+                          "share":  0.0019308702865756698,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "390x844",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  274,
+                          "above":  27.86517615384614,
+                          "below":  28.5042216666666,
+                          "share":  0.0025060608345900365,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "360x740",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  611,
+                          "above":  17.155930833333205,
+                          "below":  16.64988291666658,
+                          "share":  0.001984501633986761,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "360x740",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  518,
+                          "above":  29.060347916666615,
+                          "below":  29.113051527777746,
+                          "share":  0.00020668082788678728,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "360x740",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  426,
+                          "above":  33.965296944444454,
+                          "below":  34.25004944444447,
+                          "share":  0.001116676470588304,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "360x740",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  333,
+                          "above":  34.39981458333335,
+                          "below":  34.920275416666726,
+                          "share":  0.0020410228758171523,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-3-reduced",
+        "viewport":  "360x740",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  241,
+                          "above":  30.271151666666597,
+                          "below":  30.88541111111109,
+                          "share":  0.00240886056644899,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1440x900",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1440x900",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1440x900",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1440x900",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1440x900",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1920x1080",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1920x1080",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1920x1080",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1920x1080",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "1920x1080",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "390x844",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "390x844",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "390x844",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "390x844",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "390x844",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "360x740",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "360x740",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "360x740",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "360x740",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty",
+        "viewport":  "360x740",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1440x900",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1440x900",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "1920x1080",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "390x844",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "390x844",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "390x844",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "390x844",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "390x844",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "360x740",
+        "depth":  0,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "360x740",
+        "depth":  0.25,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "360x740",
+        "depth":  0.5,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "360x740",
+        "depth":  0.75,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "empty-reduced",
+        "viewport":  "360x740",
+        "depth":  1,
+        "seams":  [
+
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1440x900",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  743,
+                          "above":  16.82622302083364,
+                          "below":  16.435970034722526,
+                          "share":  0.001530403867102411,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1440x900",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  620,
+                          "above":  22.039090381944586,
+                          "below":  21.71367458333362,
+                          "share":  0.001276140386709668,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1440x900",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  501,
+                          "above":  26.019441874999544,
+                          "below":  25.809460347221687,
+                          "share":  0.0008234569716778669,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1440x900",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  386,
+                          "above":  25.918913645832937,
+                          "below":  25.962942083332727,
+                          "share":  0.00017266053921486326,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1440x900",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  281,
+                          "above":  23.331110520833136,
+                          "below":  23.53611440972196,
+                          "share":  0.0008039368191718638,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1920x1080",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  891,
+                          "above":  15.286869791667337,
+                          "below":  14.701405234375374,
+                          "share":  0.002295939440360642,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1920x1080",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  744,
+                          "above":  18.405765390625106,
+                          "below":  18.196352942708486,
+                          "share":  0.0008212252859475283,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1920x1080",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  601,
+                          "above":  21.28755281249987,
+                          "below":  21.068481249999888,
+                          "share":  0.0008591041666666037,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1920x1080",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  463,
+                          "above":  22.138261588541727,
+                          "below":  21.91821624999987,
+                          "share":  0.0008629228962425818,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "1920x1080",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  336,
+                          "above":  20.220071354166205,
+                          "below":  20.248438541666506,
+                          "share":  0.0001112438725501995,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "390x844",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  696,
+                          "above":  13.993395384615338,
+                          "below":  13.375972179487137,
+                          "share":  0.0024212674710909847,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "390x844",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  581,
+                          "above":  26.490788333333274,
+                          "below":  25.97499935897441,
+                          "share":  0.0020227018602308336,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "390x844",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  469,
+                          "above":  33.79661782051275,
+                          "below":  33.38430923076927,
+                          "share":  0.001616896430366596,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "390x844",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  361,
+                          "above":  32.536398076923,
+                          "below":  33.03253115384618,
+                          "share":  0.001945619909502664,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "390x844",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  262,
+                          "above":  25.991404358974396,
+                          "below":  26.369713846153783,
+                          "share":  0.0014835666163897506,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "360x740",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  685,
+                          "above":  8.307375972222136,
+                          "below":  8.013336249999947,
+                          "share":  0.0011530969498909386,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "360x740",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  546,
+                          "above":  25.52313763888869,
+                          "below":  25.08118277777764,
+                          "share":  0.001733156318082549,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "360x740",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  411,
+                          "above":  33.27180138888886,
+                          "below":  33.421308055555535,
+                          "share":  0.0005863006535948018,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "360x740",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  281,
+                          "above":  31.116503888888964,
+                          "below":  31.51606250000003,
+                          "share":  0.001566896514161038,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12",
+        "viewport":  "360x740",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  161,
+                          "above":  19.34910930555548,
+                          "below":  19.961389999999867,
+                          "share":  0.002401100762527006,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1440x900",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  743,
+                          "above":  15.600434583333534,
+                          "below":  15.253886180555865,
+                          "share":  0.0013590133442261542,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  630,
+                          "above":  20.4072542013892,
+                          "below":  20.131451354166995,
+                          "share":  0.0010815797930282581,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  518,
+                          "above":  23.739693229166864,
+                          "below":  23.59656579861132,
+                          "share":  0.0005612840413942933,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1440x900",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  405,
+                          "above":  24.070981944444444,
+                          "below":  23.96483506944434,
+                          "share":  0.000416262254902366,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1440x900",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  293,
+                          "above":  21.28284288194465,
+                          "below":  21.324982951389334,
+                          "share":  0.00016525517429288045,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  891,
+                          "above":  14.695937552083778,
+                          "below":  14.542062317708837,
+                          "share":  0.0006034322916664387,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  756,
+                          "above":  17.256568333333814,
+                          "below":  17.311092473958745,
+                          "share":  0.0002138201593134551,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  621,
+                          "above":  20.522884479166557,
+                          "below":  20.618098281249946,
+                          "share":  0.00037338745915054607,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1920x1080",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  486,
+                          "above":  20.78603307291665,
+                          "below":  20.962744843750183,
+                          "share":  0.0006929873366020974,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "1920x1080",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  351,
+                          "above":  17.957047083333602,
+                          "below":  18.262973229166583,
+                          "share":  0.0011997103758156107,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "390x844",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  696,
+                          "above":  13.973866666666565,
+                          "below":  13.653602820512743,
+                          "share":  0.0012559366515836135,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "390x844",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  590,
+                          "above":  26.200956538461483,
+                          "below":  25.92935076923067,
+                          "share":  0.0010651206636502484,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "390x844",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  485,
+                          "above":  32.7724776923077,
+                          "below":  32.97736358974361,
+                          "share":  0.0008034741075917953,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "390x844",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  379,
+                          "above":  33.310604615384705,
+                          "below":  33.8029765384615,
+                          "share":  0.0019308702865756698,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "390x844",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  274,
+                          "above":  27.86517615384614,
+                          "below":  28.5042216666666,
+                          "share":  0.0025060608345900365,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "360x740",
+        "depth":  0,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  685,
+                          "above":  8.101547499999924,
+                          "below":  7.885192361111042,
+                          "share":  0.0008484515250544385,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "360x740",
+        "depth":  0.25,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  555,
+                          "above":  23.486983888888755,
+                          "below":  23.199995277777653,
+                          "share":  0.0011254455337690282,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "360x740",
+        "depth":  0.5,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  426,
+                          "above":  32.547756527777835,
+                          "below":  32.684241388888935,
+                          "share":  0.0005352347494552943,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "360x740",
+        "depth":  0.75,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  296,
+                          "above":  31.79168097222229,
+                          "below":  32.21630722222219,
+                          "share":  0.001665200980391764,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    },
+    {
+        "place":  "sky",
+        "case":  "ghosts-12-reduced",
+        "viewport":  "360x740",
+        "depth":  1,
+        "seams":  [
+                      {
+                          "zone":  "haze",
+                          "y":  167,
+                          "above":  20.51417972222201,
+                          "below":  21.24536527777753,
+                          "share":  0.0028673943355118424,
+                          "pass":  true
+                      }
+                  ],
+        "fallbackEdges":  [
+
+                          ]
+    }
+]

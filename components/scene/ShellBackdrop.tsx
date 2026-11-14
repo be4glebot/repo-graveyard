@@ -13,6 +13,9 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useTheme } from "@/components/scene/ThemeProvider";
+import DayPalette from "@/components/scene/DayPalette";
+import { themeArt, themeFilter } from "@/lib/theme-art";
 
 export type ShellBackdropImage = "place-gate" | "place-ground";
 
@@ -36,6 +39,28 @@ export default function ShellBackdrop({
   priority = false,
 }: ShellBackdropProps) {
   const [failed, setFailed] = useState(false);
+  const { theme } = useTheme();
+  // Unmapped art (the gate plate) falls back to night inside themeArt.
+  const src = themeArt(theme, `/art/${image}.webp`);
+  const isDayArt = src !== themeArt("night", `/art/${image}.webp`);
+  const filter = isDayArt
+    ? themeFilter(theme, `brightness(${BRIGHTNESS[image]})`, "--art-filter-ground")
+    : `brightness(${BRIGHTNESS[image]})`;
+
+  // Day with no painted day plate (the gate): draw the day palette instead of
+  // night art.
+  if (theme === "day" && !isDayArt) {
+    return (
+      <div
+        aria-hidden="true"
+        data-testid="shell-backdrop"
+        data-image={image}
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
+        <DayPalette variant="full" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -51,7 +76,7 @@ export default function ShellBackdrop({
       />
       {!failed && (
         <Image
-          src={`/art/${image}.webp`}
+          src={src}
           alt=""
           width={IMAGE_WIDTH}
           height={IMAGE_HEIGHT}
@@ -59,7 +84,7 @@ export default function ShellBackdrop({
           draggable={false}
           sizes="100vw"
           className="absolute inset-0 h-full w-full select-none object-cover"
-          style={{ filter: `brightness(${BRIGHTNESS[image]})` }}
+          style={{ filter }}
           onError={() => setFailed(true)}
         />
       )}

@@ -1,0 +1,306 @@
+[
+ {
+  "place": "gate",
+  "w": 1440,
+  "h": 900,
+  "steps": 0,
+  "partiallyCovered": {}
+ },
+ {
+  "place": "sky",
+  "w": 1440,
+  "h": 900,
+  "steps": 8,
+  "partiallyCovered": {
+   "hollow-atlas": {
+    "worst": 0.8,
+    "covers": {
+     "filter-chip-all": 4,
+     "filter-chip-healthy": 6
+    }
+   },
+   "cobweb-cli": {
+    "worst": 0.6,
+    "covers": {
+     "filter-chip-about to turn": 15
+    }
+   }
+  }
+ },
+ {
+  "place": "ground",
+  "w": 1440,
+  "h": 900,
+  "steps": 8,
+  "partiallyCovered": {
+   "willow-ui": {
+    "worst": 0.96,
+    "covers": {
+     "world-stage": 9
+    }
+   },
+   "harvest-engine": {
+    "worst": 0.8,
+    "covers": {
+     "world-stage": 14
+    }
+   },
+   "ember-notes": {
+    "worst": 0.95,
+    "covers": {
+     "return-to-gate": 3
+    }
+   }
+  }
+ },
+ {
+  "place": "crypt",
+  "w": 1440,
+  "h": 900,
+  "steps": 8,
+  "partiallyCovered": {
+   "tin-can-chat": {
+    "worst": 0.4,
+    "covers": {
+     "pager-deeper": 12
+    }
+   }
+  }
+ },
+ {
+  "place": "gate",
+  "w": 1280,
+  "h": 720,
+  "steps": 0,
+  "partiallyCovered": {
+   "barrow-sync": {
+    "worst": 0.6,
+    "covers": {
+     "filter-chip-rotting": 10
+    }
+   }
+  }
+ },
+ {
+  "place": "sky",
+  "w": 1280,
+  "h": 720,
+  "steps": 8,
+  "partiallyCovered": {
+   "hollow-atlas": {
+    "worst": 0.6,
+    "covers": {
+     "filter-chip-all": 4,
+     "filter-chips": 4,
+     "filter-chip-healthy": 12,
+     "styled-toggle": 15
+    }
+   },
+   "lantern-notes": {
+    "worst": 0.8,
+    "covers": {
+     "none": 5
+    }
+   },
+   "cobweb-cli": {
+    "worst": 0.8,
+    "covers": {
+     "filter-chip-about to turn": 10
+    }
+   }
+  }
+ },
+ {
+  "place": "ground",
+  "w": 1280,
+  "h": 720,
+  "steps": 8,
+  "partiallyCovered": {
+   "willow-ui": {
+    "worst": 0.92,
+    "covers": {
+     "pager-deeper": 1,
+     "world-stage": 9
+    }
+   },
+   "harvest-engine": {
+    "worst": 0.8,
+    "covers": {
+     "world-stage": 14
+    }
+   },
+   "ember-notes": {
+    "worst": 0.75,
+    "covers": {
+     "return-to-gate": 8,
+     "scene-header": 6,
+     "styled-toggle": 3
+    }
+   }
+  }
+ },
+ {
+  "place": "crypt",
+  "w": 1280,
+  "h": 720,
+  "steps": 8,
+  "partiallyCovered": {
+   "tin-can-chat": {
+    "worst": 0.52,
+    "covers": {
+     "pager-deeper": 16
+    }
+   },
+   "null-pointer-bistro": {
+    "worst": 0.4,
+    "covers": {
+     "styled-toggle": 16,
+     "scene-header": 9
+    }
+   }
+  }
+ },
+ {
+  "place": "gate",
+  "w": 390,
+  "h": 844,
+  "steps": 0,
+  "partiallyCovered": {
+   "phoenix-draft": {
+    "worst": 0.8,
+    "covers": {
+     "plaque": 2,
+     "plaque-name": 3
+    }
+   },
+   "dusk-scheduler": {
+    "worst": 0.6,
+    "covers": {
+     "plaque-name": 5,
+     "plaque": 4,
+     "plaque-sub": 1
+    }
+   },
+   "gravel-parser": {
+    "worst": 0.6,
+    "covers": {
+     "plaque": 6,
+     "plaque-name": 3,
+     "plaque-sub": 1
+    }
+   },
+   "moth-metrics": {
+    "worst": 0.6,
+    "covers": {
+     "plaque": 5,
+     "plaque-name": 5
+    }
+   },
+   "barrow-sync": {
+    "worst": 0.6,
+    "covers": {
+     "plaque": 3,
+     "scatter-plaque": 5,
+     "plaque-sub": 2
+    }
+   },
+   "crypt-keeper": {
+    "worst": 0.8,
+    "covers": {
+     "plaque-name": 5
+    }
+   }
+  }
+ },
+ {
+  "place": "sky",
+  "w": 390,
+  "h": 844,
+  "steps": 8,
+  "partiallyCovered": {
+   "fenwick-timer": {
+    "worst": 0.4666666666666667,
+    "covers": {
+     "pager-nearer": 16
+    }
+   },
+   "hollow-atlas": {
+    "worst": 0.8,
+    "covers": {
+     "filter-chip-all": 6,
+     "filter-chip-healthy": 9,
+     "return-to-gate": 15
+    }
+   },
+   "cobweb-cli": {
+    "worst": 0.36,
+    "covers": {
+     "depth-marker": 17,
+     "depth-step-1": 3,
+     "depth-step-0": 4,
+     "depth-marker-label": 6,
+     "filter-chip-fading": 15,
+     "filter-chips": 5,
+     "filter-chip-flickering": 5
+    }
+   },
+   "lantern-notes": {
+    "worst": 0,
+    "covers": {
+     "pager-deeper": 25
+    }
+   }
+  }
+ },
+ {
+  "place": "ground",
+  "w": 390,
+  "h": 844,
+  "steps": 8,
+  "partiallyCovered": {
+   "willow-ui": {
+    "worst": 0.32,
+    "covers": {
+     "world-stage": 6,
+     "depth-marker": 34,
+     "depth-marker-label": 16,
+     "return-to-gate": 1
+    }
+   },
+   "harvest-engine": {
+    "worst": 0.2,
+    "covers": {
+     "pager-nearer": 15,
+     "world-stage": 13
+    }
+   },
+   "ember-notes": {
+    "worst": 0.8,
+    "covers": {
+     "return-to-gate": 15
+    }
+   }
+  }
+ },
+ {
+  "place": "crypt",
+  "w": 390,
+  "h": 844,
+  "steps": 8,
+  "partiallyCovered": {
+   "tin-can-chat": {
+    "worst": 0.2,
+    "covers": {
+     "pager-deeper": 20,
+     "depth-marker": 16
+    }
+   },
+   "null-pointer-bistro": {
+    "worst": 0.4,
+    "covers": {
+     "return-to-gate": 15
+    }
+   }
+  }
+ }
+]

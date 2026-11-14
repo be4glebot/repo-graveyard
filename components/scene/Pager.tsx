@@ -23,6 +23,9 @@
  * Requirements: 8.1, 8.2, 8.3
  */
 
+import { useTheme } from "@/components/scene/ThemeProvider";
+import { dayCopy } from "@/lib/day-copy";
+
 export interface PagerProps {
   /** The current 0-based plot index (may be out of range; clamped here). */
   plotIndex: number;
@@ -33,16 +36,15 @@ export interface PagerProps {
 }
 
 /**
- * Shared bevelled-iron `.btn2` treatment for the two pager controls. The base
+ * Shared `fixture-rail` (iron rail) treatment for the two pager controls. The base
  * class from the boards owns the box, Cinzel uppercase label, border, and
  * background (Req 7.1); the utilities here carry only interaction and disabled
  * state so the two controls still disable correctly at the plot ends.
  */
 const PAGER_BUTTON = [
-  "btn2 pointer-events-auto transition-colors",
-  "enabled:cursor-pointer enabled:hover:bg-candle-400/10",
+  "fixture-rail pointer-events-auto px-4 py-2 font-heading text-xs uppercase tracking-[1.5px] transition-colors",
+  "enabled:cursor-pointer enabled:hover:border-candle-400",
   "disabled:cursor-not-allowed disabled:opacity-40",
-  "outline-none focus-visible:ring-2 focus-visible:ring-candle-400",
 ].join(" ");
 
 export default function Pager({
@@ -50,6 +52,7 @@ export default function Pager({
   plotCount,
   onPlotChange,
 }: PagerProps) {
+  const { theme } = useTheme();
   // Clamp defensively so an out-of-range index never renders an incoherent
   // label or mis-enabled control (Req 8.3). `plotCount` is ≥ 1 by contract.
   const count = Math.max(1, plotCount);
@@ -69,16 +72,18 @@ export default function Pager({
       <button
         type="button"
         data-testid="pager-nearer"
+        title={dayCopy(theme, "pager.nearer.title")}
         disabled={atFirst}
         onClick={() => onPlotChange(index - 1)}
         className={PAGER_BUTTON}
       >
-        ‹ Nearer the gate
+        {dayCopy(theme, "pager.nearer")}
       </button>
 
       <span
         data-testid="pager-label"
-        className="font-heading text-xs uppercase tracking-[2px] text-scene-fg-muted"
+        title="Page of projects in this place"
+        className="day-chrome-plate font-heading text-xs uppercase tracking-[2px] text-scene-fg-muted"
       >
         Plot {index + 1} of {count}
       </span>
@@ -86,11 +91,12 @@ export default function Pager({
       <button
         type="button"
         data-testid="pager-deeper"
+        title={dayCopy(theme, "pager.deeper.title")}
         disabled={atLast}
         onClick={() => onPlotChange(index + 1)}
         className={PAGER_BUTTON}
       >
-        Deeper into the dark ›
+        {dayCopy(theme, "pager.deeper")}
       </button>
     </div>
   );

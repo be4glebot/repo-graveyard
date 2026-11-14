@@ -1,0 +1,26 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL defunkt/gate 768x500: tag:Mustache.tmbundle x tag:Markdown-problems 8.4x42.5
+FAIL defunkt/gate 820x500: tag:redis-namespace x tag:Markdown-problems 92.4x42.5
+FAIL defunkt/gate 320x720: pager x tag:ambition 118x18.6; pager x tag:ike 118x18.6; tag:choice x tag:ambition 118x3.6; tag:exception_logger x tag:ike 118x3.6
+FAIL defunkt/gate 768x720: pager x tag:ircamp 42.4x27.6; pager x tag:colored 78.5x28.6; pager x tag:ooc-markdown 124.3x15.1; pager x tag:gibberish 83.5x27; tag:ooc-markdown x tag:gibberish 27x30.5; tag:Mustache.tmbundle x tag:Markdown-problems 8.4x42.5
+FAIL defunkt/gate 820x720: pager x tag:ircamp 16.4x27.6; pager x tag:colored 78.5x28.6; pager x tag:ooc-markdown 124.3x15.1; pager x tag:gibberish 35.6x27; tag:redis-namespace x tag:Markdown-problems 92.4x42.5
+FAIL defunkt/gate 1024x720: pager x tag:colored 78.5x28.6; pager x tag:ooc-markdown 124.3x15.1; pager x tag:gibberish 51.3x27
+FAIL defunkt/gate 768x900: pager x tag:ircamp 34.9x18.1; pager x tag:colored 78.5x19.2; pager x tag:ooc-markdown 124.3x3.4; pager x tag:gibberish 83.5x17.4; tag:ooc-markdown x tag:gibberish 18.2x28.5
+FAIL defunkt/gate 820x900: pager x tag:ircamp 8.9x18.1; pager x tag:colored 78.5x19.2; pager x tag:ooc-markdown 124.3x3.4; pager x tag:gibberish 38.7x17.4
+FAIL defunkt/gate 1024x900: pager x tag:colored 78.5x19.2; pager x tag:ooc-markdown 124.3x3.4; pager x tag:gibberish 47.5x17.4
+FAIL defunkt/gate 1024x768: pager x tag:colored 78.5x28.6; pager x tag:ooc-markdown 124.3x15.1; pager x tag:gibberish 51.3x27
+FAIL defunkt/gate 1024x800: pager x tag:colored 78.5x28.8; pager x tag:ooc-markdown 124.3x14.8; pager x tag:gibberish 47.5x27.1
+done defunkt/gate
+
+69 case(s) measured, 38 finding(s), 11 distinct pair(s)
+  defunkt/gate: tag:Markdown-problems x tag:redis-namespace x2 worst 92.4x42.5 at 820x500
+  defunkt/gate: pager x tag:colored x8 worst 78.5x28.8 at 1024x800
+  defunkt/gate: pager x tag:gibberish x8 worst 83.5x27 at 768x720
+  defunkt/gate: pager x tag:ambition x1 worst 118x18.6 at 320x720
+  defunkt/gate: pager x tag:ike x1 worst 118x18.6 at 320x720
+  defunkt/gate: pager x tag:ooc-markdown x8 worst 124.3x15.1 at 768x720
+  defunkt/gate: pager x tag:ircamp x4 worst 42.4x27.6 at 768x720
+  defunkt/gate: tag:gibberish x tag:ooc-markdown x2 worst 27x30.5 at 768x720
+  defunkt/gate: tag:ambition x tag:choice x1 worst 118x3.6 at 320x720
+  defunkt/gate: tag:exception_logger x tag:ike x1 worst 118x3.6 at 320x720
+  defunkt/gate: tag:Markdown-problems x tag:Mustache.tmbundle x2 worst 8.4x42.5 at 768x500

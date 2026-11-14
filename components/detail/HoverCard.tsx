@@ -44,7 +44,7 @@ export default function HoverCard({
   const stars = Math.max(0, Math.trunc(row.stargazerCount) || 0);
 
   return (
-    <div className="w-72 rounded-[3px] border border-iron-border bg-gradient-to-b from-plaque-bg-top to-plaque-bg-bottom p-3 text-plaque-name shadow-[inset_0_1px_0_var(--color-iron-inset),0_6px_18px_var(--color-iron-shadow)]">
+    <div className="day-card w-72 rounded-[3px] border border-iron-border bg-gradient-to-b from-plaque-bg-top to-plaque-bg-bottom p-3 text-plaque-name shadow-[inset_0_1px_0_var(--color-iron-inset),0_6px_18px_var(--color-iron-shadow)]">
       <p className="truncate font-heading text-sm font-bold tracking-wide text-iron-label">
         {row.name}
       </p>

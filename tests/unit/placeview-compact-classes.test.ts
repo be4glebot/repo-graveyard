@@ -13,7 +13,7 @@ const read = (p: string): string => readFileSync(join(process.cwd(), p), "utf8")
 const RESPONSIVE_PREFIX = /(?:^|[\s"'`])(?:sm|md|lg|xl|2xl):[\w[-]/;
 
 describe("PlaceView compact chrome has no sm:/md: classes", () => {
-  const source = read("components/scene/PlaceView.tsx");
+  const source = read("components/scene/GatePlaceView.tsx");
   const start = source.indexOf("{compact ? (");
   const end = source.indexOf(") : (", start);
 

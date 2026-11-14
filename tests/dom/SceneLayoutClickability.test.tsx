@@ -22,9 +22,8 @@
 import { afterEach, beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 import { cleanup, render } from "@testing-library/react";
 
-import PlaceView from "@/components/scene/PlaceView";
+import WorldPlaceView from "@/components/world/WorldPlaceView";
 import type { GraveyardRow } from "@/lib/graveyard-view";
-import { CREATURE_BASE_SIZE } from "@/lib/estate-view";
 
 const SCENE_W = 1392;
 const SCENE_H = 900;
@@ -78,6 +77,10 @@ function ghosts(names: string[]): GraveyardRow[] {
 /** Effective pointer-events: nearest ancestor-or-self carrying a pe class. */
 function pointerEventsOf(el: Element, root: Element): "none" | "auto" {
   for (let n: Element | null = el; n && n !== root.parentElement; n = n.parentElement) {
+    // World creatures re-enable pointer events through an inline style on the
+    // creature button (task 8.5), not a class; honour it like the CSS would.
+    const inline = (n as HTMLElement).style?.pointerEvents;
+    if (inline === "auto" || inline === "none") return inline;
     if (n.classList.contains("pointer-events-none")) return "none";
     if (n.classList.contains("pointer-events-auto")) return "auto";
   }
@@ -105,13 +108,14 @@ function rectOf(el: Element): Box | null {
     return { left: 0, top: SCENE_H - 64 - 48, right: 1440, bottom: SCENE_H - 64 };
   }
   if (el.tagName === "BUTTON" && el.closest('[data-testid="scatter-creature"]')) {
+    // World slots (task 8.5): the `li` is pixel-positioned. `left` is a % of the
+    // stage width, `top` is px, `width`/`height` are the slot `size` in px, and
+    // the box is centred on (left, top) by translate(-50%, -50%).
     const wrapper = el.closest<HTMLElement>('[data-testid="scatter-creature"]')!;
-    const inner = wrapper.querySelector<HTMLElement>(".pointer-events-auto");
-    const scale = Number(/scale\(([\d.]+)\)/.exec(inner?.style.transform ?? "")?.[1] ?? 1);
-    const h = CREATURE_BASE_SIZE * scale;
-    const feetX = (parseFloat(wrapper.style.left) / 100) * SCENE_W + SCENE_LEFT;
-    const feetY = (parseFloat(wrapper.style.top) / 100) * SCENE_H;
-    return { left: feetX - h / 2, right: feetX + h / 2, top: feetY - h, bottom: feetY };
+    const size = parseFloat(wrapper.style.width);
+    const cx = (parseFloat(wrapper.style.left) / 100) * SCENE_W + SCENE_LEFT;
+    const cy = parseFloat(wrapper.style.top);
+    return { left: cx - size / 2, right: cx + size / 2, top: cy - size / 2, bottom: cy + size / 2 };
   }
   return null;
 }
@@ -132,7 +136,7 @@ function hitTest(root: Element, x: number, y: number): Element | null {
 /** Renders sky with the given ghosts; returns a description of each creature the hit test misses. */
 function missesFor(names: string[]): string[] {
   const { container, unmount } = render(
-    <PlaceView
+    <WorldPlaceView
       place="sky"
       rows={ghosts(names)}
       activeFilter="all"

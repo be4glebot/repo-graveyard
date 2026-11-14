@@ -24,6 +24,7 @@
   --font-narrative: var(--font-narrative); /* IM Fell English — narrative/whispers */
   --font-ui: var(--font-ui); /* Inter — UI chrome */
   --font-fact: var(--font-fact); /* JetBrains Mono — facts/numbers/repo names */
+  --font-day-display: var(--font-day-display); /* Fraunces — day wordmark/headings */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -846,6 +847,757 @@ body {
 }
 
 /* ============================================================================
+   Explorable Worlds — tokens and shared CSS (task 5.1).
+   Every shared world rule lives here so later tasks never edit this file.
+   Animates transform and opacity only (filter only for Hub cues).
+   `static` keeps tokens that components read only through var() in the output.
+   ============================================================================ */
+
+@theme static {
+  /* --- Chrome clearance. pad-top = WORLD_CONFIG TOP_CLEAR + 8; pad-bottom =
+     BOTTOM_CLEAR. Desktop and compact (< 768 px) values; a source-scan test
+     keeps these equal to lib/world-layout.ts. --- */
+  --world-pad-top: 288px; /* 280 + 8 */
+  --world-pad-bottom: 120px;
+  --world-pad-top-compact: 292px; /* 284 + 8 */
+  --world-pad-bottom-compact: 80px;
+  --world-fixture-top: 112px; /* height of the top fixture band (header) */
+  --world-creature-scroll-margin: 16px;
+
+  /* --- Environmental mist opacity caps (Req 15.9: <= 0.25, crypt <= 0.2) --- */
+  --world-mist-sky: 0.18;
+  --world-mist-ground: 0.2;
+  --world-mist-crypt: 0.15;
+
+  /* --- Motion --- */
+  --world-reveal-ms: 600ms;
+  --world-ambient-floor: 0.8; /* crypt ambient brightness never below this */
+  --motion-camera-drift: 40s;
+  --motion-env-mist: 60s;
+  --motion-place-cue-in: 200ms;
+  --motion-place-cue-out: 400ms;
+
+  /* --- Light sources (names used by lib/world-light.ts) --- */
+  --light-sky-sx: -0.6;
+  --light-sky-sy: 0.5;
+  --light-sky-rim: rgba(236, 234, 217, 0.9);
+  --light-sky-glow: rgba(159, 231, 255, 0.5);
+  --light-sky-shadow: rgba(159, 231, 255, 0.35);
+  --light-ground-sx: 0.8;
+  --light-ground-sy: 0.2;
+  --light-ground-rim: rgba(244, 184, 96, 0.85);
+  --light-ground-glow: rgba(244, 184, 96, 0.4);
+  --light-ground-shadow: rgba(0, 0, 0, 0.7);
+  --light-crypt-sx: 0.7;
+  --light-crypt-sy: 0.35;
+  --light-crypt-rim: rgba(244, 150, 70, 0.85);
+  --light-crypt-glow: rgba(244, 150, 70, 0.4);
+  --light-crypt-shadow: rgba(0, 0, 0, 0.75);
+
+  /* --- Stone family (ledges, grave markers). Each *-text token is read against
+     its *-surface token by the contrast property test (>= 4.5). --- */
+  --color-stone-surface: #1d1b24;
+  --color-stone-surface-raised: #26242f;
+  --color-stone-text: #ecead9;
+  --color-stone-text-muted: #c9c4ae;
+  --color-stone-edge: rgba(230, 207, 154, 0.3);
+  --color-stone-moss: #8fb359;
+
+  /* --- Brass family (candle-lit plates, signs) --- */
+  --color-brass-surface: #2a2113;
+  --color-brass-surface-raised: #3a2d17;
+  --color-brass-text: #ffd28f;
+  --color-brass-text-muted: #e6cf9a;
+  --color-brass-edge: rgba(244, 184, 96, 0.55);
+  --color-brass-glow: rgba(244, 184, 96, 0.3);
+
+  /* --- Tag (hanging creature tags) --- */
+  --color-tag-surface: #151a26;
+  --color-tag-text: #ecead9;
+
+  /* --- Type scale (minimum 12 px for tags and labels) --- */
+  --text-tag: 12px;
+  --text-label: 12px;
+  --text-body: 15px;
+}
+
+/* ----------------------------------------------------------------------------
+   Fixtures: controls built from the place's own materials. Square, bevelled,
+   no pills, no soft cards.
+   ---------------------------------------------------------------------------- */
+.fixture-rail {
+  border-radius: 2px;
+  border: 1px solid var(--color-iron-border);
+  background: linear-gradient(
+    var(--color-iron-bg-top),
+    var(--color-iron-bg-bottom)
+  );
+  color: var(--color-iron-label);
+  box-shadow: inset 0 1px 0 var(--color-iron-inset);
+}
+.fixture-ledge {
+  border-radius: 1px;
+  border: 1px solid var(--color-stone-edge);
+  background: var(--color-stone-surface);
+  color: var(--color-stone-text);
+  box-shadow: inset 0 1px 0 var(--color-iron-inset);
+}
+.fixture-sign {
+  border-radius: 1px;
+  border: 1px solid var(--color-brass-edge);
+  background: var(--color-brass-surface);
+  color: var(--color-brass-text);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: var(--text-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px var(--color-brass-glow);
+}
+.fixture-marker {
+  border-radius: 1px;
+  border: 1px solid var(--color-stone-edge);
+  background: var(--color-tag-surface);
+  color: var(--color-tag-text);
+  font-size: var(--text-tag);
+}
+.fixture-rail:focus-visible,
+.fixture-ledge:focus-visible,
+.fixture-sign:focus-visible,
+.fixture-marker:focus-visible,
+[data-world-scroller]:focus-visible {
+  outline: 2px solid var(--color-candle-400);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------------------------
+   Camera drift: slow idle translation of background layers, <= 12 px.
+   ---------------------------------------------------------------------------- */
+@keyframes camera-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(6px, -4px, 0);
+  }
+}
+.camera-drift {
+  animation: camera-drift var(--motion-camera-drift) ease-in-out infinite;
+}
+[data-travel-active="true"] .camera-drift {
+  animation-play-state: paused;
+}
+
+/* ----------------------------------------------------------------------------
+   World shell and scroll-linked parallax bands.
+   --world-scroll / --world-depth are written on the root by the scroll hook;
+   --band-anchor (px) is set inline per stratum. K = 1 - rate.
+   ---------------------------------------------------------------------------- */
+[data-world-scroller] {
+  scroll-padding-top: var(--world-clip-top, var(--world-pad-top));
+  scroll-padding-bottom: var(--world-clip-bottom, var(--world-pad-bottom));
+  /* The depth marker is the progress cue; the native bar is hidden. Wheel,
+     touch and keyboard scrolling are unchanged. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+[data-world-scroller]::-webkit-scrollbar,
+[data-testid="estate-map"]::-webkit-scrollbar,
+[data-testid="place-view"]::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+/* The Hub and the gate view also scroll natively without a visible bar. */
+[data-testid="estate-map"],
+[data-testid="place-view"] {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+@media (max-width: 767px) {
+  [data-world-scroller] {
+    scroll-padding-top: var(--world-clip-top, var(--world-pad-top-compact));
+    scroll-padding-bottom: var(--world-clip-bottom, var(--world-pad-bottom-compact));
+  }
+}
+.world-creature {
+  scroll-margin: var(--world-creature-scroll-margin);
+}
+/* Visible window of the creature layer (task 20.3). Creatures only exist
+   between the bottom of the top chrome (title, filters: the same clearance as
+   the scroll padding) and the top of the bottom chrome (pager, footer), so a
+   sprite or nameplate can never be drawn, or hit, under a chrome label. The
+   window is in stage coordinates: it moves with --world-scroll, and
+   --world-view-h is the scroller height. The depth marker's box is cut out
+   (--world-marker-* are set from its measured box; the defaults give an empty
+   notch). clip-path also removes the clipped part from hit testing; the mask
+   fades creatures in over --world-clip-fade just inside the window. The
+   elements stay in the DOM, tab order and accessibility tree. */
+[data-world] {
+  /* Clearance below the top chrome and above the bottom chrome: never less
+     than the design clearance, and the measured chrome box when the header or
+     the pager wraps (--world-chrome-* are written by WorldPlaceView). */
+  --world-clip-top: max(var(--world-pad-top), var(--world-chrome-top, 0px));
+  --world-clip-bottom: max(
+    calc(var(--world-pad-bottom) + env(safe-area-inset-bottom, 0px)),
+    var(--world-chrome-bottom, 0px)
+  );
+}
+@media (max-width: 767px) {
+  [data-world] {
+    --world-clip-top: max(var(--world-pad-top-compact), var(--world-chrome-top, 0px));
+    --world-clip-bottom: max(
+      calc(var(--world-pad-bottom-compact) + env(safe-area-inset-bottom, 0px)),
+      var(--world-chrome-bottom, 0px)
+    );
+  }
+}
+.world-creatures {
+  --world-clip-fade: 40px;
+  --wc-scroll: calc(var(--world-scroll, 0) * 1px);
+  --wc-top: calc(var(--wc-scroll) + var(--world-clip-top));
+  --wc-bottom: calc(var(--wc-scroll) + var(--world-view-h, 100dvh) - var(--world-clip-bottom));
+  --wc-mtop: max(var(--wc-top), calc(var(--wc-scroll) + var(--world-marker-top, 0px)));
+  --wc-mbottom: min(var(--wc-bottom), max(var(--wc-mtop), calc(var(--wc-scroll) + var(--world-marker-bottom, 0px))));
+  clip-path: polygon(
+    0 var(--wc-top),
+    100% var(--wc-top),
+    100% var(--wc-mtop),
+    var(--world-marker-left, 100%) var(--wc-mtop),
+    var(--world-marker-left, 100%) var(--wc-mbottom),
+    100% var(--wc-mbottom),
+    100% var(--wc-bottom),
+    0 var(--wc-bottom)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent var(--wc-top),
+    black calc(var(--wc-top) + var(--world-clip-fade)),
+    black calc(var(--wc-bottom) - var(--world-clip-fade)),
+    transparent var(--wc-bottom)
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent var(--wc-top),
+    black calc(var(--wc-top) + var(--world-clip-fade)),
+    black calc(var(--wc-bottom) - var(--world-clip-fade)),
+    transparent var(--wc-bottom)
+  );
+}
+/* The band the depth marker may use: between the chrome bands. */
+.world-window {
+  top: var(--world-clip-top);
+  height: calc(100% - var(--world-clip-top) - var(--world-clip-bottom));
+}
+.world-stage {
+  position: relative;
+}
+.world-band {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+/* background: rate 0.88, pointer max 8 px */
+.world-band-bg {
+  transform: translate3d(
+    calc(var(--px, 0) * 8px),
+    calc(var(--py, 0) * 8px + (var(--world-scroll, 0) - var(--band-anchor, 0)) * 0.12px),
+    0
+  );
+}
+/* mid-ground and far mist: rate 0.94, pointer max 16 px */
+.world-band-mid {
+  transform: translate3d(
+    calc(var(--px, 0) * 16px),
+    calc(var(--py, 0) * 16px + (var(--world-scroll, 0) - var(--band-anchor, 0)) * 0.06px),
+    0
+  );
+}
+/* creatures: rate 1, no pointer offset */
+.world-band-creatures {
+  transform: none;
+}
+/* near mist: rate 1.06, pointer max 26 px */
+.world-band-near {
+  transform: translate3d(
+    calc(var(--px, 0) * 26px),
+    calc(var(--py, 0) * 26px + (var(--world-scroll, 0) - var(--band-anchor, 0)) * -0.06px),
+    0
+  );
+}
+/* foreground: rate 1.12, pointer max 26 px */
+.world-band-fg {
+  transform: translate3d(
+    calc(var(--px, 0) * 26px),
+    calc(var(--py, 0) * 26px + (var(--world-scroll, 0) - var(--band-anchor, 0)) * -0.12px),
+    0
+  );
+}
+/* Crypt ambient brightness: 1 at depth 0, floor at depth 1 (opacity only). */
+.world-ambient {
+  opacity: calc(1 - (1 - var(--world-ambient-floor)) * var(--world-depth, 0));
+}
+
+/* Crypt darkness overlay: 1 - ambientBrightness(depth), i.e. 0 at depth 0 and
+   at most 1 - floor (0.2) at depth 1. Opacity only, a static function of scroll
+   (no animation), so it is identical under reduced motion. */
+.crypt-darkness {
+  opacity: calc((1 - var(--world-ambient-floor)) * var(--world-depth, 0));
+}
+
+/* Discovery reveal: once per creature, transform and opacity only. */
+.world-reveal:not([data-revealed="true"]) {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.world-reveal {
+  transition:
+    opacity var(--world-reveal-ms) ease-out,
+    transform var(--world-reveal-ms) ease-out;
+}
+.world-reveal[data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Offscreen pause: loops stop while their owner is out of view. */
+[data-offscreen="true"],
+[data-offscreen="true"] * {
+  animation-play-state: paused !important;
+}
+
+/* ----------------------------------------------------------------------------
+   Environmental mist (never tiles an art plate; opacity is a fixed token).
+   ---------------------------------------------------------------------------- */
+@keyframes env-mist-sway {
+  0%,
+  100% {
+    transform: translate3d(-2%, 0, 0);
+  }
+  50% {
+    transform: translate3d(2%, 0, 0);
+  }
+}
+[data-place="sky"] {
+  --env-mist-opacity: var(--world-mist-sky);
+}
+[data-place="ground"] {
+  --env-mist-opacity: var(--world-mist-ground);
+}
+[data-place="crypt"] {
+  --env-mist-opacity: var(--world-mist-crypt);
+}
+.env-mist,
+.env-mist-near {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--env-mist-opacity, 0);
+  animation: env-mist-sway var(--motion-env-mist) ease-in-out infinite;
+}
+.env-mist-near {
+  animation-direction: reverse;
+}
+
+/* Sky ambient effects (transform / opacity only). Offscreen pause comes from
+   the [data-offscreen="true"] rule above; reduced motion makes them static. */
+/* The star field's base opacity is inline (it encodes data), so the twinkle is
+   a negative delta added on top of it; browsers without animation-composition
+   keep the field static rather than overriding the inline value. */
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: -0.35;
+  }
+}
+@keyframes cloud-drift {
+  0%,
+  100% {
+    transform: translate3d(-1.5%, 0, 0);
+  }
+  50% {
+    transform: translate3d(1.5%, 0, 0);
+  }
+}
+@supports (animation-composition: add) {
+  [data-effect="star-twinkle"] {
+    animation: star-twinkle 7s ease-in-out infinite;
+    animation-composition: add;
+  }
+}
+[data-effect="cloud-drift"] {
+  animation: cloud-drift var(--motion-env-mist) ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-effect="star-twinkle"],
+  [data-effect="cloud-drift"] {
+    animation: none !important;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Hub cues: environment-specific response on hover and focus. In within
+   200 ms, out within 400 ms. transform, opacity and filter only.
+   ---------------------------------------------------------------------------- */
+.place-cue {
+  transition:
+    transform var(--motion-place-cue-out) ease-out,
+    opacity var(--motion-place-cue-out) ease-out,
+    filter var(--motion-place-cue-out) ease-out;
+}
+.place-cue:focus-visible {
+  transition-duration: var(--motion-place-cue-in);
+}
+.place-cue-sky:focus-visible,
+.place-cue-ground:focus-visible {
+  filter: drop-shadow(0 0 12px var(--color-brass-glow)) brightness(1.15);
+}
+.place-cue-gate:focus-visible {
+  filter: brightness(1.1);
+  transform: translate3d(0, -3px, 0);
+}
+.place-cue-crypt:focus-visible {
+  filter: drop-shadow(0 0 12px var(--light-crypt-glow)) brightness(1.15);
+  animation: lantern-flicker var(--motion-lantern-flicker) ease-in-out infinite;
+}
+/* Hover cues only where hover is real; touch devices get no sticky hover. */
+@media (hover: hover) and (pointer: fine) {
+  .place-cue:hover {
+    transition-duration: var(--motion-place-cue-in);
+  }
+  .place-cue-sky:hover,
+  .place-cue-ground:hover {
+    filter: drop-shadow(0 0 12px var(--color-brass-glow)) brightness(1.15);
+  }
+  .place-cue-gate:hover {
+    filter: brightness(1.1);
+    transform: translate3d(0, -3px, 0);
+  }
+  .place-cue-crypt:hover {
+    filter: drop-shadow(0 0 12px var(--light-crypt-glow)) brightness(1.15);
+    animation: lantern-flicker var(--motion-lantern-flicker) ease-in-out infinite;
+  }
+}
+/* Empty place: unlit lantern, desaturated art (filter, never faded text). */
+.place-cue-unlit {
+  filter: grayscale(0.7) brightness(0.8);
+}
+
+/* ----------------------------------------------------------------------------
+   Reduced motion: no drift, bands at rest, reveals pre-applied, mist static,
+   cues become static style changes with no transition.
+   ---------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .camera-drift,
+  .env-mist,
+  .env-mist-near,
+  .place-cue-crypt:hover,
+  .place-cue-crypt:focus-visible {
+    animation: none !important;
+  }
+  .world-band-bg,
+  .world-band-mid,
+  .world-band-near,
+  .world-band-fg {
+    transform: none;
+  }
+  .world-reveal:not([data-revealed="true"]),
+  .world-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .place-cue {
+    transition: none;
+  }
+}
+/* Turning-soon notice: a soft crimson glow halo pulses behind the notice. Only
+   opacity and transform animate, on a pseudo-element, so the text never fades.
+   The period (--pulse-period) is set inline from days left (lib/turning-pulse.ts,
+   0.6 Hz at 30 days up to 1.4 Hz at 3 days or fewer). */
+.turning-soon-pulse {
+  position: relative;
+  isolation: isolate;
+}
+.turning-soon-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow:
+    0 0 22px 4px var(--color-crimson-glow),
+    0 0 4px 1px var(--color-crimson-200);
+  opacity: 0.25;
+  pointer-events: none;
+  animation: turning-soon-glow var(--pulse-period, 1.2s) ease-in-out infinite;
+}
+@keyframes turning-soon-glow {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+/* The WHOLE notice (pill, border, text, button) beats as one: a gentle scale
+   and opacity swing on the container. Opacity never drops below 0.85 so the
+   text keeps its contrast; scale stays within 4% so the hit target barely moves. */
+.turning-soon-pulse {
+  animation: turning-soon-beat var(--pulse-period, 1.2s) ease-in-out infinite;
+  transform-origin: center;
+  box-shadow: 0 0 14px var(--color-crimson-glow);
+}
+@keyframes turning-soon-beat {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .turning-soon-pulse {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    box-shadow:
+      0 0 22px 6px var(--color-crimson-glow),
+      0 0 0 1px var(--color-crimson-200);
+  }
+  .turning-soon-pulse::after {
+    animation: none;
+    opacity: 0.85;
+    transform: none;
+  }
+}
+
+/* ===== end Explorable Worlds ===== */
+
+/* ============================================================================
+   Daytime Lights On — day tokens (Spec daytime-lights-on, task 3.3)
+   Lights On is the same scene in warm daylight. `data-theme="day"` is set on
+   #scene-root (and the loading shell root); the block below overrides existing
+   scene tokens in place, so components pick day values up with no hex of their
+   own. Night values above are untouched. Kept above the séance block, whose
+   CSS tests read from its first rule to the end of the file.
+   ============================================================================ */
+
+@theme {
+  --color-day-haze: #efe2c8; /* warm haze: backdrop fill, veil, mist */
+  --color-day-light: #fff1c9; /* sunlight highlight */
+  --color-day-parchment: #f6ecd3; /* empty-state card surface */
+  --color-day-ink: #2a2418; /* empty-state card text (>= 4.5:1 on parchment) */
+  --color-day-ink-muted: #4f4631; /* empty-state card secondary text */
+  --color-day-card-border: #8a6f3e; /* visible card and grave-marker border */
+  --color-day-card-shadow: rgb(42 36 24 / 0.18); /* soft card shadow */
+  --color-day-gold-bg: #f3dc9a; /* turning-soon banner fill (warm gold) */
+  --color-day-gold-border: #8a6a1f; /* turning-soon banner border */
+  --color-day-gold-ink: #2a2418; /* turning-soon banner text (>= 4.5:1 on gold) */
+  --color-day-gold-glow: rgb(214 168 60 / 0.45); /* soft golden halo */
+  --color-day-wordmark-ink: #3a2a14; /* day wordmark: warm dark ink on haze */
+  --color-day-sun-core: #fff6d6; /* sun disc centre */
+  --color-day-sun-mid: #ffd98a; /* sun disc body */
+  --color-day-sun-edge: #f0a43c; /* sun disc rim */
+  --color-day-sun-glow: rgb(255 200 90 / 0.55); /* sun halo */
+  --color-day-chrome-hover: #fff6dc; /* chrome hover fill (light, never dark) */
+  --color-day-candle-ring: #8a5a0c; /* candle focus ring + accent on parchment */
+  --color-day-crimson-ink: #7a1424; /* crimson text on parchment (active chips) */
+  --color-day-backdrop: rgb(246 236 211 / 0.72); /* dialog scrim: warm light */
+  --color-day-sky-top: #bfe0ee; /* day palette: high sky */
+  --color-day-sky-horizon: #fbe8c2; /* day palette: warm horizon glow */
+  --color-day-meadow-far: #bcd59c; /* day palette: distant meadow */
+  --color-day-meadow-near: #92b972; /* day palette: near meadow */
+}
+
+/* Day wordmark: friendly Fraunces in warm dark ink, no crimson glow.
+   !important beats the inline night text-shadow set on the wordmark. */
+[data-theme="day"] .site-wordmark {
+  font-family: var(--font-day-display), Georgia, serif;
+  color: var(--color-day-wordmark-ink);
+  text-shadow: none !important;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Turning-soon banner in day: gold glow instead of the crimson halo. */
+.turning-soon-pulse.turning-soon-day {
+  box-shadow: 0 0 14px var(--color-day-gold-glow);
+}
+.turning-soon-pulse.turning-soon-day::after {
+  box-shadow:
+    0 0 22px 4px var(--color-day-gold-glow),
+    0 0 4px 1px var(--color-day-gold-border);
+}
+@media (prefers-reduced-motion: reduce) {
+  .turning-soon-pulse.turning-soon-day {
+    box-shadow:
+      0 0 22px 6px var(--color-day-gold-glow),
+      0 0 0 1px var(--color-day-gold-border);
+  }
+}
+
+[data-theme="day"] {
+  /* Backdrop and cover: warm haze in place of night black. */
+  --color-night-sky: #efe2c8;
+  --color-night-sky-top: #f4e9d2;
+  --color-night-sky-mid: #ecdfc4;
+  --color-night-sky-bottom: #e4d4b4;
+  --color-night-cover: #efe2c8;
+  --color-night-cover-top: rgba(255, 241, 201, 0.35);
+  --color-night-cover-top-gate: rgba(255, 241, 201, 0.4);
+  --color-night-cover-bottom: rgba(239, 226, 200, 0.55);
+
+  /* Scene foreground text: warm ink on the light backdrop. */
+  --color-scene-fg: #1f2330;
+  --color-scene-fg-muted: #4a4f5e;
+  --color-scene-fg-faint: #5c5646;
+
+  /* Fog and mist read as warm haze. */
+  --color-fog: rgba(239, 226, 200, 1);
+  --color-fog-tint: #efe2c8;
+  --world-mist-sky: 0.1;
+  --world-mist-ground: 0.12;
+  --world-mist-crypt: 0.1;
+
+  /* Plate filters: night darkens the plates; day shows them as painted. */
+  --art-filter-ground: none;
+  --art-filter-fence: none;
+
+  /* Soft warm wash over the stage. Apply with pointer-events: none. */
+  --day-wash: linear-gradient(
+    to bottom,
+    rgba(255, 241, 201, 0.35) 0%,
+    rgba(255, 226, 170, 0.12) 55%,
+    rgba(239, 226, 200, 0.28) 100%
+  );
+}
+
+/* ---- Day chrome (task 12.6) -------------------------------------------------
+   Header, buttons, cards, pager, legend, badges, detail panel, chips, summary
+   line, toggles and dialogs: light parchment, dark ink, visible borders and a
+   candle focus ring. Nothing translucent-dark sits over the bright art. All
+   rules are scoped to [data-theme="day"], so night is untouched. */
+[data-theme="day"] .fixture-rail,
+[data-theme="day"] .fixture-ledge,
+[data-theme="day"] .fixture-sign,
+[data-theme="day"] .fixture-marker,
+[data-theme="day"] .day-chrome-btn,
+[data-theme="day"] .day-chrome-plate {
+  background: var(--color-day-parchment);
+  color: var(--color-day-ink);
+  border: 1px solid var(--color-day-card-border);
+  box-shadow: 0 1px 3px var(--color-day-card-shadow);
+  text-shadow: none;
+}
+[data-theme="day"] .day-chrome-plate {
+  border-radius: 4px;
+  padding: 0.25rem 0.625rem;
+}
+[data-theme="day"] .day-chrome-plate * {
+  color: inherit;
+}
+[data-theme="day"] .day-chrome-menu {
+  background: var(--color-day-parchment);
+}
+[data-theme="day"] .fixture-rail:enabled:hover,
+[data-theme="day"] .fixture-ledge:enabled:hover,
+[data-theme="day"] .day-chrome-btn:hover {
+  background: var(--color-day-chrome-hover);
+  border-color: var(--color-day-candle-ring);
+}
+[data-theme="day"] .fixture-ledge[data-active="true"],
+[data-theme="day"] .day-chrome-btn[aria-checked="true"] {
+  background: var(--color-day-gold-bg);
+  color: var(--color-day-gold-ink) !important;
+  border-color: var(--color-day-gold-border) !important;
+}
+[data-theme="day"] .day-chrome-btn input,
+[data-theme="day"] input.day-chrome-btn {
+  color: var(--color-day-ink);
+}
+[data-theme="day"] input.day-chrome-btn::placeholder {
+  color: var(--color-day-ink-muted);
+}
+[data-theme="day"] .day-chrome-btn [class*="text-scene-fg-muted"] {
+  color: var(--color-day-ink-muted);
+}
+[data-theme="day"] .day-chrome-btn span[aria-hidden="true"] {
+  background: var(--color-day-card-border);
+  border-color: var(--color-day-card-border);
+}
+[data-theme="day"] .day-chrome-btn[aria-checked="true"] span[aria-hidden="true"] {
+  background: var(--color-day-gold-border);
+}
+[data-theme="day"] .day-chrome-btn span[aria-hidden="true"] > span {
+  background: var(--color-day-parchment);
+}
+
+/* Candle focus ring: a 3px outline in the day candle token (replaces the pale
+   night ring, which vanishes on parchment). */
+[data-theme="day"] :is(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-day-candle-ring);
+  outline-offset: 2px;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  box-shadow: none;
+}
+
+/* Panels and dialogs (portalled; they carry their own data-theme="day").
+   Remap the dark panel tokens to parchment and ink inside the scope only. */
+[data-theme="day"] .day-panel {
+  --color-night-800: var(--color-day-parchment);
+  --color-night-900: var(--color-day-chrome-hover);
+  --color-night-950: var(--color-day-parchment);
+  --color-moon-100: var(--color-day-ink);
+  --color-moon-300: var(--color-day-ink-muted);
+  --color-candle-400: var(--color-day-candle-ring);
+  --color-candle-300: var(--color-day-candle-ring);
+  --color-candle-tan: var(--color-day-ink-muted);
+  --color-ghost-300: var(--color-day-card-border);
+  --color-glow-ghost: transparent;
+  --color-crimson-200: var(--color-day-crimson-ink);
+  --color-crimson-400: var(--color-day-gold-border);
+  --color-iron-500: var(--color-day-card-border);
+  --color-iron-border: var(--color-day-card-border);
+  --color-iron-bg-top: var(--color-day-parchment);
+  --color-iron-bg-bottom: var(--color-day-parchment);
+  --color-iron-label: var(--color-day-ink);
+  --color-iron-inset: transparent;
+  --color-iron-shadow: var(--color-day-card-shadow);
+  --color-stone-surface: var(--color-day-parchment);
+  --color-stone-text: var(--color-day-ink);
+  color: var(--color-day-ink);
+}
+[data-theme="day"] .day-panel .day-card {
+  background: var(--color-day-parchment);
+  border-color: var(--color-day-card-border);
+}
+[data-theme="day"] .day-panel .text-plaque-name {
+  color: var(--color-day-ink);
+}
+[data-theme="day"] .day-panel .text-plaque-sub {
+  color: var(--color-day-ink-muted);
+}
+[data-theme="day"] .day-panel [role="dialog"] {
+  background-color: var(--color-day-parchment);
+  color: var(--color-day-ink);
+  border: 1px solid var(--color-day-card-border);
+  box-shadow: 0 6px 24px var(--color-day-card-shadow);
+}
+[data-theme="day"] .day-backdrop {
+  background: var(--color-day-backdrop);
+}
+/* ============================================================================
    The Séance (Spec 4, task 11.1) — additive classes. Tokens only; animates
    transform, opacity and filter only; no flicker above 3 per second.
    ============================================================================ */
@@ -1273,11 +2025,47 @@ body {
   bottom: 4px;
   width: 16px;
   height: 16px;
-  background: var(--color-candle-400);
+  background: linear-gradient(135deg, var(--color-candle-400), var(--color-candle-300));
   border-radius: 0 50% 50% 50%;
   transform: rotate(45deg);
+  box-shadow: 0 0 10px 2px var(--color-ember-500);
 }
-/* A faint warm glow on the smoke behind the flame. */
+/* Inner bright core of the flame. */
+.ritual-flame::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  width: 6px;
+  height: 11px;
+  background: var(--color-moon-100);
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  opacity: 0.8;
+}
+/* Natural flicker while lit (not during the held stage, which has its own). */
+.ritual-flame:not([data-holding="true"]) {
+  animation: ritual-flame-flicker 1.7s ease-in-out infinite;
+}
+@keyframes ritual-flame-flicker {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1, 1);
+  }
+  25% {
+    opacity: 0.95;
+    transform: scale(0.96, 1.07);
+  }
+  55% {
+    opacity: 0.78;
+    transform: scale(1.03, 0.94);
+  }
+  80% {
+    opacity: 0.92;
+    transform: scale(0.98, 1.04);
+  }
+}
+/* A faint warm glow on the smoke behind the flame; it breathes with the flame. */
 .ritual-glow {
   position: absolute;
   left: 50%;
@@ -1289,6 +2077,22 @@ body {
   opacity: 0.3;
   filter: blur(6px);
   pointer-events: none;
+  animation: ritual-glow-breathe 1.7s ease-in-out infinite;
+}
+@keyframes ritual-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 0.38;
+    transform: scale(1.06);
+  }
+  55% {
+    opacity: 0.22;
+    transform: scale(0.95);
+  }
 }
 .ritual-flame[data-holding="true"] {
   animation: ritual-flame-hold var(--motion-ritual-flicker) ease-in-out infinite;
@@ -1321,6 +2125,56 @@ body {
   background: linear-gradient(to bottom, var(--color-moon-300), var(--color-night-sky));
   border-radius: 45% 55% 0 0 / 18% 12% 0 0;
   opacity: 0.6;
+  position: relative;
+}
+/* Soft highlight down the lit side of the wax. */
+.ritual-wax::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 3px;
+  bottom: 6px;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--color-candle-tan), transparent);
+  opacity: 0.7;
+}
+/* Two wax drips running down the side. */
+.ritual-wax::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 11px;
+  height: 16px;
+  background:
+    linear-gradient(var(--color-moon-100), var(--color-moon-100)) 1px 0 / 2px 14px no-repeat,
+    linear-gradient(var(--color-moon-100), var(--color-moon-100)) 8px 0 / 2px 8px no-repeat;
+  border-radius: 0 0 3px 3px;
+  opacity: 0.45;
+}
+/* Holder: a small brass dish, with the flame's light pooled on the surface beneath. */
+.ritual-holder {
+  position: relative;
+  width: 18px;
+  height: 5px;
+  margin-top: -1px;
+  background: linear-gradient(to bottom, var(--color-brass-surface-raised), var(--color-brass-surface));
+  border-radius: 1px 1px 40% 40%;
+}
+.ritual-holder::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 64px;
+  height: 14px;
+  margin-left: -32px;
+  background: radial-gradient(ellipse, var(--color-ember-500), transparent 70%);
+  opacity: 0.3;
+  filter: blur(3px);
+  pointer-events: none;
+  animation: ritual-glow-breathe 1.7s ease-in-out infinite;
 }
 
 /* The repo's own creature at the centre of the ritual: slightly larger (sized
@@ -1596,6 +2450,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ritual-flame,
   .ritual-flame[data-holding="true"],
+  .ritual-flame:not([data-holding="true"]),
+  .ritual-glow,
+  .ritual-holder::before,
   .ritual-frost,
   .ritual-frost[data-holding="true"],
   .ritual-text,
@@ -1671,3 +2528,4 @@ body {
       color-mix(in srgb, var(--color-crimson-900) 55%, var(--color-night-sky-bottom)) 100%
     );
 }
+

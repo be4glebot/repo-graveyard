@@ -46,6 +46,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import SceneView from "@/components/scene/SceneView";
+import { ThemeProvider } from "@/components/scene/ThemeProvider";
 import { buildRows } from "@/lib/graveyard-view";
 import type { RepoFacts } from "@/lib/lifecycle";
 import { LIFECYCLE_CONFIG } from "@/lib/lifecycle";
@@ -132,16 +133,18 @@ function creatureButton(repoName: string): HTMLButtonElement {
  */
 function renderScene(options: { initialRepo?: string; at?: string } = {}) {
   return render(
-    <SceneView
-      rows={initialRows()}
-      repos={REPOS}
-      truncated={false}
-      username="octocat"
-      renderedAt={NOW}
-      mode="live"
-      initialRepo={options.initialRepo}
-      at={options.at}
-    />,
+    <ThemeProvider>
+      <SceneView
+        rows={initialRows()}
+        repos={REPOS}
+        truncated={false}
+        username="octocat"
+        renderedAt={NOW}
+        mode="live"
+        initialRepo={options.initialRepo}
+        at={options.at}
+      />
+    </ThemeProvider>,
   );
 }
 
@@ -210,7 +213,7 @@ describe("SceneView", () => {
     expect(creatureButton("Done-Project").getAttribute("aria-pressed")).toBe("true");
   });
 
-  it("Lights-on toggle reveals the accessible register table and hides the view, then toggles back (10.6, 14.1)", async () => {
+  it("Lights-on toggle switches the scene to day and back; the list dialog holds the register table (10.6, 14.1)", async () => {
     const user = userEvent.setup();
     renderScene();
 
@@ -219,27 +222,26 @@ describe("SceneView", () => {
     expect(screen.queryByTestId("lights-on-view")).toBeNull();
     expect(screen.queryByRole("table")).toBeNull();
 
-    // There may be more than one "Lights on" switch on screen over the test's
-    // life (the header has one; the register's control bar has another), so
-    // always grab the currently-rendered one.
     const lightsOn = () =>
       screen.getAllByRole("switch", { name: /lights on/i })[0] as HTMLButtonElement;
 
     await user.click(lightsOn());
 
-    // The accessible register table is now shown and the map is gone.
+    // Same scene in daylight: the map stays and no table appears by itself.
+    expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("day");
+    expect(screen.queryByTestId("estate-map")).not.toBeNull();
+    expect(screen.queryByRole("table")).toBeNull();
+
+    // "View as list" opens the accessible register table.
+    await user.click(screen.getByTestId("view-list-button"));
     expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
     expect(screen.queryByRole("table")).not.toBeNull();
-    expect(screen.queryByTestId("estate-map")).toBeNull();
-
-    // The register carries its own Lights-on switch so the reader can return to
-    // the view with the same data (Req 10.6).
-    await user.click(lightsOn());
-
-    // Back to the map, register gone.
-    expect(screen.queryByTestId("estate-map")).not.toBeNull();
-    expect(screen.queryByTestId("lights-on-view")).toBeNull();
+    await user.keyboard("{Escape}");
     expect(screen.queryByRole("table")).toBeNull();
+
+    await user.click(lightsOn());
+    expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("night");
+    expect(screen.queryByTestId("estate-map")).not.toBeNull();
   });
 
   it("Sound toggle reflects its state without loading or playing any audio (13.1, 13.2)", async () => {
@@ -285,19 +287,17 @@ describe("SceneView", () => {
       await user.click(creatureButton("old-zombie"));
       expect(creatureButton("old-zombie").getAttribute("aria-pressed")).toBe("true");
 
-      // Turn the lights on: the register replaces the place. Selection is held
-      // only in state, not shown in the register, so nothing is observable here
-      // beyond the place being gone.
+      // Turn the lights on: the same place stays mounted, now in daylight.
       await user.click(lightsOn());
-      expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
-      expect(screen.queryByTestId("place-view")).toBeNull();
+      expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("day");
+      expect(screen.queryByTestId("place-view")).not.toBeNull();
 
-      // Turn the lights back off: the place view returns instantly...
+      // Turn the lights back off: the same place view is still there...
       await user.click(lightsOn());
       expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
         "gate",
       );
-      expect(screen.queryByTestId("lights-on-view")).toBeNull();
+      expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("night");
 
       // ...with the swap running NO travel transition (Req 14.6) — the overlay
       // is never mounted on a lights-off restore.
@@ -322,7 +322,7 @@ describe("SceneView", () => {
 
       // Lights on, then off again.
       await user.click(lightsOn());
-      expect(screen.queryByTestId("lights-on-view")).not.toBeNull();
+      expect(screen.getByTestId("scene-view").getAttribute("data-theme")).toBe("day");
       await user.click(lightsOn());
 
       // Back on the map instantly with no travel: the empty selection is

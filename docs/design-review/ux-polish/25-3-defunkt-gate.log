@@ -1,0 +1,29 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL defunkt/gate 768x500: tag:choice x tag:redis-namespace 62.7x42.5; tag:exception_logger x tag:magit 12.7x42.5; tag:exception_logger x tag:Mustache.tmbundle 23.3x42.5; tag:ambition x tag:Mustache.tmbundle 54.8x42.5; tag:ambition x tag:Markdown-problems 35x42.5; tag:ike x tag:Markdown-problems 7.4x42.5; tag:Mustache.tmbundle x tag:Markdown-problems 8.4x42.5
+FAIL defunkt/gate 820x500: tag:choice x tag:redis-namespace 60.1x42.5; tag:exception_logger x tag:magit 6.1x42.5; tag:exception_logger x tag:Mustache.tmbundle 15.2x42.5; tag:ambition x tag:Mustache.tmbundle 51.2x42.5; tag:ambition x tag:Markdown-problems 30x42.5
+FAIL defunkt/gate 1024x500: tag:choice x tag:redis-namespace 49.8x13.3; tag:ambition x tag:Mustache.tmbundle 37x10.5; tag:ambition x tag:Markdown-problems 10.4x10.5; tag:magit x tag:Markdown-problems 55.9x42.5
+FAIL defunkt/gate 320x720: pager x tag:ambition 118x18.6; pager x tag:ike 118x18.6; tag:choice x tag:ambition 118x3.6; tag:exception_logger x tag:ike 118x3.6
+FAIL defunkt/gate 768x720: tag:ooc-markdown x tag:gibberish 18.2x32.2; tag:choice x tag:redis-namespace 62x42.5; tag:exception_logger x tag:magit 10.8x42.5; tag:exception_logger x tag:Mustache.tmbundle 21x42.5; tag:ambition x tag:Mustache.tmbundle 53.7x42.5; tag:ambition x tag:Markdown-problems 33.6x42.5; tag:ike x tag:Markdown-problems 3.6x42.5; tag:Mustache.tmbundle x tag:Markdown-problems 5.9x42.5
+FAIL defunkt/gate 820x720: tag:choice x tag:redis-namespace 59.3x13.3; tag:exception_logger x tag:magit 4.1x11; tag:exception_logger x tag:Mustache.tmbundle 12.8x11; tag:ambition x tag:Mustache.tmbundle 50.1x10.5; tag:ambition x tag:Markdown-problems 28.6x10.5
+FAIL defunkt/gate 1024x720: tag:ambition x tag:Mustache.tmbundle 36x10.5; tag:ambition x tag:Markdown-problems 8.9x10.5; tag:redis-namespace x tag:Markdown-problems 81.3x42.5
+FAIL defunkt/gate 768x900: tag:ooc-markdown x tag:gibberish 18.2x28.9; tag:Mustache.tmbundle x tag:Markdown-problems 5.9x42.5
+FAIL defunkt/gate 1024x480: tag:choice x tag:redis-namespace 49.8x13.3; tag:ambition x tag:Mustache.tmbundle 37x10.5; tag:ambition x tag:Markdown-problems 10.4x10.5; tag:magit x tag:Markdown-problems 55.9x42.5
+FAIL defunkt/gate 1024x550: tag:choice x tag:redis-namespace 49.8x13.3; tag:ambition x tag:Mustache.tmbundle 37x10.5; tag:ambition x tag:Markdown-problems 10.4x10.5; tag:magit x tag:Markdown-problems 55.9x42.5
+FAIL defunkt/gate 1024x600: tag:choice x tag:redis-namespace 49.8x13.3; tag:ambition x tag:Mustache.tmbundle 37x10.5; tag:ambition x tag:Markdown-problems 10.4x10.5; tag:magit x tag:Markdown-problems 55.9x42.5
+done defunkt/gate
+
+69 case(s) measured, 50 finding(s), 14 distinct pair(s)
+  defunkt/gate: tag:Markdown-problems x tag:redis-namespace x1 worst 81.3x42.5 at 1024x720
+  defunkt/gate: tag:choice x tag:redis-namespace x8 worst 62.7x42.5 at 768x500
+  defunkt/gate: tag:Markdown-problems x tag:magit x4 worst 55.9x42.5 at 1024x500
+  defunkt/gate: tag:Mustache.tmbundle x tag:ambition x9 worst 54.8x42.5 at 768x500
+  defunkt/gate: pager x tag:ambition x1 worst 118x18.6 at 320x720
+  defunkt/gate: pager x tag:ike x1 worst 118x18.6 at 320x720
+  defunkt/gate: tag:Markdown-problems x tag:ambition x9 worst 35x42.5 at 768x500
+  defunkt/gate: tag:Mustache.tmbundle x tag:exception_logger x4 worst 23.3x42.5 at 768x500
+  defunkt/gate: tag:gibberish x tag:ooc-markdown x2 worst 18.2x32.2 at 768x720
+  defunkt/gate: tag:exception_logger x tag:magit x4 worst 12.7x42.5 at 768x500
+  defunkt/gate: tag:ambition x tag:choice x1 worst 118x3.6 at 320x720
+  defunkt/gate: tag:exception_logger x tag:ike x1 worst 118x3.6 at 320x720
+  defunkt/gate: tag:Markdown-problems x tag:Mustache.tmbundle x3 worst 8.4x42.5 at 768x500
+  defunkt/gate: tag:Markdown-problems x tag:ike x2 worst 7.4x42.5 at 768x500

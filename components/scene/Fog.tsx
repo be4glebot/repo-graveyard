@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Fog overlay (presentational, two render sites).
  *
@@ -43,7 +45,9 @@
  * Requirements: 3.3, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 7.5, 9.1, 9.2
  */
 
+import { useTheme } from "@/components/scene/ThemeProvider";
 import { fogDensity } from "@/lib/scene-view";
+import { themeArt } from "@/lib/theme-art";
 
 /**
  * Density (0–100) at which the fog reaches its tasteful maximum on-screen
@@ -88,6 +92,12 @@ export default function Fog({
   layer,
   reducedMotion = false,
 }: FogProps) {
+  const { theme } = useTheme();
+  // Daytime has no data fog.
+  if (theme === "day") {
+    return null;
+  }
+
   // Density is a pure function of the zombie count (Req 3.3 / 6.4). Both layers
   // derive their opacity from this SAME single `fogDensity` call — no second
   // density function (Req 6.7). Map the 0..100 density onto a 0..MAX_FOG_OPACITY
@@ -115,8 +125,8 @@ export default function Fog({
   // double-width drifting strip (visual fix 2C). `background-size: auto 100%`
   // keeps the art at the strip's height and lets it repeat horizontally.
   const fogArt = isThin
-    ? "url(/art/fog-wisps-thin.webp)"
-    : "url(/art/fog-wisps.webp)";
+    ? `url(${themeArt(theme, "/art/fog-wisps-thin.webp")})`
+    : `url(${themeArt(theme, "/art/fog-wisps.webp")})`;
 
   // Each layer covers only the bottom of the scene where the ground fog sits
   // — the dense bank reaches higher (55%) than the thin near-fog (30%) — and a

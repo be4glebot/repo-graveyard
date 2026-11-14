@@ -11,6 +11,7 @@ import { explanationLine } from "@/lib/repoDetails/explanationLine";
 import { buildGitHubUrl } from "@/lib/repoDetails/githubUrl";
 import { homepageDomain, isValidHttpsHomepage } from "@/lib/repoDetails/homepage";
 import { useIsCompact } from "@/components/ui/useIsCompact";
+import { useTheme } from "@/components/scene/ThemeProvider";
 import { RepoBadgeDialog } from "@/components/badge/RepoBadgeDialog";
 import ExternalLink from "./ExternalLink";
 import Portrait from "./Portrait";
@@ -92,6 +93,7 @@ function PanelModal({
   getFallbackFocus,
   seanceFixture,
 }: DetailPanelProps & { row: RepoRow }) {
+  const { theme } = useTheme();
   const headingId = useId();
   // Filled by SeanceRegion; Escape asks it first (skip ritual / settle reveal).
   const escapeClaimRef = useRef<(() => boolean) | null>(null);
@@ -200,7 +202,7 @@ function PanelModal({
       : "translateX(100%)";
 
   return (
-    <div className="fixed inset-0 z-[70]">
+    <div data-theme={theme} className="day-panel fixed inset-0 z-[70]">
       <div
         data-testid="detail-overlay"
         onClick={onClose}
@@ -454,9 +456,10 @@ function PanelContent({
                 ref={badgeOpenerRef}
                 type="button"
                 onClick={() => setBadgeOpen(true)}
+                title="Put a small live picture of this repo in your GitHub README"
                 className="seance-focus h-9 cursor-pointer self-start rounded-sm border border-candle-400 px-2 text-xs text-candle-400 hover:bg-night-900 motion-safe:transition-colors"
               >
-                Badge for this repo
+                Share this repo
               </button>
               {badgeOpen && (
                 <RepoBadgeDialog

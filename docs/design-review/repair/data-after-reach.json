@@ -1,0 +1,353 @@
+[
+ {
+  "place": "gate",
+  "w": 1440,
+  "h": 900,
+  "steps": 0,
+  "partiallyCovered": {}
+ },
+ {
+  "place": "sky",
+  "w": 1440,
+  "h": 900,
+  "steps": 8,
+  "partiallyCovered": {
+   "fenwick-timer": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 50
+    }
+   },
+   "hollow-atlas": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 115,
+     "filter-chip-all": 4,
+     "filter-chip-healthy": 6
+    }
+   },
+   "lantern-notes": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 50
+    }
+   },
+   "cobweb-cli": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 40,
+     "filter-chip-about to turn": 15
+    }
+   }
+  }
+ },
+ {
+  "place": "ground",
+  "w": 1440,
+  "h": 900,
+  "steps": 8,
+  "partiallyCovered": {
+   "willow-ui": {
+    "worst": 0.36,
+    "covers": {
+     "world-stage": 38
+    }
+   },
+   "harvest-engine": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 55
+    }
+   },
+   "ember-notes": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 116,
+     "return-to-gate": 4
+    }
+   }
+  }
+ },
+ {
+  "place": "crypt",
+  "w": 1440,
+  "h": 900,
+  "steps": 8,
+  "partiallyCovered": {
+   "tin-can-chat": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 41,
+     "pager-deeper": 9
+    }
+   },
+   "null-pointer-bistro": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 125
+    }
+   }
+  }
+ },
+ {
+  "place": "gate",
+  "w": 1280,
+  "h": 720,
+  "steps": 0,
+  "partiallyCovered": {
+   "barrow-sync": {
+    "worst": 0.6,
+    "covers": {
+     "filter-chip-rotting": 10
+    }
+   }
+  }
+ },
+ {
+  "place": "sky",
+  "w": 1280,
+  "h": 720,
+  "steps": 8,
+  "partiallyCovered": {
+   "cobweb-cli": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 50,
+     "pager-deeper": 5,
+     "filter-chip-about to turn": 15
+    }
+   },
+   "fenwick-timer": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 65
+    }
+   },
+   "hollow-atlas": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 110,
+     "filter-chip-all": 3,
+     "filter-chips": 3,
+     "filter-chip-healthy": 9,
+     "styled-toggle": 15
+    }
+   },
+   "lantern-notes": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 60
+    }
+   }
+  }
+ },
+ {
+  "place": "ground",
+  "w": 1280,
+  "h": 720,
+  "steps": 8,
+  "partiallyCovered": {
+   "willow-ui": {
+    "worst": 0.16,
+    "covers": {
+     "world-stage": 70,
+     "pager-deeper": 2
+    }
+   },
+   "harvest-engine": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 83
+    }
+   },
+   "ember-notes": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 104,
+     "return-to-gate": 6,
+     "scene-header": 12,
+     "styled-toggle": 3
+    }
+   }
+  }
+ },
+ {
+  "place": "crypt",
+  "w": 1280,
+  "h": 720,
+  "steps": 8,
+  "partiallyCovered": {
+   "tin-can-chat": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 58,
+     "pager-deeper": 12
+    }
+   },
+   "null-pointer-bistro": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 135,
+     "styled-toggle": 16,
+     "scene-header": 9
+    }
+   }
+  }
+ },
+ {
+  "place": "gate",
+  "w": 390,
+  "h": 844,
+  "steps": 0,
+  "partiallyCovered": {
+   "phoenix-draft": {
+    "worst": 0.8,
+    "covers": {
+     "plaque": 2,
+     "plaque-name": 3
+    }
+   },
+   "dusk-scheduler": {
+    "worst": 0.6,
+    "covers": {
+     "plaque-name": 5,
+     "plaque": 4,
+     "plaque-sub": 1
+    }
+   },
+   "gravel-parser": {
+    "worst": 0.4,
+    "covers": {
+     "plaque": 9,
+     "plaque-name": 6
+    }
+   },
+   "moth-metrics": {
+    "worst": 0.6,
+    "covers": {
+     "plaque": 5,
+     "plaque-name": 5
+    }
+   },
+   "barrow-sync": {
+    "worst": 0.4,
+    "covers": {
+     "plaque-name": 5,
+     "plaque": 3,
+     "scatter-plaque": 5,
+     "plaque-sub": 2
+    }
+   },
+   "crypt-keeper": {
+    "worst": 0.8,
+    "covers": {
+     "plaque-name": 5
+    }
+   }
+  }
+ },
+ {
+  "place": "sky",
+  "w": 390,
+  "h": 844,
+  "steps": 8,
+  "partiallyCovered": {
+   "cobweb-cli": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 66,
+     "depth-marker": 22,
+     "depth-step-1": 5,
+     "depth-step-0": 3,
+     "depth-marker-label": 3,
+     "filter-chip-fading": 15,
+     "filter-chips": 5,
+     "filter-chip-flickering": 5
+    }
+   },
+   "fenwick-timer": {
+    "worst": 0,
+    "covers": {
+     "nextjs-portal": 3,
+     "world-stage": 32,
+     "pager-nearer": 15
+    }
+   },
+   "hollow-atlas": {
+    "worst": 0,
+    "covers": {
+     "filter-chip-all": 6,
+     "world-stage": 125,
+     "filter-chip-healthy": 9,
+     "return-to-gate": 15
+    }
+   },
+   "lantern-notes": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 30,
+     "pager-deeper": 20,
+     "depth-marker": 4,
+     "depth-step-1": 2
+    }
+   }
+  }
+ },
+ {
+  "place": "ground",
+  "w": 390,
+  "h": 844,
+  "steps": 8,
+  "partiallyCovered": {
+   "willow-ui": {
+    "worst": 0.16,
+    "covers": {
+     "world-stage": 50,
+     "pager-deeper": 5,
+     "depth-marker": 29,
+     "depth-marker-label": 8,
+     "return-to-gate": 1
+    }
+   },
+   "harvest-engine": {
+    "worst": 0,
+    "covers": {
+     "pager-nearer": 11,
+     "world-stage": 41,
+     "nextjs-portal": 3
+    }
+   },
+   "ember-notes": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 120,
+     "return-to-gate": 15
+    }
+   }
+  }
+ },
+ {
+  "place": "crypt",
+  "w": 390,
+  "h": 844,
+  "steps": 8,
+  "partiallyCovered": {
+   "tin-can-chat": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 55,
+     "pager-deeper": 16,
+     "depth-marker": 22,
+     "depth-marker-label": 4
+    }
+   },
+   "null-pointer-bistro": {
+    "worst": 0,
+    "covers": {
+     "world-stage": 120,
+     "return-to-gate": 15
+    }
+   }
+  }
+ }
+]

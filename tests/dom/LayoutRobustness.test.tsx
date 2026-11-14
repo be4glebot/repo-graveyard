@@ -455,11 +455,18 @@ describe("Filter chips and pager stay keyboard- and pointer-reachable (1.4)", ()
 // ---------------------------------------------------------------------------
 
 describe("Performance budget: at most PLOT_SIZE (12) animated creatures per view (9.3)", () => {
-  /** The `scatter-creature` nodes DepthScatter paints for the current plot. */
-  function scatterCreatureCount(): number {
-    return screen
-      .getByTestId("depth-scatter")
-      .querySelectorAll("[data-testid='scatter-creature']").length;
+  /**
+   * The creature `li` elements painted for the current plot. Task 8.5: sky is
+   * now a world, whose creatures are `li` slots (still tagged
+   * `scatter-creature`) inside per-stratum `ol`s; the gate's DepthScatter
+   * wrappers are `div`s. Counting `li` for the sky and `scatter-creature` for
+   * the gate keeps the cap-of-12 intent for both.
+   */
+  function scatterCreatureCount(place: "sky" | "gate" = "gate"): number {
+    const scatter = screen.getByTestId("depth-scatter");
+    return place === "sky"
+      ? scatter.querySelectorAll("li[data-testid='scatter-creature']").length
+      : scatter.querySelectorAll("[data-testid='scatter-creature']").length;
   }
 
   it("caps the rendered creatures at 12 even when the plot is over-filled (20 rows)", () => {
@@ -467,7 +474,7 @@ describe("Performance budget: at most PLOT_SIZE (12) animated creatures per view
     // never animate more than 12 creatures in a single view (Req 9.3).
     renderPlace({ place: "sky", rows: makeRows(20, "ghost"), plotIndex: 0 });
 
-    const count = scatterCreatureCount();
+    const count = scatterCreatureCount("sky");
     expect(count).toBeLessThanOrEqual(PLOT_SIZE);
     expect(count).toBe(PLOT_SIZE);
   });
@@ -550,3 +557,185 @@ describe("Performance budget: loop classes use translateX, not background-positi
     expect(hasDescendantWithClass(scatter, "gate-wander")).toBe(false);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Explorable worlds — clip rules (Req 3.2, 3.4, 3.11, 17.6)
+//
+// `overflow-clip` / `overflow-x-clip` may appear only on the WorldScroller and
+// on `data-decor-clip` wrappers; those wrappers hold no focusable element and
+// are never ancestors of a Creature or control. Only fog strips carry
+// `overflow-hidden`, and the world root has no overflow utility at all.
+// ---------------------------------------------------------------------------
+
+import WorldPlaceView from "@/components/world/WorldPlaceView";
+
+type WorldCase = { place: "sky" | "ground" | "crypt"; rows: GraveyardRow[] };
+
+const WORLD_CASES: WorldCase[] = [
+  { place: "sky", rows: makeRows(6, "ghost") },
+  { place: "ground", rows: makeRows(6, "tombstone", null) },
+  { place: "crypt", rows: makeRows(6, "coffin", null) },
+];
+
+const FOCUSABLE =
+  "button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])";
+
+function renderWorld({ place, rows }: WorldCase) {
+  render(
+    <WorldPlaceView
+      place={place}
+      rows={rows}
+      activeFilter="all"
+      plotIndex={0}
+      selectedName={null}
+      onFilterChange={() => {}}
+      onPlotChange={() => {}}
+      onSelect={() => {}}
+      onReturn={() => {}}
+      reducedMotion={false}
+    />,
+  );
+}
+
+function isClipUtility(token: string): boolean {
+  return token === "overflow-clip" || token === "overflow-x-clip";
+}
+
+function hasClipUtility(el: Element): boolean {
+  return classTokens(el).some(isClipUtility);
+}
+
+function isFogStrip(el: Element): boolean {
+  const id = el.getAttribute("data-testid");
+  return id === "scene-fog" || id === "scene-fog-near";
+}
+
+describe.each(WORLD_CASES)(
+  "World clip rules: $place (3.2, 3.4, 3.11, 17.6)",
+  (worldCase) => {
+    it("the world root carries no overflow utility", () => {
+      renderWorld(worldCase);
+
+      const root = screen.getByTestId("place-view");
+      expect(root.hasAttribute("data-world")).toBe(true);
+      const overflow = classTokens(root).filter((t) => /(^|:)overflow/.test(t));
+      expect(overflow).toEqual([]);
+    });
+
+    it("the scroller is the only overflow-auto element and carries overflow-x-clip, not overflow-hidden", () => {
+      renderWorld(worldCase);
+
+      const root = screen.getByTestId("place-view");
+      const scroller = screen.getByTestId("world-scroller");
+      expect(hasClass(scroller, "overflow-y-auto")).toBe(true);
+      expect(hasClass(scroller, "overflow-x-clip")).toBe(true);
+      expect(hasClass(scroller, "overflow-hidden")).toBe(false);
+
+      const autoScrollers = Array.from(
+        root.querySelectorAll<HTMLElement>("*"),
+      ).filter((el) =>
+        classTokens(el).some(
+          (t) => t === "overflow-auto" || t === "overflow-y-auto",
+        ),
+      );
+      expect(autoScrollers).toEqual([scroller]);
+    });
+
+    it("overflow-clip / overflow-x-clip appear only on the scroller and data-decor-clip wrappers", () => {
+      renderWorld(worldCase);
+
+      const root = screen.getByTestId("place-view");
+      const scroller = screen.getByTestId("world-scroller");
+      const clippers = Array.from(
+        root.querySelectorAll<HTMLElement>("*"),
+      ).filter(hasClipUtility);
+
+      expect(clippers).toContain(scroller);
+      for (const el of clippers) {
+        const allowed = el === scroller || el.hasAttribute("data-decor-clip");
+        expect(
+          allowed,
+          `clip utility on a non-allowed element: "${el.className}"`,
+        ).toBe(true);
+      }
+    });
+
+    it("data-decor-clip wrappers hold no focusable element and no Creature or control", () => {
+      renderWorld(worldCase);
+
+      const root = screen.getByTestId("place-view");
+      const wrappers = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-decor-clip]"),
+      );
+      expect(wrappers.length).toBeGreaterThan(0);
+
+      for (const wrapper of wrappers) {
+        expect(
+          wrapper.querySelectorAll(FOCUSABLE).length,
+          `decor wrapper holds a focusable element: "${wrapper.className}"`,
+        ).toBe(0);
+        expect(
+          wrapper.querySelector("[data-testid='scatter-creature']"),
+        ).toBeNull();
+        for (const testId of [
+          "filter-chips",
+          "pager",
+          "return-to-gate",
+          "place-heading",
+        ]) {
+          expect(wrapper.querySelector(`[data-testid='${testId}']`)).toBeNull();
+        }
+        expect(wrapper.getAttribute("aria-hidden")).toBe("true");
+      }
+    });
+
+    it("no ancestor of a Creature or control clips, other than the scroller", () => {
+      renderWorld(worldCase);
+
+      const root = screen.getByTestId("place-view");
+      const scroller = screen.getByTestId("world-scroller");
+      const targets: Element[] = [
+        ...Array.from(
+          root.querySelectorAll("[data-testid='scatter-creature']"),
+        ),
+        // Filter chips render only for places with filterable groups.
+        ...["filter-chips", "pager", "return-to-gate", "place-heading"]
+          .map((id) => screen.queryByTestId(id))
+          .filter((el): el is HTMLElement => el !== null),
+      ];
+      expect(targets.length).toBeGreaterThan(3);
+
+      for (const target of targets) {
+        let node: Element | null = target.parentElement;
+        while (node && node !== root) {
+          if (node !== scroller) {
+            expect(
+              hasClipUtility(node) || hasClass(node, "overflow-hidden"),
+              `clipping ancestor "${node.className}" wraps a creature/control`,
+            ).toBe(false);
+          }
+          node = node.parentElement;
+        }
+        // Sanity: the scroller really is on the path.
+        expect(scroller.contains(target)).toBe(true);
+      }
+    });
+
+    it("only fog strips carry overflow-hidden (a world renders none)", () => {
+      renderWorld(worldCase);
+
+      const root = screen.getByTestId("place-view");
+      const hidden = Array.from(
+        root.querySelectorAll<HTMLElement>("*"),
+      ).filter((el) => hasClass(el, "overflow-hidden"));
+      for (const el of hidden) {
+        expect(
+          isFogStrip(el),
+          `non-fog element carries overflow-hidden: "${el.className}"`,
+        ).toBe(true);
+      }
+      // Worlds use Environmental_Mist only, so there is no Data_Fog strip.
+      expect(hidden.length).toBe(0);
+    });
+  },
+);

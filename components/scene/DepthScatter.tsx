@@ -68,6 +68,9 @@ import {
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
 import { type LifecycleState } from "@/lib/lifecycle";
+import { dayCopy } from "@/lib/day-copy";
+import type { Theme } from "@/lib/theme-art";
+import { useTheme } from "@/components/scene/ThemeProvider";
 import {
   CREATURE_BASE_SIZE,
   DEPTH_ROWS,
@@ -255,7 +258,7 @@ export interface DepthScatterProps {
  * threshold recomputed); the risen, tombstones, and coffins show a fixed state
  * word. Total: an out-of-band or null `decayLevel` falls back to the state.
  */
-function plaqueSub(row: GraveyardRow): string {
+function plaqueSub(row: GraveyardRow, theme: Theme): string {
   switch (row.state) {
     case "ghost":
       return decayWordOr(GHOST_DECAY_WORDS, row.decayLevel, "ghost");
@@ -264,9 +267,9 @@ function plaqueSub(row: GraveyardRow): string {
     case "risen":
       return "risen";
     case "tombstone":
-      return "at rest";
+      return dayCopy(theme, "plaque.tombstone");
     case "coffin":
-      return "sealed";
+      return dayCopy(theme, "plaque.coffin");
     default: {
       // Exhaustiveness guard: a new lifecycle state fails to compile here.
       const _exhaustive: never = row.state;
@@ -367,6 +370,7 @@ export default function DepthScatter({
   compact = false,
   compactBand,
 }: DepthScatterProps) {
+  const { theme } = useTheme();
   // Compute the scatter layout once per (plot, place). The seed is the place id
   // so each place scatters deterministically and differently; the names are the
   // plot's rows in order, so the i-th placement pairs with the i-th creature.
@@ -576,7 +580,9 @@ export default function DepthScatter({
                 // Anchor the creature by its FEET at (x, y): the stage-band `y`
                 // is the ground line, so the body rises from there (visual fix 2C).
                 transform: "translate(-50%, -100%)",
-                filter: `brightness(${placement.brightness})`,
+                // Day shows creatures as painted: no depth dimming.
+                filter:
+                  theme === "day" ? undefined : `brightness(${placement.brightness})`,
               }}
             >
               <div
@@ -660,7 +666,7 @@ export default function DepthScatter({
             >
               <Plaque
                 name={row.name}
-                sub={plaqueSub(row)}
+                sub={plaqueSub(row, theme)}
                 scale={placement.scale}
                 widthPx={r.plaqueWidthPx}
               />

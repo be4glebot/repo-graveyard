@@ -50,7 +50,9 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { coverRect, PAINTED_MOON, type PlaceId } from "@/lib/estate-view";
 import type { GraveyardRow } from "@/lib/graveyard-view";
+import DayPalette from "./DayPalette";
 import Moon from "./Moon";
+import { useTheme } from "./ThemeProvider";
 
 /** Base path for the painted place art under `public/art`. */
 const ART_BASE = "/art";
@@ -86,6 +88,38 @@ const PLACE_PAINTING: Record<PlaceId, { image: string; brightness: number }> = {
  */
 const GRADIENT_BAND_VH = 18;
 
+/**
+ * Gate bleed. The gate adds a 6 px `camera-drift` to the 8 px pointer
+ * parallax, so it needs 14 px of overscan; `-4%` is 14.4 px at the 360 px
+ * floor (the other places keep `-3%`).
+ */
+const GATE_BLEED_INSET = "-4%";
+
+/**
+ * Gate-only idle drift wrapper (`camera-drift`, 6 px peak, off under reduced
+ * motion via the globals.css media block). A decorative sibling layer: it holds
+ * no focusable element and no creature. Other places render no wrapper.
+ */
+function DriftWrap({
+  enabled,
+  children,
+}: {
+  enabled: boolean;
+  children: ReactNode;
+}) {
+  if (!enabled) {
+    return <>{children}</>;
+  }
+  return (
+    <div
+      data-testid="place-background-drift"
+      className="camera-drift absolute inset-0"
+    >
+      {children}
+    </div>
+  );
+}
+
 export interface PlaceBackgroundProps {
   /** Which place's painting to draw (selects the image + brightness). */
   place: PlaceId;
@@ -108,6 +142,10 @@ export default function PlaceBackground({
   children,
 }: PlaceBackgroundProps) {
   const { image, brightness } = PLACE_PAINTING[place];
+  // Day: no night plate, no brightness filter and no dark legibility
+  // gradients. A warm day palette is drawn from tokens instead.
+  const { theme } = useTheme();
+  const isDay = theme === "day";
   // When the painted image fails to load we hide it and let the always-present
   // solid fallback fill show through (Req 4.6). We never render a broken-image
   // box, and the creatures + header keep rendering regardless.
@@ -191,16 +229,20 @@ export default function PlaceBackground({
              background parallax transform moves later (bleed ≈10.8px > 8px max
              offset at the 360px floor, CHANGE 5). The Sky `Moon` (task 6.2)
              nests here so it shares this transform. */}
+      <DriftWrap enabled={place === "gate"}>
       <div
         ref={bleedRef}
         data-testid="place-background-bleed"
         className="absolute"
         style={{
-          inset: "-3%",
-          filter: `brightness(${brightness})`,
+          inset: place === "gate" ? GATE_BLEED_INSET : "-3%",
+          filter: isDay ? "none" : `brightness(${brightness})`,
         }}
       >
-        {!imageFailed && (
+        {isDay && (
+          <DayPalette variant={place === "sky" ? "sky" : place === "crypt" ? "meadow" : "full"} />
+        )}
+        {!isDay && !imageFailed && (
           <Image
             src={`${ART_BASE}/${image}.webp`}
             alt=""
@@ -224,10 +266,13 @@ export default function PlaceBackground({
         )}
         {children}
       </div>
+      </DriftWrap>
 
       {/* 3. Top + bottom dark legibility gradients, each ≥15% of viewport
              height, so the header and pager read over the painting (Req 4.5).
              Token-based colors only — no hardcoded hex. */}
+      {!isDay && (
+      <>
       <div
         data-testid="place-background-gradient-top"
         className="absolute inset-x-0 top-0"
@@ -249,6 +294,8 @@ export default function PlaceBackground({
             "linear-gradient(to top, var(--color-night-cover-bottom), transparent)",
         }}
       />
+      </>
+      )}
     </div>
   );
 }

@@ -16,16 +16,12 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import PlaceView from "@/components/scene/PlaceView";
 import {
   COMPACT_CHROME_FALLBACK_PX,
-  DEPTH_ROWS,
   compactPlotSize,
-  compactStackLayout,
   layoutCompactChrome,
-  rectsIntersect,
-  scatterLayout,
-  stageBand,
-  type SceneRect,
 } from "@/lib/estate-view";
 import type { GraveyardRow } from "@/lib/graveyard-view";
+import { placePlots } from "@/lib/place-pipeline";
+import { computeWorldLayout, worldColumns } from "@/lib/world-layout";
 
 afterEach(() => {
   cleanup();
@@ -132,25 +128,6 @@ function renderPlace(rows: GraveyardRow[]) {
   );
 }
 
-function rect(cx: number, top: number, bottom: number, halfW: number): SceneRect {
-  return {
-    cx,
-    cy: (top + bottom) / 2,
-    left: cx - halfW,
-    right: cx + halfW,
-    top,
-    bottom,
-  };
-}
-
-const shrink = (r: SceneRect): SceneRect => ({
-  ...r,
-  left: r.left + EPS,
-  right: r.right - EPS,
-  top: r.top + EPS,
-  bottom: r.bottom - EPS,
-});
-
 describe.each([
   { w: 375, h: 812 },
   { w: 700, h: 1024 },
@@ -164,70 +141,59 @@ describe.each([
 
   it("renders the compact column, bottom bar with pager, and no title block", () => {
     setup();
-    const column = screen.getByTestId("place-chrome");
-    expect(column.className).not.toContain("left-0");
-    expect(column.className).not.toContain("p-6");
-    expect(within(column).getByTestId("return-to-gate")).toBeTruthy();
-    expect(within(column).getByTestId("place-heading")).toBeTruthy();
-    expect(within(column).getByTestId("filter-chips")).toBeTruthy();
+    // Sky is a world now (Req 17.5): the chrome is `world-chrome-top`, a
+    // sticky zero-height host inside the scroller, instead of `place-chrome`.
+    const top = screen.getByTestId("world-chrome-top");
+    const column = screen.getByTestId("place-chips-row").parentElement as HTMLElement;
+    expect(top.contains(column)).toBe(true);
+    // Compact column: full-width stack, not the desktop centred title layout.
+    expect(column.className).toContain("items-stretch");
+    expect(column.className).not.toContain("place-title-clear");
+    expect(column.className).not.toContain("px-6");
+    expect(within(top).getByTestId("return-to-gate")).toBeTruthy();
+    expect(within(top).getByTestId("place-heading")).toBeTruthy();
+    expect(within(top).getByTestId("filter-chips")).toBeTruthy();
+    // Chips scroll horizontally on compact.
+    expect(screen.getByTestId("place-chips-row").style.touchAction).toBe("pan-x");
     expect(screen.queryByTestId("place-title-block")).toBeNull();
 
     const bar = screen.getByTestId("place-bottom-bar");
     expect(within(bar).getByTestId("pager")).toBeTruthy();
     expect(within(bar).queryByTestId("filter-chips")).toBeNull();
     expect(within(bar).queryByTestId("return-to-gate")).toBeNull();
+    // The bottom bar clears the home indicator.
+    expect(bar.style.paddingBottom).toContain("safe-area-inset-bottom");
+    expect(screen.getByTestId("world-scroller")).toBeTruthy();
   });
 
-  it("positions creatures and plaques with compactStackLayout, clear of the chrome", () => {
+  it("positions creatures with the world layout, inside the width", () => {
     setup();
-    const scatter = screen.getByTestId("depth-scatter");
-    expect(scatter.getAttribute("data-layout")).toBe("two-column");
-
+    // Sky is a world now (Req 17.5): there is no `data-layout` on the scatter;
+    // the world layout's `columns` and slot rectangles replace it.
     const creatures = screen.getAllByTestId("scatter-creature");
-    const plaques = screen.getAllByTestId("scatter-plaque");
     expect(creatures).toHaveLength(compactPlotSize(w));
-    expect(plaques).toHaveLength(creatures.length);
 
-    const chrome = layoutCompactChrome(w, h, COMPACT_CHROME_FALLBACK_PX);
-    const band = stageBand(h, chrome.chips.bottom, chrome.bottomBar.top);
-    const names = creatures.map((el) => el.getAttribute("data-name") ?? "");
-    const expected = compactStackLayout(
-      scatterLayout(names, DEPTH_ROWS, "sky", "sky"),
-      w,
-      band,
-      h,
-    );
+    const plot = placePlots("sky", ghostRows(20), "all", compactPlotSize(w))[0];
+    const layout = computeWorldLayout({
+      place: "sky",
+      names: plot.map((r) => r.name),
+      viewportW: w,
+      viewportH: h,
+    });
+    expect(layout.columns).toBe(worldColumns(plot.length, w));
 
-    const column = rect(w / 2, 0, chrome.chips.bottom, w / 2);
-    const bar = rect(w / 2, chrome.bottomBar.top, h, w / 2);
+    creatures.forEach((el) => {
+      const slot = layout.slots[plot.findIndex((r) => r.name === el.getAttribute("data-name"))];
+      // World slots are `left %`, `top px` (centre of the creature box).
+      const cx = (parseFloat(el.style.left) / 100) * w;
+      const cy = parseFloat(el.style.top);
+      expect(cx).toBeCloseTo(slot.cx, 3);
+      expect(cy).toBeCloseTo(slot.cy, 3);
+      expect(parseFloat(el.style.width)).toBeCloseTo(slot.size, 3);
 
-    creatures.forEach((el, i) => {
-      const e = expected[i];
-      const feetX = (parseFloat(el.style.left) / 100) * w;
-      const feetY = (parseFloat(el.style.top) / 100) * h;
-      expect(feetX).toBeCloseTo(e.x * w, 3);
-      expect(feetY).toBeCloseTo(e.y * h, 3);
-
-      const side = e.creatureHeightPx;
-      const creatureRect = rect(feetX, feetY - side, feetY, side / 2);
-      expect(rectsIntersect(shrink(creatureRect), column)).toBe(false);
-      expect(rectsIntersect(shrink(creatureRect), bar)).toBe(false);
-
-      const pl = plaques[i];
-      const pcx = (parseFloat(pl.style.left) / 100) * w;
-      const pcy = (parseFloat(pl.style.top) / 100) * h;
-      expect(pcx).toBeCloseTo(e.plaque.cx, 3);
-      expect(pcy).toBeCloseTo(e.plaque.cy, 3);
-      const pw = parseFloat(pl.style.width);
-      expect(pw).toBeCloseTo(e.plaque.right - e.plaque.left, 3);
-      const plaqueRect = rect(
-        pcx,
-        pcy - (e.plaque.bottom - e.plaque.top) / 2,
-        pcy + (e.plaque.bottom - e.plaque.top) / 2,
-        pw / 2,
-      );
-      expect(rectsIntersect(shrink(plaqueRect), column)).toBe(false);
-      expect(rectsIntersect(shrink(plaqueRect), bar)).toBe(false);
+      const half = slot.size / 2;
+      expect(cx - half).toBeGreaterThanOrEqual(-EPS);
+      expect(cx + half).toBeLessThanOrEqual(w + EPS);
     });
   });
 });
@@ -239,13 +205,21 @@ describe("desktop PlaceView at 1024 px (matchMedia does not match)", () => {
     stubLayout(1024, 768);
     renderPlace(ghostRows(9));
 
-    const chrome = screen.getByTestId("place-chrome");
-    expect(chrome.className).toContain("absolute left-0 z-50 p-6");
-    expect(screen.getByTestId("place-title-block")).toBeTruthy();
-    expect(screen.queryByTestId("place-bottom-bar")).toBeNull();
+    // Sky is a world now (Req 17.5): desktop chrome is the centred title
+    // layout inside `world-chrome-top`; the pager bar exists on every
+    // viewport, and there is no `data-layout` (the world layout replaces it).
+    const top = screen.getByTestId("world-chrome-top");
+    const column = screen.getByTestId("place-chips-row").parentElement as HTMLElement;
+    expect(top.contains(column)).toBe(true);
+    expect(column.className).toContain("place-title-clear");
+    expect(column.className).toContain("items-center");
+    expect(column.className).not.toContain("items-stretch");
+    expect(screen.getByTestId("place-chips-row").style.touchAction).toBe("");
+    expect(screen.queryByTestId("place-title-block")).toBeNull();
+    expect(within(top).getByTestId("place-heading")).toBeTruthy();
+    expect(within(screen.getByTestId("place-bottom-bar")).getByTestId("pager")).toBeTruthy();
     expect(screen.queryByTestId("place-compact-heading")).toBeNull();
-    expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBe(
-      "scatter",
-    );
+    expect(screen.getByTestId("world-scroller")).toBeTruthy();
+    expect(screen.getByTestId("depth-scatter").getAttribute("data-layout")).toBeNull();
   });
 });

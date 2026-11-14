@@ -33,7 +33,7 @@ const FILES = [
   "components/ui/useMedia.ts",
   "components/ui/Header.tsx",
   "components/detail/DetailPanel.tsx",
-  "components/scene/PlaceView.tsx",
+  "components/scene/GatePlaceView.tsx",
   "components/scene/DepthScatter.tsx",
 ];
 
@@ -41,12 +41,19 @@ const FILES = [
 const RESPONSIVE_FILES = [
   "components/ui/Header.tsx",
   "components/detail/DetailPanel.tsx",
-  "components/scene/PlaceView.tsx",
+  "components/scene/GatePlaceView.tsx",
   "components/scene/DepthScatter.tsx",
   "components/scene/SceneView.tsx",
   "components/scene/EstateMap.tsx",
   "lib/estate-view.ts",
 ];
+
+/**
+ * The gate view has one deliberate extra band (768-1099 px, task 25.3) where the
+ * pager and creature ground line need more room. It is the only allowed
+ * threshold besides the compact/desktop pair.
+ */
+const MID_BAND_MAX_WIDTH_PX = 1099;
 
 /** Reads a file with block and line comments removed (URLs are kept). */
 function load(path: string): string {
@@ -82,11 +89,11 @@ describe("lms breakpoint thresholds", () => {
       const src = load(file);
       for (const m of src.matchAll(/max-\[(\d+)px\]/g)) {
         maxVariants += 1;
-        expect(Number(m[1]), `${file}: ${m[0]}`).toBe(COMPACT_MAX_WIDTH_PX);
+        expect([COMPACT_MAX_WIDTH_PX, MID_BAND_MAX_WIDTH_PX], `${file}: ${m[0]}`).toContain(Number(m[1]));
       }
       for (const m of src.matchAll(/min-\[(\d+)px\]/g)) {
         minVariants += 1;
-        expect(Number(m[1]), `${file}: ${m[0]}`).toBe(MOBILE_BREAKPOINT);
+        expect([MOBILE_BREAKPOINT, MID_BAND_MAX_WIDTH_PX + 1], `${file}: ${m[0]}`).toContain(Number(m[1]));
       }
       for (const m of src.matchAll(/\(max-width:\s*(\d+)px\)/g)) {
         expect(Number(m[1]), `${file}: ${m[0]}`).toBe(COMPACT_MAX_WIDTH_PX);
@@ -106,7 +113,7 @@ describe("lms breakpoint thresholds", () => {
     for (const file of [
       "components/ui/Header.tsx",
       "components/detail/DetailPanel.tsx",
-      "components/scene/PlaceView.tsx",
+      "components/scene/GatePlaceView.tsx",
     ]) {
       expect(load(file), file).toContain("useIsCompact");
     }

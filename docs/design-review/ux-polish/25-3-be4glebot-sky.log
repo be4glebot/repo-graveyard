@@ -1,0 +1,9 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL be4glebot/sky 768x500: chips x pager 510.1x5
+FAIL be4glebot/sky 320x720: depth-marker x tag:0 5.3x46
+FAIL be4glebot/sky 320x900: depth-marker x tag:0 5.3x27.1
+done be4glebot/sky
+
+69 case(s) measured, 3 finding(s), 2 distinct pair(s)
+  be4glebot/sky: chips x pager x1 worst 510.1x5 at 768x500
+  be4glebot/sky: depth-marker x tag:0 x2 worst 5.3x46 at 320x720

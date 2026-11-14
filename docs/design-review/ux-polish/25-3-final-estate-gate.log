@@ -1,0 +1,14 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL estate/gate 768x720: pager x tag:phoenix-draft 117.5x23.9; pager x tag:dusk-scheduler 65x23.3
+FAIL estate/gate 820x720: pager x tag:phoenix-draft 117.5x23.9; pager x tag:dusk-scheduler 39x23.3
+FAIL estate/gate 1024x720: pager x tag:phoenix-draft 117.5x23.9
+FAIL estate/gate 768x900: pager x tag:phoenix-draft 117.5x13.7; pager x tag:dusk-scheduler 57.5x13
+FAIL estate/gate 820x900: pager x tag:phoenix-draft 117.5x13.7; pager x tag:dusk-scheduler 31.5x13
+FAIL estate/gate 1024x900: pager x tag:phoenix-draft 117.5x13.7
+FAIL estate/gate 1024x768: pager x tag:phoenix-draft 117.5x23.9
+FAIL estate/gate 1024x800: pager x tag:phoenix-draft 117.5x23.9
+done estate/gate
+
+69 case(s) measured, 12 finding(s), 2 distinct pair(s)
+  estate/gate: pager x tag:phoenix-draft x8 worst 117.5x23.9 at 768x720
+  estate/gate: pager x tag:dusk-scheduler x4 worst 65x23.3 at 768x720

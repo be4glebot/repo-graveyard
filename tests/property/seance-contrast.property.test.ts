@@ -24,7 +24,11 @@ const css = readFileSync(resolve(__dirname, "../../app/globals.css"), "utf8");
 /** Last declaration wins, as in the cascade. Comments are stripped first. */
 function parseTokens(source: string): Map<string, string> {
   const tokens = new Map<string, string>();
-  const text = source.replace(/\/\*[\s\S]*?\*\//g, "");
+  // The séance contrast is a night-theme property: skip `[data-theme="day"]`
+  // override blocks (their values may be var() references).
+  const text = source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\[data-theme="day"\][^{]*\{[^{}]*\}/g, "");
   const re = /(--[a-z0-9-]+)\s*:\s*([^;{}]+);/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) tokens.set(m[1], m[2].trim());

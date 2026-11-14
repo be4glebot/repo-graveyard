@@ -1,5 +1,5 @@
 /**
- * DOM tests for the "Get a badge" entry points in Header.
+ * DOM tests for the "Share your graveyard" entry points in Header.
  *
  * Requirements: 7.1, 7.2, 7.3, 7.4, 7.15, 10.8
  */
@@ -61,7 +61,7 @@ describe("Header badge entry point visibility (7.1, 7.2, 7.15)", () => {
     stubWidth(1024);
     renderHeader();
     expect(headerButton()).not.toBeNull();
-    expect(headerButton()!.textContent).toBe("Get a badge");
+    expect(headerButton()!.textContent).toBe("Share your graveyard");
     expect(menuItem()).toBeNull();
   });
 
@@ -69,7 +69,7 @@ describe("Header badge entry point visibility (7.1, 7.2, 7.15)", () => {
     stubWidth(500);
     renderHeader();
     expect(menuItem()).not.toBeNull();
-    expect(menuItem()!.textContent).toBe("Get a badge");
+    expect(menuItem()!.textContent).toBe("Share your graveyard");
     expect(headerButton()).toBeNull();
   });
 
@@ -78,7 +78,7 @@ describe("Header badge entry point visibility (7.1, 7.2, 7.15)", () => {
     renderHeader({ mode: "estate" });
     expect(headerButton()).toBeNull();
     expect(menuItem()).toBeNull();
-    expect(screen.queryByText("Get a badge")).toBeNull();
+    expect(screen.queryByText("Share your graveyard")).toBeNull();
   });
 
   it.each([1024, 500])("renders nothing badge-related for an empty username at %i px", (w) => {

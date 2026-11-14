@@ -1,0 +1,1698 @@
+[
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1440x900",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 743,
+    "above": 16.082427291666587,
+    "below": 15.9427224305555,
+    "share": 0.0005478622004356332,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1440x900",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 610,
+    "above": 22.20750361111083,
+    "below": 22.11933017361086,
+    "share": 0.0003457781862743986,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1440x900",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 485,
+    "above": 26.256684618055512,
+    "below": 26.30214645833353,
+    "share": 0.0001782817265804672,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1440x900",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 368,
+    "above": 26.114191388888806,
+    "below": 26.087085277777746,
+    "share": 0.00010629847494533239,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1440x900",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 270,
+    "above": 23.933702569444403,
+    "below": 23.687055243055415,
+    "share": 0.0009672444172117181,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1920x1080",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 891,
+    "above": 15.887570468750036,
+    "below": 15.58714505208337,
+    "share": 0.0011781388888888872,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1920x1080",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 732,
+    "above": 20.462891171874567,
+    "below": 20.002686640624727,
+    "share": 0.0018047236519601558,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1920x1080",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 582,
+    "above": 23.47447986979115,
+    "below": 23.263020390624494,
+    "share": 0.0008292528594770831,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1920x1080",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 441,
+    "above": 24.007721041666446,
+    "below": 22.649752499999668,
+    "share": 0.005325366830065799,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "1920x1080",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 324,
+    "above": 22.02262835937488,
+    "below": 21.875031614583282,
+    "share": 0.000578810763888624,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "390x844",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 696,
+    "above": 18.649120769230812,
+    "below": 16.677074871794893,
+    "share": 0.0077335133232781135,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "390x844",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 571,
+    "above": 40.39696384615388,
+    "below": 38.47124358974351,
+    "share": 0.007551844142785773,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "390x844",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 454,
+    "above": 50.02892435897424,
+    "below": 48.315931025641035,
+    "share": 0.006717620915032164,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "390x844",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 344,
+    "above": 46.94717256410264,
+    "below": 48.03150487179499,
+    "share": 0.00425228355957787,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "390x844",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 253,
+    "above": 41.836877051282066,
+    "below": 43.42570512820503,
+    "share": 0.006230698340874374,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "360x740",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 611,
+    "above": 28.603530138888956,
+    "below": 23.681191527777816,
+    "share": 0.01930328867102408,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "360x740",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 502,
+    "above": 51.761218611111076,
+    "below": 47.70933208333334,
+    "share": 0.01588975108932447,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "360x740",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 399,
+    "above": 60.27153722222216,
+    "below": 58.594546527777645,
+    "share": 0.006576434095860833,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "360x740",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 303,
+    "above": 57.843474722222275,
+    "below": 60.037137500000185,
+    "share": 0.008602599128540821,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3",
+  "viewport": "360x740",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 222,
+    "above": 52.41632180555557,
+    "below": 56.749041944444386,
+    "share": 0.01699105936819144,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1440x900",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 743,
+    "above": 17.026115694444634,
+    "below": 17.34850972222242,
+    "share": 0.0012642903050109268,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1440x900",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 630,
+    "above": 23.2517961458332,
+    "below": 23.87732159722212,
+    "share": 0.002453040985838904,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1440x900",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 518,
+    "above": 26.78272993055527,
+    "below": 27.610225034722134,
+    "share": 0.003245078839870056,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1440x900",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 405,
+    "above": 27.12773520833318,
+    "below": 27.98943326388883,
+    "share": 0.003379208061002547,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1440x900",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 293,
+    "above": 24.187402743055465,
+    "below": 25.179060138888694,
+    "share": 0.0038888525326793307,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1920x1080",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 891,
+    "above": 17.23233377604161,
+    "below": 17.603648984374917,
+    "share": 0.001456138071895322,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 756,
+    "above": 21.03538382812508,
+    "below": 21.7887059635417,
+    "share": 0.0029542044526141994,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 621,
+    "above": 25.354365651041476,
+    "below": 26.482311432291738,
+    "share": 0.004423316789216711,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 486,
+    "above": 25.64371682291654,
+    "below": 26.8610767708334,
+    "share": 0.0047739605800661096,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "1920x1080",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 351,
+    "above": 22.144033046875077,
+    "below": 23.427476562499987,
+    "share": 0.005033111825980039,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "390x844",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 696,
+    "above": 17.237345256410233,
+    "below": 17.75585564102561,
+    "share": 0.0020333740573152104,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "390x844",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 590,
+    "above": 31.598606538461528,
+    "below": 33.559477948717934,
+    "share": 0.007689691804927082,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "390x844",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 485,
+    "above": 37.91239153846155,
+    "below": 40.35219487179466,
+    "share": 0.00956785620914945,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "390x844",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 379,
+    "above": 38.42579038461541,
+    "below": 41.12301064102552,
+    "share": 0.010577334338863187,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "390x844",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 274,
+    "above": 33.17134910256399,
+    "below": 36.032656282051306,
+    "share": 0.011220812468577722,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "360x740",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 611,
+    "above": 21.274018749999975,
+    "below": 23.3186663888889,
+    "share": 0.00801822603485853,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "360x740",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 518,
+    "above": 33.56314250000004,
+    "below": 37.695616388888965,
+    "share": 0.016205779956427153,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "360x740",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 426,
+    "above": 38.27178638888876,
+    "below": 42.62149388888882,
+    "share": 0.01705767647058846,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "360x740",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 333,
+    "above": 38.68048777777776,
+    "below": 43.22221972222218,
+    "share": 0.017810713507625156,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-3-reduced",
+  "viewport": "360x740",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 241,
+    "above": 34.70475347222213,
+    "below": 39.390548472222136,
+    "share": 0.01837566666666669,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1440x900",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1440x900",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1440x900",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1440x900",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1440x900",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1920x1080",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1920x1080",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1920x1080",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1920x1080",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "1920x1080",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "390x844",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "390x844",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "390x844",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "390x844",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "390x844",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "360x740",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "360x740",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "360x740",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "360x740",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty",
+  "viewport": "360x740",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1440x900",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1440x900",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1440x900",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1440x900",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1440x900",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1920x1080",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "1920x1080",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "390x844",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "390x844",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "390x844",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "390x844",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "390x844",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "360x740",
+  "depth": 0,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "360x740",
+  "depth": 0.25,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "360x740",
+  "depth": 0.5,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "360x740",
+  "depth": 0.75,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "empty-reduced",
+  "viewport": "360x740",
+  "depth": 1,
+  "seams": [],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1440x900",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "crossfade",
+    "y": 743,
+    "above": 16.412565451388787,
+    "below": 15.965177118055534,
+    "share": 0.0017544640522872653,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1440x900",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "crossfade",
+    "y": 421,
+    "above": 28.317341875000032,
+    "below": 27.922636770833297,
+    "share": 0.0015478631535950423,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1440x900",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "crossfade",
+    "y": 119,
+    "above": 15.415818680555667,
+    "below": 15.714293506944577,
+    "share": 0.001170489515250627,
+    "pass": true
+   },
+   {
+    "zone": "haze",
+    "y": 794,
+    "above": 9.15942628472269,
+    "below": 8.64395701388916,
+    "share": 0.002021448120915801,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1440x900",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 509,
+    "above": 29.911243854166642,
+    "below": 29.031296562500035,
+    "share": 0.003450773692810223,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1440x900",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 272,
+    "above": 25.4009464583332,
+    "below": 26.420141527777783,
+    "share": 0.003996843409586608,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1920x1080",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 1107,
+    "above": 0,
+    "below": 0,
+    "share": 0,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1920x1080",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 833,
+    "above": 18.92036705729167,
+    "below": 18.993318333333452,
+    "share": 0.0002860834354579655,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1920x1080",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 576,
+    "above": 27.03635273437457,
+    "below": 26.96793380208292,
+    "share": 0.0002683095383986256,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1920x1080",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 334,
+    "above": 21.43295588541656,
+    "below": 21.843677031249893,
+    "share": 0.0016106711601307127,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "1920x1080",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 132,
+    "above": 14.59699679687558,
+    "below": 14.88076500000053,
+    "share": 0.0011128164828429412,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "390x844",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 738,
+    "above": 12.947768076923099,
+    "below": 12.734352948717998,
+    "share": 0.0008369220713925534,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "390x844",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 591,
+    "above": 36.452535128205014,
+    "below": 34.41290397435881,
+    "share": 0.007998553544494908,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "390x844",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 453,
+    "above": 46.8130228205129,
+    "below": 45.99118012820529,
+    "share": 0.0032229125188533536,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "390x844",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 323,
+    "above": 48.492443589743644,
+    "below": 46.49743935897442,
+    "share": 0.007823546003016572,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "390x844",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 215,
+    "above": 36.910804999999996,
+    "below": 38.20582961538461,
+    "share": 0.005078527903469068,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "360x740",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 740,
+    "above": 6.5515451388888275,
+    "below": 0,
+    "share": 0.025692333877995403,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "360x740",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 562,
+    "above": 36.99739166666663,
+    "below": 35.78335819444442,
+    "share": 0.0047609155773420085,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "360x740",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 395,
+    "above": 52.10841902777781,
+    "below": 52.176558194444496,
+    "share": 0.0002672124183007162,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "360x740",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 237,
+    "above": 46.495854166666675,
+    "below": 47.72519722222244,
+    "share": 0.004820953159042221,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12",
+  "viewport": "360x740",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 107,
+    "above": 20.355307222222265,
+    "below": 22.007323333333368,
+    "share": 0.006478494553376872,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1440x900",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "crossfade",
+    "y": 743,
+    "above": 16.145507673611135,
+    "below": 16.331711736111057,
+    "share": 0.0007302120098036146,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1440x900",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "crossfade",
+    "y": 462,
+    "above": 26.226779652777573,
+    "below": 26.953066736110976,
+    "share": 0.0028481846405231507,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1440x900",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "crossfade",
+    "y": 180,
+    "above": 17.110147673611152,
+    "below": 17.76043121527762,
+    "share": 0.0025501315359469337,
+    "pass": true
+   },
+   {
+    "zone": "haze",
+    "y": 855,
+    "above": 6.703367916666673,
+    "below": 8.949973229167021,
+    "share": 0.00881021691176607,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1440x900",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 574,
+    "above": 16.566714548611266,
+    "below": 26.399533159722058,
+    "share": 0.0385600729847482,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1440x900",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 293,
+    "above": 15.587719375000088,
+    "below": 25.34909020833311,
+    "share": 0.03827988562091381,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1920x1080",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 1107,
+    "above": 0,
+    "below": 0,
+    "share": 0,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 864,
+    "above": 15.745122994792203,
+    "below": 16.17456476562545,
+    "share": 0.0016840853758166609,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 621,
+    "above": 22.124794687500373,
+    "below": 22.736118385417047,
+    "share": 0.0023973478349673502,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1920x1080",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 378,
+    "above": 20.252394036458607,
+    "below": 21.043425911458492,
+    "share": 0.003102085784313272,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "1920x1080",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 135,
+    "above": 13.008352890625495,
+    "below": 13.525928828125549,
+    "share": 0.0020297095588237392,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "390x844",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 738,
+    "above": 11.973421025640976,
+    "below": 12.642564230769201,
+    "share": 0.0026240910005028454,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "390x844",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 611,
+    "above": 27.6129387179486,
+    "below": 29.902681794871647,
+    "share": 0.008979384615384492,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "390x844",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 485,
+    "above": 36.73618320512814,
+    "below": 39.62201692307687,
+    "share": 0.011316994972347953,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "390x844",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 358,
+    "above": 36.559021282051205,
+    "below": 39.71930871794872,
+    "share": 0.0123932840623432,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "390x844",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 232,
+    "above": 27.024479230769202,
+    "below": 30.28961974358961,
+    "share": 0.012804472599295721,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "360x740",
+  "depth": 0,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 740,
+    "above": 5.928428611111067,
+    "below": 0,
+    "share": 0.02324873965141595,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "360x740",
+  "depth": 0.25,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 583,
+    "above": 23.856704861111186,
+    "below": 25.397347638888885,
+    "share": 0.006041736383441954,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "360x740",
+  "depth": 0.5,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 425,
+    "above": 36.577785555555494,
+    "below": 39.13080305555549,
+    "share": 0.010011833333333317,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "360x740",
+  "depth": 0.75,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 268,
+    "above": 34.54812291666664,
+    "below": 37.38409611111107,
+    "share": 0.011121463507625207,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ },
+ {
+  "place": "ground",
+  "case": "tombstones-12-reduced",
+  "viewport": "360x740",
+  "depth": 1,
+  "seams": [
+   {
+    "zone": "haze",
+    "y": 111,
+    "above": 16.293737499999995,
+    "below": 18.215847361111102,
+    "share": 0.007537685729847477,
+    "pass": true
+   }
+  ],
+  "fallbackEdges": []
+ }
+]

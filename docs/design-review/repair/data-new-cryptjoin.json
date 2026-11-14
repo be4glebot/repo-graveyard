@@ -1,0 +1,86 @@
+[
+ {
+  "w": 1440,
+  "h": 900,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 329
+  },
+  "best": {
+   "y": 390,
+   "d": 5.8,
+   "share": 0.1
+  },
+  "shot": "before-new-cryptjoin-1440x900-band-chamber-1.png"
+ },
+ {
+  "w": 1440,
+  "h": 900,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 450.5
+  },
+  "best": {
+   "y": 389,
+   "d": 5.7,
+   "share": 0.09
+  },
+  "shot": "before-new-cryptjoin-1440x900-zone0-stairs.png"
+ },
+ {
+  "w": 1280,
+  "h": 720,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 263
+  },
+  "best": {
+   "y": 290,
+   "d": 5.8,
+   "share": 0.08
+  },
+  "shot": "before-new-cryptjoin-1280x720-band-chamber-1.png"
+ },
+ {
+  "w": 1280,
+  "h": 720,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 360
+  },
+  "best": {
+   "y": 290,
+   "d": 5.7,
+   "share": 0.08
+  },
+  "shot": "before-new-cryptjoin-1280x720-zone0-stairs.png"
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "join": {
+   "n": "band-chamber-1",
+   "y": 308
+  },
+  "best": {
+   "y": 352,
+   "d": 12.9,
+   "share": 0.59
+  },
+  "shot": "before-new-cryptjoin-390x844-band-chamber-1.png"
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "join": {
+   "n": "zone0-stairs",
+   "y": 422.5
+  },
+  "best": {
+   "y": 368,
+   "d": 9,
+   "share": 0.31
+  },
+  "shot": "before-new-cryptjoin-390x844-zone0-stairs.png"
+ }
+]

@@ -57,9 +57,10 @@ import {
 import {
   TRAVEL_CROSSFADE_MS,
   PLACE_CENTERS,
-  PLACES,
   type PlaceId,
 } from "@/lib/estate-view";
+import { themeArt, type Theme } from "@/lib/theme-art";
+import { dayCopy, placeNameKey } from "@/lib/day-copy";
 
 /** Which way the pull runs: into a place, or back out to the map. */
 export type TravelDirection = "in" | "out";
@@ -76,6 +77,8 @@ const EASE_IN = "cubic-bezier(.55,0,1,.45)";
 const EASE_OUT = "cubic-bezier(0,.55,.45,1)";
 
 export interface UseTravelOptions {
+  /** Art theme for the destination preload only (default night). */
+  theme?: Theme;
   /** The place being entered ("in") or left ("out"); drives the zoom origin. */
   place: PlaceId;
   /** Pull direction. */
@@ -129,6 +132,7 @@ function easeOut(t: number): number {
  */
 export function useTravel(options: UseTravelOptions): TravelState {
   const { place, direction, reducedMotion, onCut, onDone } = options;
+  const theme = options.theme ?? "night";
   const durationMs = reducedMotion ? TRAVEL_CROSSFADE_MS : TRAVEL_FULL_MS;
   const cutAt = reducedMotion ? TRAVEL_REDUCED_CUT_MS : TRAVEL_CUT_MS;
 
@@ -160,8 +164,8 @@ export function useTravel(options: UseTravelOptions): TravelState {
       return;
     }
     const img = new window.Image();
-    img.src = `/art/place-${place}.webp`;
-  }, [place]);
+    img.src = themeArt(theme, `/art/place-${place}.webp`);
+  }, [place, theme]);
 
   // The clock: advance `elapsed` on a ~60fps interval, fire the cut at `cutAt`,
   // finish at the end. Using `setInterval` + `Date.now()` (rather than rAF +
@@ -316,6 +320,8 @@ export interface TravelFogProps {
   /** Direction + place for test hooks. */
   direction: TravelDirection;
   place: PlaceId;
+  /** Visual theme only; never affects timing or travel state. */
+  theme?: Theme;
 }
 
 /**
@@ -329,7 +335,9 @@ export function TravelFog({
   reduced,
   direction,
   place,
+  theme = "night",
 }: TravelFogProps) {
+  const day = theme === "day";
   if (reduced) {
     return (
       <div
@@ -339,7 +347,11 @@ export function TravelFog({
         data-place={place}
         data-reduced-motion="true"
         className="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center"
-        style={{ backgroundColor: "color-mix(in srgb, var(--color-night-sky) 80%, transparent)" }}
+        style={{
+          backgroundColor: day
+            ? "color-mix(in srgb, var(--color-day-haze) 80%, transparent)"
+            : "color-mix(in srgb, var(--color-night-sky) 80%, transparent)",
+        }}
       >
         {destinationName ? (
           <h2
@@ -362,17 +374,41 @@ export function TravelFog({
       data-reduced-motion="false"
       className="pointer-events-none fixed inset-0 z-[100] overflow-hidden"
     >
+      {/* Night veil under the wisps: it hides the view swap at the cut with a
+          dark wash (not a bright white flash) and follows the fog opacity. */}
       <div
-        data-testid="travel-fog"
+        data-testid="travel-veil"
         className="absolute inset-0"
         style={{
           opacity: fog.opacity,
-          transform: `scale(${fog.scale})`,
-          transformOrigin: "center",
-          backgroundImage: "url(/art/fog-wisps.webp)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundColor: day
+            ? "var(--color-day-haze)"
+            : "var(--color-night-sky)",
         }}
+      />
+      <div
+        data-testid="travel-fog"
+        className="absolute inset-0"
+        style={
+          day
+            ? {
+                // Day: a warm wash instead of the dark fog art.
+                opacity: fog.opacity,
+                transform: `scale(${fog.scale})`,
+                transformOrigin: "center",
+                backgroundImage: "var(--day-wash)",
+              }
+            : {
+                opacity: fog.opacity,
+                transform: `scale(${fog.scale})`,
+                transformOrigin: "center",
+                backgroundImage: `url(${themeArt(theme, "/art/fog-wisps.webp")})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                // Dim the plate so the mist reads as dark fog, not a white-grey flash.
+                filter: "brightness(0.45)",
+              }
+        }
       />
     </div>
   );
@@ -382,8 +418,11 @@ export function TravelFog({
 export function travelDestinationName(
   direction: TravelDirection,
   place: PlaceId,
+  theme: Theme = "night",
 ): string {
-  return direction === "in" ? PLACES[place].name : "The Estate";
+  return direction === "in"
+    ? dayCopy(theme, placeNameKey(place))
+    : dayCopy(theme, "travel.estate");
 }
 
 
@@ -392,6 +431,8 @@ export interface TravelRunnerProps {
   place: PlaceId;
   direction: TravelDirection;
   reducedMotion: boolean;
+  /** Visual theme only; never a dependency of timers or travel state. */
+  theme?: Theme;
   /** The REAL source view (mounted before the cut). */
   from: ReactNode;
   /** The REAL destination view (mounted after the cut). */
@@ -418,13 +459,21 @@ export function TravelRunner({
   place,
   direction,
   reducedMotion,
+  theme = "night",
   from,
   to,
   onCut,
   onDone,
   onState,
 }: TravelRunnerProps) {
-  const state = useTravel({ place, direction, reducedMotion, onCut, onDone });
+  const state = useTravel({
+    place,
+    direction,
+    reducedMotion,
+    theme,
+    onCut,
+    onDone,
+  });
   onState?.(state);
 
   return (
@@ -452,8 +501,9 @@ export function TravelRunner({
         reduced={state.reduced}
         direction={direction}
         place={place}
+        theme={theme}
         destinationName={
-          state.reduced ? travelDestinationName(direction, place) : undefined
+          state.reduced ? travelDestinationName(direction, place, theme) : undefined
         }
       />
     </>

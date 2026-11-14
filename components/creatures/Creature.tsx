@@ -31,7 +31,9 @@ import {
   type ReactNode,
 } from "react";
 
+import { useTheme } from "@/components/scene/ThemeProvider";
 import { type GraveyardRow } from "@/lib/graveyard-view";
+import { themeArt } from "@/lib/theme-art";
 import { type LifecycleState } from "@/lib/lifecycle";
 import {
   animationDelay,
@@ -99,6 +101,14 @@ export interface CreatureProps {
   onBlurEnd?: (name: string) => void;
   /** DOM id of the hover tooltip, referenced via `aria-describedby`. */
   hoverCardId?: string;
+  /** World mode: art box in px, overriding the default. Absent = unchanged. */
+  size?: number;
+  /** World mode: a `CreatureTag` mounted inside the button (absolute, no layout). */
+  tag?: ReactNode;
+  /** World mode: a `CreatureShadow` mounted under the feet (absolute, no layout). */
+  shadow?: ReactNode;
+  /** World mode: flip the ART only (never the tag or shadow). */
+  mirror?: boolean;
 }
 
 /**
@@ -122,7 +132,12 @@ export default function Creature({
   onFocusStart,
   onBlurEnd,
   hoverCardId,
+  size,
+  tag,
+  shadow,
+  mirror,
 }: CreatureProps) {
+  const { theme } = useTheme();
   const basename = creatureImage(row.state, row.decayLevel);
   const accessibleName = creatureAccessibleName(row);
   // Deterministic, name-stable stagger in seconds (Req 6.8).
@@ -149,14 +164,18 @@ export default function Creature({
   // enclosing element (interactive button vs. decorative div) differs, and the
   // decorative path draws a smaller box so the estate-map representatives read
   // as the small markers the canvas calls for (tombstones/coffins smallest).
-  const artSize = decorative ? decorativeArtSize(row.state) : CREATURE_ART_SIZE;
+  const artSize =
+    size ?? (decorative ? decorativeArtSize(row.state) : CREATURE_ART_SIZE);
   const inner = (
     <span
       className={animationClassName}
-      style={{ animationDelay: `${delaySeconds}s` }}
+      style={{
+        animationDelay: `${delaySeconds}s`,
+        ...(mirror ? { transform: "scaleX(-1)" } : null),
+      }}
     >
       <Image
-        src={`/art/${basename}.webp`}
+        src={themeArt(theme, `/art/${basename}.webp`)}
         alt=""
         aria-hidden
         width={artSize}
@@ -224,7 +243,9 @@ export default function Creature({
         "outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-candle-400)] focus-visible:ring-offset-0",
       ].join(" ")}
     >
+      {shadow}
       {inner}
+      {tag}
     </button>
   );
 }

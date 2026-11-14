@@ -49,7 +49,12 @@
  * 3.7, 6.1, 6.2, 6.3
  */
 
-import { useRef, type CSSProperties } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  noticePlacement,
+  type NoticePlacement,
+  type NoticeRect,
+} from "@/lib/notice-placement";
 
 import Atmosphere from "@/components/scene/Atmosphere";
 import Backdrop from "@/components/scene/Backdrop";
@@ -64,6 +69,7 @@ import Whisper from "@/components/scene/Whisper";
 import Place from "@/components/scene/Place";
 
 import { type GraveyardRow } from "@/lib/graveyard-view";
+import type { Theme } from "@/lib/theme-art";
 import {
   placeOf,
   PLACE_ORDER,
@@ -151,7 +157,7 @@ export interface EstateMapProps {
    * on). Optional so existing callers/tests that predate the polish wiring
    * still type-check; the map's own polish wiring lands in task 9.2.
    */
-  lightsOn?: boolean;
+  theme?: Theme;
   /**
    * Travel-transition hint (visual fix r3 travel). While `active`, the map
    * pauses its pointer parallax (so the zoom origin can't drift) and fades its
@@ -226,7 +232,7 @@ export default function EstateMap({
   onEnterPlace,
   onGoToTurningSoon,
   reducedMotion = false,
-  lightsOn = false,
+  theme = "night",
   travel,
 }: EstateMapProps) {
   const grouped = groupByPlace(rows);
@@ -244,6 +250,69 @@ export default function EstateMap({
   // Pause parallax during a travel transition so the zoom origin stays put.
   useParallax(rootRef, { reducedMotion, paused: travel?.active ?? false });
 
+  // Turning-soon notice placement (desktop only). Measured from the real Sky
+  // button, its plaque and the header so the notice never lands on a plaque or
+  // the header; the maths lives in the pure `noticePlacement`. Mobile keeps the
+  // CSS-only top lane (`placement` stays null below 768px).
+  const noticeWrapRef = useRef<HTMLDivElement>(null);
+  const [placement, setPlacement] = useState<NoticePlacement | null>(null);
+  const hasNotice = turningSoon !== null;
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || !hasNotice) {
+      setPlacement(null);
+      return;
+    }
+    const measure = () => {
+      const rr = root.getBoundingClientRect();
+      if (rr.width < 768) {
+        setPlacement(null);
+        return;
+      }
+      const rel = (el: Element | null): NoticeRect | null => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          left: r.left - rr.left,
+          right: r.right - rr.left,
+          top: r.top - rr.top + root.scrollTop,
+          bottom: r.bottom - rr.top + root.scrollTop,
+        };
+      };
+      const sky = rel(root.querySelector('[data-testid="estate-place-sky"]'));
+      const plaque = rel(root.querySelector('[data-testid="estate-place-sky-plaque"]'));
+      const header = document.querySelector('[data-testid="scene-header"]');
+      const headerBottom = header ? header.getBoundingClientRect().bottom - rr.top : 0;
+      const wrap = noticeWrapRef.current;
+      const next = noticePlacement({
+        vw: rr.width,
+        headerBottom,
+        sky: sky ?? { left: rr.width * 0.46, right: rr.width * 0.46, top: 0, bottom: 0 },
+        plaque: plaque ?? sky ?? { left: rr.width * 0.46, right: rr.width * 0.46, top: 0, bottom: 0 },
+        noticeH: wrap ? wrap.firstElementChild?.getBoundingClientRect().height : 0,
+      });
+      setPlacement((prev) =>
+        prev &&
+        prev.anchor === next.anchor &&
+        Math.abs(prev.left - next.left) < 0.5 &&
+        Math.abs(prev.top - next.top) < 0.5 &&
+        Math.abs(prev.maxWidth - next.maxWidth) < 0.5
+          ? prev
+          : next,
+      );
+    };
+    measure();
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    ro?.observe(root);
+    const header = document.querySelector('[data-testid="scene-header"]');
+    if (header) ro?.observe(header);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [hasNotice, rows.length]);
+
   // During a travel transition the stage sets `--travel-others-fade` (1 -> 0 as
   // the view zooms into the target place). Every place EXCEPT the destination,
   // plus the map heading and the map-only decorations (turning-soon notice,
@@ -258,13 +327,23 @@ export default function EstateMap({
     ? othersFade
     : undefined;
 
+  // Camera drift on the Hub background layers (peak <= 12px, Req 2.4). It sits
+  // on an inner wrapper so it composes with the parallax transform on the
+  // outer one. Absent under reduced motion (static, Req 2.5); paused during
+  // travel via `[data-travel-active] .camera-drift` in globals.css.
+  const driftClass = reducedMotion ? "h-full w-full" : "camera-drift h-full w-full";
+
   return (
     <div
       ref={rootRef}
       data-scene-root
       data-testid="estate-map"
       data-mode={mode}
-      className="relative min-h-dvh w-full overflow-x-hidden overflow-y-auto"
+      data-travel-active={travel?.active ? "true" : undefined}
+      // On short desktop viewports (<700px tall) the board keeps a 700px
+      // minimum (`HUB_MIN_BOARD_H_PX`) and the page scrolls, so the percent
+      // positioned place cards, whisper and header never collide (25.3).
+      className="relative min-h-dvh w-full overflow-x-hidden overflow-y-auto md:[@media(max-height:699px)]:min-h-[700px]"
       style={{ backgroundColor: "var(--color-night-sky)" }}
     >
       {/* --- Reused painted stack, same back-to-front order as Scene. These are
@@ -277,19 +356,25 @@ export default function EstateMap({
         className="pointer-events-none absolute inset-0 z-0"
         style={BG_PARALLAX}
       >
-        <Sky />
+        <div className={driftClass} data-testid="estate-drift-sky">
+          <Sky />
+        </div>
       </div>
       <div
         className="pointer-events-none absolute inset-0 z-0"
         style={BG_PARALLAX}
       >
-        <Backdrop />
+        <div className={driftClass} data-testid="estate-drift-backdrop">
+          <Backdrop />
+        </div>
       </div>
       <div
         className="pointer-events-none absolute inset-0 z-10"
         style={BG_PARALLAX}
       >
-        <Moon rows={rows} />
+        <div className={driftClass} data-testid="estate-drift-moon">
+          <Moon rows={rows} />
+        </div>
       </div>
 
       {/* --- Far fog (z 10): the dense layer behind the place links, density =
@@ -320,7 +405,7 @@ export default function EstateMap({
           region matching the old scene (role=status, so it never collides with
           the interactive chrome). Renders nothing when `whispers` is empty. --- */}
       <div
-        className="pointer-events-none absolute z-40 flex items-start justify-center overflow-hidden text-center [&>*]:line-clamp-2"
+        className="pointer-events-none absolute z-40 flex items-start justify-center overflow-hidden text-center max-[767px]:hidden [&>*]:line-clamp-2"
         style={{
           ...decorFadeStyle,
           top: `${WHISPER_TOP_PCT}%`,
@@ -352,14 +437,29 @@ export default function EstateMap({
           (Req 1.3/1.4). Its "Go to it" action jumps into the sky place on the
           exact plot holding the ghost (estate-map Req 12.1–12.6), wired through
           `onGoToTurningSoon`. --- */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-[14%] z-40 flex justify-center"
-        style={decorFadeStyle}
-      >
-        <div className="pointer-events-auto">
-          <TurningSoon turningSoon={turningSoon} onGoTo={onGoToTurningSoon} />
+      {turningSoon !== null && (
+        <div
+          ref={noticeWrapRef}
+          data-testid="turning-soon-lane"
+          data-anchor={placement?.anchor}
+          className="pointer-events-none absolute z-40 flex justify-center max-md:inset-x-0 max-md:top-[14%] max-md:px-4 md:invisible"
+          style={{
+            ...decorFadeStyle,
+            ...(placement
+              ? {
+                  visibility: "visible",
+                  left: placement.left,
+                  top: placement.top,
+                  maxWidth: placement.maxWidth,
+                }
+              : null),
+          }}
+        >
+          <div className="pointer-events-auto max-w-full">
+            <TurningSoon turningSoon={turningSoon} onGoTo={onGoToTurningSoon} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* --- The four place links in display order sky, gate, ground, crypt
           (Req 1.2). Each place gets only its own rows (grouped by placeOf).
@@ -424,7 +524,7 @@ export default function EstateMap({
           z-40) so it dims only the scene and place links, never the controls.
           Renders nothing while the lights are on (Req 3.1 / 3.7). No parallax
           transform. --- */}
-      <LanternCursor lightsOn={lightsOn} reducedMotion={reducedMotion} />
+      <LanternCursor theme={theme} reducedMotion={reducedMotion} />
     </div>
   );
 }

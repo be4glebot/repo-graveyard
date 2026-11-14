@@ -32,7 +32,10 @@
  */
 
 import { type LifecycleState } from "@/lib/lifecycle";
-import { PLACE_ORDER, PLACES } from "@/lib/estate-view";
+import type { CSSProperties } from "react";
+import { hubFooterLimits, PLACE_ORDER, PLACES } from "@/lib/estate-view";
+import { useTheme } from "@/components/scene/ThemeProvider";
+import { countKey, dayCopy, placeNameKey } from "@/lib/day-copy";
 
 /** The scene render modes; the plaque is shown only for the sample estate. */
 export type SceneMode = "live" | "estate";
@@ -60,23 +63,39 @@ export interface FooterProps {
    * plaque; `"live"` (the default) omits it and renders only the legend.
    */
   mode?: SceneMode;
+  /** True on the Hub map: caps the notice and legend beside the gate card (desktop). */
+  hub?: boolean;
 }
 
-export default function Footer({ mode = "live" }: FooterProps) {
+export default function Footer({ mode = "live", hub = false }: FooterProps) {
+  // On the Hub the gate card sits in the middle of the bottom edge, so the
+  // notice (left) and legend (right) are capped to the space beside it and wrap
+  // instead of running underneath it (25.3).
+  const limits = hubFooterLimits();
   return (
     <footer
       data-testid="scene-footer"
+      data-hub={hub ? "true" : undefined}
       className={[
         "pointer-events-none flex w-full items-center justify-between gap-4 px-4 py-2",
       ].join(" ")}
-      style={{ color: "var(--color-scene-fg-muted)" }}
+      style={
+        {
+          color: "var(--color-scene-fg-muted)",
+          "--hub-notice-max": limits.noticeMaxWidth,
+          "--hub-legend-max": limits.legendMaxWidth,
+        } as CSSProperties
+      }
     >
       {/* Plaque (left) — sample estate only. A spacer keeps the legend pinned
           right when the plaque is absent. */}
       {mode === "estate" ? (
         <p
           data-testid="scene-footer-plaque"
-          className="font-[family-name:var(--font-narrative)] italic text-sm"
+          className={[
+            "day-chrome-plate font-[family-name:var(--font-narrative)] italic text-sm",
+            hub ? "md:max-w-[var(--hub-notice-max)]" : "",
+          ].join(" ")}
           style={{
             color: "var(--color-candle-tan)",
             textShadow: "0 1px 6px var(--color-night-sky)",
@@ -95,7 +114,10 @@ export default function Footer({ mode = "live" }: FooterProps) {
           so the compact Bottom_Bar holds only the Pager. */}
       <SceneLegend
         testId="scene-footer-legend"
-        className="max-[767px]:hidden"
+        className={[
+          "max-[767px]:hidden",
+          hub ? "md:max-w-[var(--hub-legend-max)]" : "",
+        ].join(" ")}
       />
     </footer>
   );
@@ -110,12 +132,13 @@ export interface SceneLegendProps {
 
 /** The lifecycle legend list, shared by the desktop footer and the compact menu. */
 export function SceneLegend({ testId, className }: SceneLegendProps) {
+  const { theme } = useTheme();
   return (
     <ul
       data-testid={testId}
       aria-label="Lifecycle legend"
       className={[
-        "flex flex-wrap items-start gap-x-4 gap-y-1",
+        "day-chrome-plate flex flex-wrap items-start gap-x-4 gap-y-1",
         "font-[family-name:var(--font-ui)] text-xs",
         className ?? "",
       ].join(" ")}
@@ -132,7 +155,7 @@ export function SceneLegend({ testId, className }: SceneLegendProps) {
               className="font-[family-name:var(--font-heading)] uppercase tracking-[1.5px]"
               style={{ color: "var(--color-candle-tan)" }}
             >
-              {place.name}
+              {dayCopy(theme, placeNameKey(placeId))}
             </span>
             <ul className="flex flex-wrap items-center gap-x-2">
               {place.states.map((state) => (
@@ -141,7 +164,7 @@ export function SceneLegend({ testId, className }: SceneLegendProps) {
                   data-legend-state={state}
                   className="whitespace-nowrap"
                 >
-                  {STATE_LABEL[state]}
+                  {theme === "day" ? dayCopy(theme, countKey(state, 1)) : STATE_LABEL[state]}
                 </li>
               ))}
             </ul>

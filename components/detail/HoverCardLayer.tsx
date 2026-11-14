@@ -1,7 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import { createPortal } from "react-dom";
+import { useTheme } from "@/components/scene/ThemeProvider";
 import type { LifecycleState } from "@/lib/lifecycle";
 import type { RepoRow } from "@/lib/repoRow";
 import { PARALLAX_FRAME_EVENT } from "@/components/scene/useParallax";
@@ -59,6 +67,26 @@ export function computeCardPosition(
   };
 }
 
+/**
+ * The card is a preview, not a target. When a pointer click lands on its body
+ * (not on its link) over another creature, activate the creature beneath so a
+ * card that happens to cover a neighbour never swallows the click.
+ */
+export function forwardClickToCreatureBeneath(e: ReactMouseEvent<HTMLElement>): void {
+  if (e.detail === 0) return;
+  const target = e.target as Element;
+  if (target.closest("a, button")) return;
+  const card = e.currentTarget;
+  for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
+    if (card.contains(el)) continue;
+    const btn = el.closest<HTMLButtonElement>("button[aria-pressed]");
+    if (btn) {
+      btn.click();
+      return;
+    }
+  }
+}
+
 export interface HoverCardLayerProps {
   rowsByName: Map<string, RepoRow>;
   owner: string;
@@ -87,6 +115,7 @@ function OpenCard({
   renderedAt,
   isFixture,
 }: HoverCardLayerProps & { name: string; trigger: "pointer" | "focus"; anchor: HTMLElement }) {
+  const { theme } = useTheme();
   const actions = useHoverCardActions();
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
@@ -159,7 +188,8 @@ function OpenCard({
       ref={ref}
       id={hoverCardId(name)}
       role={interactive ? undefined : "tooltip"}
-      className="fixed z-[60]"
+      data-theme={theme}
+      className="day-panel fixed z-[60]"
       style={{
         left: 0,
         top: 0,
@@ -170,6 +200,7 @@ function OpenCard({
       }}
       onPointerEnter={interactive ? actions.onCardPointerEnter : undefined}
       onPointerLeave={interactive ? actions.onCardPointerLeave : undefined}
+      onClick={interactive ? forwardClickToCreatureBeneath : undefined}
     >
       <HoverCard
         row={row}

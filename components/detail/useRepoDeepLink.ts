@@ -21,6 +21,12 @@ export interface UseRepoDeepLinkParams {
   onOpenState: (name: string) => void;
   /** Close the panel (state only, no history). */
   onCloseState: () => void;
+  /**
+   * Optional: called with the matched name when the panel is opened from the
+   * URL (initial load, popstate), i.e. without a pointer activation. Not called
+   * for in-page `open`.
+   */
+  onReveal?: (name: string) => void;
 }
 
 export interface RepoDeepLink {
@@ -41,6 +47,7 @@ export function useRepoDeepLink({
   panelOpen,
   onOpenState,
   onCloseState,
+  onReveal,
 }: UseRepoDeepLinkParams): RepoDeepLink {
   /** True when the current open pushed its own history entry. */
   const pushedRef = useRef(false);
@@ -50,8 +57,10 @@ export function useRepoDeepLink({
   const rowsRef = useRef(rows);
   const openStateRef = useRef(onOpenState);
   const closeStateRef = useRef(onCloseState);
+  const revealRef = useRef(onReveal);
 
   useEffect(() => {
+    revealRef.current = onReveal;
     openRef.current = panelOpen;
     rowsRef.current = rows;
     openStateRef.current = onOpenState;
@@ -66,6 +75,7 @@ export function useRepoDeepLink({
     const match = matchRepoParam(rowsRef.current, param);
     if (match !== null) {
       pushedRef.current = false;
+      revealRef.current?.(match);
       openStateRef.current(match);
     }
     // Mount only.
@@ -125,6 +135,7 @@ export function useRepoDeepLink({
       // Forward onto an entry that carries `?repo=`: reopen it.
       pushedRef.current = true;
       openRef.current = true;
+      revealRef.current?.(match);
       openStateRef.current(match);
       return !wasOpen;
     }

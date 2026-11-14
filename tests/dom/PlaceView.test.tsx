@@ -416,8 +416,11 @@ describe("PlaceView title block: heading, subtitle, chips are one centered flow 
   });
 
   it("keeps the same flow column with no chips (ground/crypt): heading + subtitle still flow, chips absent", () => {
+    // Req 17.5 (task 11.4): ground is now a world; it has no `place-title-block`
+    // wrapper (that belongs to the old stage), so the same "heading is in the
+    // top chrome flow" intent reads the world's `world-chrome-top` container.
     renderPlace({ place: "ground", rows: makeRows(3, "tombstone", null) });
-    const block = screen.getByTestId("place-title-block");
+    const block = screen.getByTestId("world-chrome-top");
     const heading = screen.getByTestId("place-heading");
     expect(block.contains(heading)).toBe(true);
     expect(screen.queryByTestId("filter-chips")).toBeNull();

@@ -492,7 +492,7 @@ describe("DetailPanel content (6.1-6.14)", () => {
     },
   );
 
-  it("renders an Actions landmark with Hold a séance and Badge for this repo for a real repo (6.14)", () => {
+  it("renders an Actions landmark with Hold a séance and Share this repo for a real repo (6.14)", () => {
     renderPanel();
     const actions = dialog()!.querySelector<HTMLElement>(
       'section[aria-label="Actions"][data-slot="actions"]',
@@ -505,7 +505,7 @@ describe("DetailPanel content (6.1-6.14)", () => {
     );
     for (const c of controls) expect(c.tagName).toBe("BUTTON");
     expect(texts[0]).toContain("Hold a séance");
-    expect(texts[1]).toBe("Badge for this repo");
+    expect(texts[1]).toBe("Share this repo");
     expect((actions.textContent ?? "").replace(/\s+/g, " ").trim()).toBe(texts.join(""));
   });
 

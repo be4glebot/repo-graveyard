@@ -1,0 +1,8 @@
+﻿matrix: 69 sizes x 1 pages x 1 places (resize in place)
+FAIL defunkt/ground 360x900: depth-marker x tag:1 65.3x2.9
+FAIL defunkt/ground 390x900: depth-marker x tag:1 65.3x2.9
+FAIL defunkt/ground 390x1080: depth-marker x tag:1 65.3x25.7
+done defunkt/ground
+
+69 case(s) measured, 3 finding(s), 1 distinct pair(s)
+  defunkt/ground: depth-marker x tag:1 x3 worst 65.3x25.7 at 390x1080

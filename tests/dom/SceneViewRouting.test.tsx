@@ -193,7 +193,7 @@ describe("SceneView client-side routing", () => {
     // The scene is mounted; capture its host so we can prove it is not torn
     // down and rebuilt by a popstate (which would signal a server re-run).
     const hostBefore = screen.getByTestId("scene-view");
-    expect(hostBefore.getAttribute("data-lights-on")).toBe("false");
+    expect(hostBefore.getAttribute("data-theme")).toBe("night");
 
     // Back/forward lands on a place via the pushed history state. The listener
     // reads `state.view` and updates the view purely on the client — no throw,
@@ -203,7 +203,7 @@ describe("SceneView client-side routing", () => {
 
     const hostAfter = screen.getByTestId("scene-view");
     expect(hostAfter).toBe(hostBefore);
-    expect(hostAfter.getAttribute("data-lights-on")).toBe("false");
+    expect(hostAfter.getAttribute("data-theme")).toBe("night");
     expect(screen.queryByTestId("place-view")?.getAttribute("data-place")).toBe(
       "gate",
     );

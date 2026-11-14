@@ -7,6 +7,8 @@
  */
 import Image from "next/image";
 
+import { themeArt } from "@/lib/theme-art";
+
 const STEPS = [
   { title: "Visit a graveyard", art: "ghost-0" },
   { title: "Hold a séance", art: "zombie-0" },
@@ -25,7 +27,8 @@ export default function HowItWorks() {
           className="flex flex-col items-center gap-2 text-center"
         >
           <Image
-            src={`/art/${step.art}.webp`}
+            // The landing gate is always night; creatures have no day art here.
+            src={themeArt("night", `/art/${step.art}.webp`)}
             alt=""
             width={96}
             height={96}

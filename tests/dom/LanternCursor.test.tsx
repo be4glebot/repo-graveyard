@@ -4,7 +4,7 @@
  *
  * `LanternCursor` paints the lights-off dimming effect and nothing else: a
  * `pointer-events: none` layer in the lantern band (z 35, below chrome) whose
- * exact rendering depends on two inputs — the `lightsOn` prop and the device's
+ * exact rendering depends on two inputs — the `theme` prop and the device's
  * pointer capability (`matchMedia("(hover: hover) and (pointer: fine)")`):
  *
  *   - **lights-on** → renders `null` (no lantern, no vignette, Req 3.7);
@@ -157,7 +157,7 @@ function dispatchPointerLeave(el: HTMLElement): void {
  * a cleanup-safe render result. matchMedia must be installed before calling.
  */
 function renderInSceneRoot(props: {
-  lightsOn: boolean;
+  theme: "day" | "night";
   reducedMotion: boolean;
 }): { root: HTMLElement } {
   const result = render(
@@ -186,11 +186,11 @@ afterEach(() => {
 });
 
 describe("LanternCursor — lights-on renders nothing (Req 3.7)", () => {
-  it("renders neither the lantern nor the vignette when lightsOn is true, even on a fine pointer", () => {
-    installMatchMedia(true); // fine + hover, to prove lightsOn alone suppresses it
+  it("renders neither the lantern nor the vignette when theme is day, even on a fine pointer", () => {
+    installMatchMedia(true); // fine + hover, to prove theme alone suppresses it
     let container: HTMLElement;
     act(() => {
-      const result = render(<LanternCursor lightsOn={true} reducedMotion={false} />);
+      const result = render(<LanternCursor theme="day" reducedMotion={false} />);
       container = result.container;
     });
     // No overlay element of either kind is present.
@@ -207,7 +207,7 @@ describe("LanternCursor — lights-off + fine/hover renders the lantern overlay 
   it("renders the lantern overlay in the z-35 band (below chrome), pointer-events none, plain radial-gradient with no mix-blend-mode", () => {
     let container: HTMLElement;
     act(() => {
-      const result = render(<LanternCursor lightsOn={false} reducedMotion={false} />);
+      const result = render(<LanternCursor theme="night" reducedMotion={false} />);
       container = result.container;
     });
 
@@ -235,7 +235,7 @@ describe("LanternCursor — lights-off + fine/hover renders the lantern overlay 
     // Motion allowed → flicker loop present.
     let moving: HTMLElement;
     act(() => {
-      const result = render(<LanternCursor lightsOn={false} reducedMotion={false} />);
+      const result = render(<LanternCursor theme="night" reducedMotion={false} />);
       moving = result.container;
     });
     const movingOverlay = moving!.querySelector(
@@ -247,7 +247,7 @@ describe("LanternCursor — lights-off + fine/hover renders the lantern overlay 
     // Reduced motion → held steady, no flicker class.
     let steady: HTMLElement;
     act(() => {
-      const result = render(<LanternCursor lightsOn={false} reducedMotion={true} />);
+      const result = render(<LanternCursor theme="night" reducedMotion={true} />);
       steady = result.container;
     });
     const steadyOverlay = steady!.querySelector(
@@ -265,7 +265,7 @@ describe("LanternCursor — coarse / no-hover renders the static vignette (Req 3
   it("renders the static vignette (not the lantern) with pointer-events none and a plain radial-gradient, no mix-blend-mode", () => {
     let container: HTMLElement;
     act(() => {
-      const result = render(<LanternCursor lightsOn={false} reducedMotion={false} />);
+      const result = render(<LanternCursor theme="night" reducedMotion={false} />);
       container = result.container;
     });
 
@@ -290,7 +290,7 @@ describe("LanternCursor — pointer tracking (Req 3.2)", () => {
   });
 
   it("coalesces a pointermove burst into one frame and writes --lx/--ly relative to the overlay box", () => {
-    const { root } = renderInSceneRoot({ lightsOn: false, reducedMotion: false });
+    const { root } = renderInSceneRoot({ theme: "night", reducedMotion: false });
     const overlay = root.querySelector(
       '[data-testid="lantern-cursor"]',
     ) as HTMLElement;
@@ -322,7 +322,7 @@ describe("LanternCursor — focusin moves the light centre (Req 3.4)", () => {
   });
 
   it("writes --lx/--ly to the focused creature's bounding-box centre (relative to the overlay box)", () => {
-    const { root } = renderInSceneRoot({ lightsOn: false, reducedMotion: false });
+    const { root } = renderInSceneRoot({ theme: "night", reducedMotion: false });
     const overlay = root.querySelector(
       '[data-testid="lantern-cursor"]',
     ) as HTMLElement;
@@ -353,7 +353,7 @@ describe("LanternCursor — pointerleave eases the light home (Req: back to 50%/
   });
 
   it("resets --lx/--ly to 50% / 50% when the pointer leaves the scene root", () => {
-    const { root } = renderInSceneRoot({ lightsOn: false, reducedMotion: false });
+    const { root } = renderInSceneRoot({ theme: "night", reducedMotion: false });
     const overlay = root.querySelector(
       '[data-testid="lantern-cursor"]',
     ) as HTMLElement;

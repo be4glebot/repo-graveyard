@@ -12,6 +12,7 @@
 import { useMemo, type CSSProperties } from "react";
 import Creature from "@/components/creatures/Creature";
 import type { LifecycleState } from "@/lib/lifecycle";
+import { themeArt } from "@/lib/theme-art";
 import {
   RITUAL_WAX_BASE_PX,
   ritualCandles,
@@ -74,6 +75,7 @@ export function RitualCandles({ positions = DEFAULT_GEOMETRY.candles, lit, lean,
               <div className="ritual-flame" data-holding={holding ? "true" : undefined} />
               <div className="ritual-wick" />
               <div className="ritual-wax" />
+              <div className="ritual-holder" />
             </div>
           </div>
         );
@@ -127,7 +129,8 @@ export function RitualSmoke({ on }: { on: boolean }) {
       data-ritual-smoke=""
       data-on={on ? "true" : "false"}
       className="ritual-smoke-rise pointer-events-none absolute inset-x-0 top-[4%] h-[48%] bg-cover bg-center"
-      style={{ backgroundImage: "url(/art/fog-wisps.webp)" }}
+      // The séance is always night; no day art exists for fog.
+      style={{ backgroundImage: `url(${themeArt("night", "/art/fog-wisps.webp")})` }}
     />
   );
 }

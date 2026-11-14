@@ -31,6 +31,7 @@ import { type LifecycleState } from "@/lib/lifecycle";
 import { creatureScale, ZONE_CAP } from "@/lib/scene-view";
 import { DEPTH_ROWS } from "@/lib/estate-view";
 
+import { useTheme } from "@/components/scene/ThemeProvider";
 import Ghost from "@/components/creatures/Ghost";
 import Risen from "@/components/creatures/Risen";
 import Zombie from "@/components/creatures/Zombie";
@@ -107,6 +108,7 @@ export default function DepthRows({
   onSelect,
   filterHeroes,
 }: DepthRowsProps) {
+  const { theme } = useTheme();
   const rows = splitIntoRows(plot);
 
   return (
@@ -139,7 +141,9 @@ export default function DepthRows({
               data-row-scale={scale.toFixed(4)}
               data-row-brightness={brightness.toFixed(4)}
               className="flex flex-wrap items-end justify-center gap-10"
-              style={{ filter: `brightness(${brightness})` }}
+              style={{
+                filter: theme === "day" ? undefined : `brightness(${brightness})`,
+              }}
             >
               {rowCreatures.map((row) => {
                 const Creature = CREATURE_BY_STATE[row.state];

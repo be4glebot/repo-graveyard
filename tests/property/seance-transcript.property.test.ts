@@ -90,7 +90,13 @@ describe("seance transcript property tests", () => {
       fc.property(partial, (input) => {
         const text = buildTranscriptText(input as never);
 
-        expect(text).not.toMatch(/undefined|null/);
+        // Only flag stringified placeholders the generated input did not itself contain.
+        const inputText = JSON.stringify(input);
+        for (const word of ["undefined", "null"]) {
+          if (!inputText.includes(word)) {
+            expect(text).not.toMatch(new RegExp(word));
+          }
+        }
         expect(text).toMatch(/^[A-Za-z0-9 .,!?:\n]*$/);
         expect(text).not.toMatch(/\n\n\n/);
         expect(text).toBe(text.trim());

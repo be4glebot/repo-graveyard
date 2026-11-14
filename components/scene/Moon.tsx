@@ -27,7 +27,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTheme } from "@/components/scene/ThemeProvider";
 import { moonTreatment, summaryCounts } from "@/lib/scene-view";
+import Sun from "@/components/scene/Sun";
+import { themeArt } from "@/lib/theme-art";
 import type { GraveyardRow } from "@/lib/graveyard-view";
 
 /** Base glow blur radius (px) at zero intensity for the blood-red treatment. */
@@ -85,6 +88,7 @@ export default function Moon({
   fillParent = false,
   glowScale = 1,
 }: MoonProps) {
+  const { theme } = useTheme();
   const [imageFailed, setImageFailed] = useState(false);
   const treatment = moonTreatment(rows);
   const isBlood = treatment === "blood-red";
@@ -127,6 +131,18 @@ export default function Moon({
       }
     : undefined;
 
+  // Day: the sun replaces the moon in every mount, with the same placement.
+  if (theme === "day") {
+    return (
+      <Sun
+        className={className}
+        placement={placement}
+        fillParent={fillParent}
+        glowScale={glowScale}
+      />
+    );
+  }
+
   const showImage = !imageFailed;
   const imageSizes = placement
     ? `${Math.max(1, Math.round(placement.diameter))}px`
@@ -152,7 +168,7 @@ export default function Moon({
     >
       {showImage ? (
         <Image
-          src="/art/moon.webp"
+          src={themeArt(theme, "/art/moon.webp")}
           alt=""
           fill
           sizes={imageSizes}

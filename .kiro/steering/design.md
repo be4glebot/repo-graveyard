@@ -67,35 +67,19 @@ Every graveyard opens the same way (skippable with a "Skip" button, any key, or 
 
 | Time | Visual | Sound |
 |---|---|---|
-| 0.0 s | The **plain register** (light paper theme, same as Lights-on mode). Doubles as the loading state: "Counting the graves… N%". | fluorescent hum |
-| 1.0 s | Lights fail: overlay flickers 4 times, text jitters, copy turns sinister, the oldest rows bleed to crimson | buzz, three pops |
+| 0.0 s | The **daytime estate** (the same world in warm light, as in Lights-on mode). Doubles as the loading state: "Counting the graves… N%". | fluorescent hum |
+| 1.0 s | Lights fail: the daylight flickers 4 times, the warm wash drains, and the oldest graves bleed to crimson | buzz, three pops |
 | 2.2 s | Total black. A pair of red eyes opens center, blinks once; two smaller pairs appear in the corners. "YOU LEFT THEM HERE…" fades in (Cinzel, crimson) | silence, a held breath |
 | 3.8 s | Lightning: a white flash and bolt reveal the castle on the cliff, screen shakes ~0.5 s | thunder crack, rain begins |
 | 4.7 s | Blood moon rises behind the clouds (red only if the undead outnumber the living), castle windows light, candles light one by one, wordmark burns in | match strikes, distant bell |
 | 6.2 s | The estate appears: tombstones and coffins first, zombies rise, ghosts materialize last; summary line fades in | ambient bed (rain, wind, ravens, low organ drone) |
 
-- **Lights on** (header button) plays it in reverse: candles snuff, lights buzz back on, the plain list returns. Same data, no effects: the accessible view and the judges' verification view.
+- **Lights on** (header button) plays it in reverse: candles snuff, lights buzz back on, the daytime estate returns. Same scene, same data, same camera and selection; only the light changes. The plain register table lives on as "View as list" (see below).
 - Reduced motion: skip straight to a 300 ms crossfade, no flicker, no shake, no lightning.
 - Return visits within a session: offer "Skip intro" by default after the first view.
 
-### Lights-on must be beautiful too
-Lesson from SpookBnB (3rd overall): its normal mode was a genuinely premium page (editorial serif headline with an italic accent word, warm paper tones, soft cards), which is why the switch to darkness landed. Our Lights-on list is the "before" picture: warm paper `#f6f3ea`, ink `#1f2330`, tan accent `#a8794a`, an IM Fell headline ("Every project, *accounted for.*"), mono repo names, soft pill state tags, one soft shadow. It must look finished, never like a debug table.
-
-### The copy turns sinister (same data, darker words)
-During the flicker the plain list's words change while the data stays identical, and the scene keeps the dark vocabulary:
-
-| Lights on | Lights out |
-|---|---|
-| The estate register | The estate register · none may leave |
-| Every project, accounted for. | Every soul, bound here forever. |
-| Ghost / Zombie / Tombstone / Coffin | Restless / Undead / At rest / Sealed |
-| 3 days ago | 3 days since last breath |
-| 16 public repositories | 16 souls on this estate |
-| State | Condition |
-| Last push | Last seen alive |
-| Open issues | Unfinished business |
-| Archived | Laid to rest |
-| Sorted by last push | Ordered by when they were last seen alive |
+### Lights on is the daytime world
+Lights on shows the same world in warm light, not a different page. The day theme swaps tokens (warm haze, soft light, no fog, no lantern cursor) and keeps the camera, selection, filters and data exactly as they were. Hallowed Ground has painted day art for this pilot (ground, fence, mausoleum, fresh tombstone, foreground frame, perched and flying birds); other worlds use their night art under the day tokens. Day copy stays kind and warm: the loading, opening and dialog strings never turn dark. It must look finished and inviting, never washed out or like a debug view.
 
 ### Whispers
 Occasional italic whispers (IM Fell, dark translucent box, center of the scene) narrate real data, one at a time, at most one every ~20 s, auto-fading: "habit-tracker is still waiting for you…", "api-server grows cold…" (turning soon), "Something stirs near the crypt…" (a coffin was just sealed). Announced politely to screen readers (`role="status"`), never blocking clicks, and switchable off with motion.
@@ -120,7 +104,7 @@ A crimson notice near the top of the scene for ghosts within 30 days of turning:
 ## Scene layout
 - Layered 2D parallax: sky + moon → distant hills → cemetery fence → ground → foreground fog. Subtle parallax on mouse move.
 - Ghosts in the sky band, risen climbing between ground and sky, tombstones inside the fence, coffins in a separate crypt plot at the edge, zombies outside the fence.
-- Labels: every creature shows its repo name on hover/focus (and always in lights-on mode); the 5 most important (turning soon, newest zombies) show names by default.
+- Labels: every creature shows its repo name on hover/focus (and always in the day theme); the 5 most important (turning soon, newest zombies) show names by default.
 - **100+ repos:** never let the scene break. Cap visible creatures per zone; extras collapse into a group ("+14 more zombies") that expands into a list.
 - Mobile: the scene becomes a vertical scroll of zones (sky, cemetery, crypt, outside the fence).
 
@@ -145,7 +129,7 @@ The signature screen. When the user clicks "Summon the ghost":
 Same scene, populated from fixtures, with a small brass plaque in the corner: "Sample estate. Enter your own name at the gate." It should show every state and decay level, plus at least one perfect séance, so it doubles as the demo-video set.
 
 ## Empty, loading and error states (these get judged too)
-- Loading: the plain list's "Counting the graves… N%" state, then the lights-out opening; never a spinner.
+- Loading: the daytime estate's "Counting the graves… N%" state (warm day copy when Lights on is active), then the lights-out opening; never a spinner.
 - User with no repos: an empty, peaceful cemetery under a full moon: "Nothing buried here yet."
 - User with only ghosts: "All your projects are alive. Rare. Respect."
 - Unknown username: the gate stays locked: "No one by that name rests here."
@@ -183,7 +167,7 @@ Performance: SVG filters are costly; use them on hovered, on-screen hero creatur
 Run `/design-review` (a manual steering file) at milestones: it uses a Playwright MCP server to screenshot every key screen at desktop and mobile widths and critiques them against this file. Run `/a11y-review` for accessibility. Keep before/after screenshots in `docs/design-review/` for the write-up.
 
 ## "Lights on" mode
-A toggle (like turning on a lantern) that shows the same data as a plain, sortable table. It's for accessibility, fast scanning, and judges who want to verify the data. Same data, no effects.
+A toggle (like turning on a lantern) that shows the same scene as a daytime world: warm light, no fog or lantern cursor, painted day art where it exists, and the same data and state. The register table remains available as the "View as list" accessibility view (a dialog opened from the header and the mobile menu). It's for accessibility, fast scanning, and judges who want to verify the data.
 
 ## Sound
 - **Opt-in at the landing page:** "Enter with sound" / "In silence". That click is the user gesture that unlocks audio for the whole session (browsers block autoplay; last year's Séance solved it the same way). A speaker toggle stays in the scene header. Remember the choice in localStorage.
